@@ -1,4 +1,4 @@
-# B01 - Radiant - BE
+# 🌟 B01 - Radiant - BE
 
 SiSPA adalah solusi sistem informasi untuk mengelola dokumentasi event, data administrasi, klien, vendor, dan inventaris secara efisien. Repository ini berisi backend dari SiSPA yang dikembangkan menggunakan **Spring Boot** dengan database **PostgreSQL**.
 
