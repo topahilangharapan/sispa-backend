@@ -44,23 +44,8 @@ chmod +x init-db.sh
 ```
 
 #### **📌 Windows (Command Prompt - CMD)**
-Windows CMD tidak mendukung langsung file `.sh`, jadi gunakan salah satu cara berikut:
+Windows CMD tidak mendukung langsung file `.sh`, jadi Jalankan yang memiliki format Windows (`init-db.bat`)
 
-1. **Gunakan Git Bash atau WSL** (direkomendasikan):
-   ```cmd
-   bash init-db.sh
-   ```
-
-2. **Gunakan PowerShell**:
-   ```powershell
-   wsl sh init-db.sh
-   ```
-   atau jika menggunakan Git Bash:
-   ```powershell
-   bash init-db.sh
-   ```
-
-3. **Gunakan yang memiliki format Windows (`.bat` atau `.cmd`)** jika tidak bisa menggunakan metode di atas.
 ---
 
 ## ⚙ **Konfigurasi Profil Spring Boot**
