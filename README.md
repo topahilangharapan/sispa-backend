@@ -15,15 +15,23 @@ SiSPA adalah solusi sistem informasi untuk mengelola dokumentasi event, data adm
 ## 🛠 **Setup & Konfigurasi**
 ### 1️⃣ **Clone Repository**
 ```bash
-git clone https://github.com/PROPENSI-RADIANT/SiSPA-backend.git
-cd sispa-backend
+git clone https://gitlab.cs.ui.ac.id/propensi-2024-2025-genap/kelas-b/b01-radiant-be.git
+cd b01-radiant-be
 ```
 
 ### 2️⃣ **Konfigurasi Environment**
 Buat file `.env` berdasarkan contoh `env.example`:
+
+#### **📌 macOS & Linux**
 ```bash
 cp env.example .env
 ```
+
+#### **📌 Windows (Git Bash, WSL, atau PowerShell)**
+```bash
+copy env.example .env
+```
+
 Kemudian isi variabel sesuai kebutuhan.
 
 ### 3️⃣ **Jalankan Database dengan Docker**
