@@ -24,12 +24,12 @@ Buat file `.env` berdasarkan contoh `env.example`:
 
 #### **📌 macOS & Linux**
 ```bash
-cp env.example .env
+cp .env.example .env
 ```
 
 #### **📌 Windows (Git Bash, WSL, atau PowerShell)**
 ```bash
-copy env.example .env
+copy .env.example .env
 ```
 
 Kemudian isi variabel sesuai kebutuhan.
@@ -43,11 +43,24 @@ chmod +x init-db.sh
 ./init-db.sh
 ```
 
-#### **📌 Windows (Git Bash, WSL, atau PowerShell)**
-```bash
-sh init-db.sh
-```
+#### **📌 Windows (Command Prompt - CMD)**
+Windows CMD tidak mendukung langsung file `.sh`, jadi gunakan salah satu cara berikut:
 
+1. **Gunakan Git Bash atau WSL** (direkomendasikan):
+   ```cmd
+   bash init-db.sh
+   ```
+
+2. **Gunakan PowerShell**:
+   ```powershell
+   wsl sh init-db.sh
+   ```
+   atau jika menggunakan Git Bash:
+   ```powershell
+   bash init-db.sh
+   ```
+
+3. **Ubah skrip ke format Windows (`.bat` atau `.cmd`)** jika tidak bisa menggunakan metode di atas.
 ---
 
 ## ⚙ **Konfigurasi Profil Spring Boot**
