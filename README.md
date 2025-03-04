@@ -60,7 +60,7 @@ Windows CMD tidak mendukung langsung file `.sh`, jadi gunakan salah satu cara be
    bash init-db.sh
    ```
 
-3. **Ubah skrip ke format Windows (`.bat` atau `.cmd`)** jika tidak bisa menggunakan metode di atas.
+3. **Gunakan yang memiliki format Windows (`.bat` atau `.cmd`)** jika tidak bisa menggunakan metode di atas.
 ---
 
 ## ⚙ **Konfigurasi Profil Spring Boot**
