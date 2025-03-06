@@ -9,8 +9,10 @@ import radiant.sispa.backend.repository.RoleDb;
 import radiant.sispa.backend.restdto.request.CreateRoleRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateRoleResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
+import radiant.sispa.backend.restdto.response.GenericDataDTO;
 
 import javax.management.relation.RoleNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -50,5 +52,17 @@ public class RoleRestServiceImpl implements RoleRestService {
         responseDTO.setName(role.getRole());
 
         return responseDTO;
+    }
+
+    @Override
+    public List<GenericDataDTO> roleToGenericData(List<Role> listRole) {
+        List<GenericDataDTO> genericDataDTOs = new ArrayList<>();
+        for (Role role : listRole) {
+            GenericDataDTO genericDataDTO = new GenericDataDTO();
+            genericDataDTO.setId(role.getId());
+            genericDataDTO.setName(role.getRole());
+            genericDataDTOs.add(genericDataDTO);
+        }
+        return genericDataDTOs;
     }
 }

@@ -5,10 +5,19 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import radiant.sispa.backend.model.UserModel;
+import radiant.sispa.backend.repository.UserDb;
+import radiant.sispa.backend.restdto.request.UserRequestDTO;
+import radiant.sispa.backend.restdto.response.UserResponseDTO;
+import radiant.sispa.backend.restservice.UserRestServiceImpl;
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class JwtUtils {
@@ -20,9 +29,21 @@ public class JwtUtils {
     @Value("${manpromanpro.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    public String generateJwtToken(String username){
+    @Autowired
+    private UserRestServiceImpl userRestService;
+
+    public String generateJwtToken(String username) throws RoleNotFoundException {
+        UserRequestDTO userRequestDTO = new UserRequestDTO();
+        userRequestDTO.setUsername(username);
+
+        List<UserResponseDTO> userModels = userRestService.getUser(userRequestDTO);
+
         return Jwts.builder()
                 .subject(username)
+                .addClaims(Map.of(
+                        "role", userModels.getFirst().getRole(),
+                        "name", userModels.getFirst().getName()
+                ))
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
