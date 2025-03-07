@@ -73,7 +73,7 @@ public class VendorRestController {
     }
 
     @PutMapping("/{id}/delete")
-    public ResponseEntity<?> deleteVendor(@PathVariable UUID id) {
+    public ResponseEntity<?> deleteVendor(@PathVariable String id) {
         var baseResponseDTO = new BaseResponseDTO<List<VendorResponseDTO>>();
 
         try {

@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class VendorResponseDTO {
-    private UUID id;
+    private String id;
     private String name;
     private String contact;
     private String email;

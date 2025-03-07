@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface VendorRestService {
     List<VendorResponseDTO> getAllVendor();
 
-    void deleteVendor(UUID id) throws EntityNotFoundException;
+    void deleteVendor(String id) throws EntityNotFoundException;
 
     VendorResponseDTO addVendor(AddVendorRequestRestDTO vendorDTO, String username);
 }

@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 
-public interface VendorDb extends JpaRepository<Vendor, UUID> {
+public interface VendorDb extends JpaRepository<Vendor, String> {
     List<Vendor> findByDeletedAtNull();
 
-    Vendor findByIdAndDeletedAtNull(UUID id);
+    Vendor findByIdAndDeletedAtNull(String id);
 }

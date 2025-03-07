@@ -34,7 +34,7 @@ public class VendorRestServiceImpl implements VendorRestService {
     }
 
     @Override
-    public void deleteVendor(UUID id) throws EntityNotFoundException {
+    public void deleteVendor(String id) throws EntityNotFoundException {
         Vendor vendorToDelete = vendorDb.findByIdAndDeletedAtNull(id);
 
         if (vendorToDelete == null) {
@@ -49,7 +49,7 @@ public class VendorRestServiceImpl implements VendorRestService {
     public VendorResponseDTO addVendor(AddVendorRequestRestDTO vendorDTO, String username) {
         Vendor newVendor = new Vendor();
 
-        newVendor.setId(UUID.randomUUID());
+        newVendor.setId(generateVendorId(vendorDTO.getName()));
         newVendor.setName(vendorDTO.getName());
         newVendor.setEmail(vendorDTO.getEmail());
         newVendor.setAddress(vendorDTO.getAddress());
@@ -81,6 +81,24 @@ public class VendorRestServiceImpl implements VendorRestService {
         vendorResponseDTO.setUpdatedBy(vendor.getUpdatedBy());
         vendorResponseDTO.setDeletedAt(vendor.getDeletedAt());
         return vendorResponseDTO;
+    }
+
+    public String generateVendorId(String vendorName) {
+        String prefix = "VEN";
+
+        String[] nameParts = vendorName.split(" ");
+        String vendorInitials;
+
+        if (nameParts.length > 1) {
+            vendorInitials = (nameParts[0].substring(0, 2) + nameParts[1].substring(0, 2)).toUpperCase();
+        } else {
+            vendorInitials = nameParts[0].substring(0, 3).toUpperCase();
+        }
+
+        int totalVendor = vendorDb.findAll().size();
+        String vendorNumber = String.format("%03d", totalVendor + 1);
+
+        return prefix + vendorInitials + vendorNumber;
     }
 
 }

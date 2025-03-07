@@ -21,7 +21,7 @@ import java.util.*;
 public class Vendor {
 
     @Id
-    private UUID id = UUID.randomUUID();
+    private String id;
 
     @NotNull
     @Column(name = "name", nullable = false)
