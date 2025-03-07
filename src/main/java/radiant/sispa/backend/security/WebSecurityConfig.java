@@ -27,6 +27,8 @@ import radiant.sispa.backend.security.jwt.JwtTokenFilter;
 
 import java.io.IOException;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 
 @Configuration
 @EnableWebSecurity
@@ -42,10 +44,12 @@ public class WebSecurityConfig {
     @Order(1)
     public SecurityFilterChain jwtFilterChain(HttpSecurity http) throws Exception {
         http.securityMatcher("/api/**")
+                .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/user/add").hasAuthority("admin".toUpperCase())
                         .requestMatchers("/api/role/add").hasAuthority("admin".toUpperCase())
+                        .requestMatchers("/api/role/all").hasAuthority("admin".toUpperCase())
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -73,7 +77,7 @@ public class WebSecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception{
-        http.csrf(Customizer.withDefaults())
+        http.csrf(withDefaults())
                 .authorizeHttpRequests (requests -> requests
                         .requestMatchers (new AntPathRequestMatcher("/css/**")).permitAll()
                         .requestMatchers (new AntPathRequestMatcher("/js/**")).permitAll()

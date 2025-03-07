@@ -4,19 +4,18 @@ import jakarta.persistence.EntityExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateRoleRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateRoleResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
+import radiant.sispa.backend.restdto.response.GenericDataDTO;
 import radiant.sispa.backend.restservice.RoleRestService;
 import radiant.sispa.backend.restservice.UserRestService;
 
 import java.util.Date;
+import java.util.List;
 
 
 @RestController
@@ -47,6 +46,24 @@ public class RoleRestController {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage("Failed to create Role!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllRoles() {
+        var baseResponseDTO = new BaseResponseDTO<List<GenericDataDTO>>();
+        try {
+            List<GenericDataDTO> genericDataDTOList = roleService.roleToGenericData(roleService.getAllRoles());
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(genericDataDTOList);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(String.format("Role retrieved!"));
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve role!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

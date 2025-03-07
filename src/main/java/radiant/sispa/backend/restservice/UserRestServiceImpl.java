@@ -28,7 +28,7 @@ public class UserRestServiceImpl implements UserRestService {
     public CreateUserResponseDTO addUser(CreateUserRequestDTO requestDTO) throws RoleNotFoundException, EntityExistsException {
 
         if (!getUser(new UserRequestDTO(null, requestDTO.getEmail(), requestDTO.getUsername(), null, null)).isEmpty()) {
-            throw new EntityExistsException("User with the same username or email already exists!");
+            throw new EntityExistsException("User with the same username already exists!");
         }
 
         UserModel user = new UserModel();
@@ -82,7 +82,7 @@ public class UserRestServiceImpl implements UserRestService {
         }
 
         if (username != null) {
-            UserModel user = userDb.findByUsername(email);
+            UserModel user = userDb.findByUsername(username);
 
             if (user != null) {
                 userResponseDTOs.add(new UserResponseDTO(user.getId(), user.getEmail(), user.getUsername(), user.getName(), user.getRole().getRole()));
