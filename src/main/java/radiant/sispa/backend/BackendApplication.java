@@ -32,6 +32,7 @@ public class BackendApplication {
 			if (roleDb.findByRole("ADMIN").orElse(null) == null) {
 				Role role = new Role();
 				role.setRole("ADMIN");
+				role.setCreatedBy("hilangharapan");
 				roleDb.save(role);
 			}
 			UserModel user;
@@ -43,6 +44,7 @@ public class BackendApplication {
 				user.setUsername("admin");
 				user.setPassword(userService.hashPassword("admin"));
 				user.setRole(roleDb.findByRole("ADMIN").orElse(null));
+				user.setCreatedBy("hilangharapan");
 				userDb.save(user);
 			}
 

@@ -10,6 +10,7 @@ import radiant.sispa.backend.restdto.request.CreateRoleRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateRoleResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
+import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.ArrayList;
@@ -19,6 +20,9 @@ import java.util.List;
 public class RoleRestServiceImpl implements RoleRestService {
     @Autowired
     private RoleDb roleDb;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Override
     public List<Role> getAllRoles() {
@@ -37,7 +41,10 @@ public class RoleRestServiceImpl implements RoleRestService {
     }
 
     @Override
-    public CreateRoleResponseDTO addRole(CreateRoleRequestDTO requestDTO) throws EntityExistsException {
+    public CreateRoleResponseDTO addRole(CreateRoleRequestDTO requestDTO, String authHeader) throws EntityExistsException {
+        String token = authHeader.substring(7);
+        String createdBy = jwtUtils.getUserNameFromJwtToken(token);
+
         Role role = new Role();
 
         if (roleDb.findByRole(requestDTO.getName().toUpperCase()).orElse(null) != null) {
@@ -45,6 +52,7 @@ public class RoleRestServiceImpl implements RoleRestService {
         }
 
         role.setRole(requestDTO.getName().toUpperCase());
+        role.setCreatedBy(createdBy);
         roleDb.save(role);
 
         CreateRoleResponseDTO responseDTO = new CreateRoleResponseDTO();

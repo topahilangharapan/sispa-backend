@@ -11,10 +11,13 @@ import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
 import radiant.sispa.backend.restdto.request.UserRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
 import radiant.sispa.backend.restdto.response.UserResponseDTO;
+import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import javax.management.relation.RoleNotFoundException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserRestServiceImpl implements UserRestService {
@@ -24,12 +27,18 @@ public class UserRestServiceImpl implements UserRestService {
     @Autowired
     private RoleRestService roleService;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @Override
-    public CreateUserResponseDTO addUser(CreateUserRequestDTO requestDTO) throws RoleNotFoundException, EntityExistsException {
+    public CreateUserResponseDTO addUser(CreateUserRequestDTO requestDTO, String authHeader) throws RoleNotFoundException, EntityExistsException {
 
         if (!getUser(new UserRequestDTO(null, requestDTO.getEmail(), requestDTO.getUsername(), null, null)).isEmpty()) {
             throw new EntityExistsException("User with the same username already exists!");
         }
+
+        String token = authHeader.substring(7);
+        String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
         UserModel user = new UserModel();
         user.setEmail(requestDTO.getEmail());
@@ -37,6 +46,7 @@ public class UserRestServiceImpl implements UserRestService {
         user.setUsername(requestDTO.getUsername());
         user.setRole(roleService.getRoleByRoleName(requestDTO.getRole()));
         user.setPassword(hashPassword(requestDTO.getPassword()));
+        user.setCreatedBy(createdBy);
         userDb.save(user);
 
         CreateUserResponseDTO responseDTO = new CreateUserResponseDTO();
@@ -67,7 +77,7 @@ public class UserRestServiceImpl implements UserRestService {
             UserModel user = userDb.findById(id).orElse(null);
 
             if (user != null) {
-                userResponseDTOs.add(new UserResponseDTO(user.getId(), user.getEmail(), user.getUsername(), user.getName(), user.getRole().getRole()));
+                userResponseDTOs.add(userToUserResponseDto(user));
                 return userResponseDTOs;
             }
         }
@@ -76,7 +86,7 @@ public class UserRestServiceImpl implements UserRestService {
             UserModel user = userDb.findByEmail(email);
 
             if (user != null) {
-                userResponseDTOs.add(new UserResponseDTO(user.getId(), user.getEmail(), user.getUsername(), user.getName(), user.getRole().getRole()));
+                userResponseDTOs.add(userToUserResponseDto(user));
                 return userResponseDTOs;
             }
         }
@@ -85,7 +95,7 @@ public class UserRestServiceImpl implements UserRestService {
             UserModel user = userDb.findByUsername(username);
 
             if (user != null) {
-                userResponseDTOs.add(new UserResponseDTO(user.getId(), user.getEmail(), user.getUsername(), user.getName(), user.getRole().getRole()));
+                userResponseDTOs.add(userToUserResponseDto(user));
                 return userResponseDTOs;
             }
         }
@@ -95,7 +105,7 @@ public class UserRestServiceImpl implements UserRestService {
 
             if (users != null) {
                 for (UserModel user : users) {
-                    userResponseDTOs.add(new UserResponseDTO(user.getId(), user.getEmail(), user.getUsername(), user.getName(), user.getRole().getRole()));
+                    userResponseDTOs.add(userToUserResponseDto(user));
                 }
 
                 return userResponseDTOs;
@@ -107,7 +117,7 @@ public class UserRestServiceImpl implements UserRestService {
             List<UserModel> users = userDb.findByRole(role);
 
             for (UserModel user : users) {
-                userResponseDTOs.add(new UserResponseDTO(user.getId(), user.getEmail(), user.getUsername(), user.getName(), user.getRole().getRole()));
+                userResponseDTOs.add(userToUserResponseDto(user));
             }
 
             return userResponseDTOs;
@@ -115,4 +125,30 @@ public class UserRestServiceImpl implements UserRestService {
 
         return userResponseDTOs;
     }
+
+    public UserResponseDTO userToUserResponseDto(UserModel user) {
+        UserResponseDTO userResponseDTO = new UserResponseDTO();
+
+        userResponseDTO.setId(user.getId());
+        userResponseDTO.setEmail(user.getEmail());
+        userResponseDTO.setUsername(user.getUsername());
+        userResponseDTO.setName(user.getName());
+        userResponseDTO.setRole(user.getRole().getRole());
+        userResponseDTO.setCreatedBy(user.getCreatedBy());
+        Optional.ofNullable(user.getCreatedAt())
+                .map(Timestamp::from)
+                .ifPresent(userResponseDTO::setCreatedAt);
+        userResponseDTO.setUpdatedBy(user.getUpdatedBy());
+        Optional.ofNullable(user.getUpdatedAt())
+                .map(Timestamp::from)
+                .ifPresent(userResponseDTO::setUpdatedAt);
+        userResponseDTO.setDeletedBy(user.getDeletedBy());
+        Optional.ofNullable(user.getDeletedAt())
+                .map(Timestamp::from)
+                .ifPresent(userResponseDTO::setDeletedAt);
+
+        return userResponseDTO;
+    }
+
+
 }
