@@ -12,11 +12,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class VendorResponseDTO {
-    private UUID Id;
+    private UUID id;
     private String name;
     private String contact;
     private String email;
     private String address;
+    private String service;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Jakarta")
     private Date createdAt;
@@ -24,5 +25,9 @@ public class VendorResponseDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Jakarta")
     private Date updatedAt;
 
-    private Boolean isDeleted;
+    private String createdBy;
+    private String updatedBy;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Jakarta")
+    private Date deletedAt;
 }

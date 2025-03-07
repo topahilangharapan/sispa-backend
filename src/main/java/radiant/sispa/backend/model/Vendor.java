@@ -2,6 +2,7 @@ package radiant.sispa.backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,21 +23,25 @@ public class Vendor {
     @Id
     private UUID id = UUID.randomUUID();
 
-    @NotBlank
+    @NotNull
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank
+    @NotNull
     @Column(name = "contact", nullable = false)
     private String contact;
 
-    @NotBlank
+    @NotNull
     @Column(name = "email", nullable = false)
     private String email;
 
-    @NotBlank
+    @NotNull
     @Column(name = "address", nullable = false)
     private String address;
+
+    @NotNull
+    @Column(name = "service", nullable = false)
+    private String service;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -48,7 +53,15 @@ public class Vendor {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    @NotNull
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @NotNull
+    @Column(name = "updated_by")
+    private String updatedBy;
+
+    @Column(name = "deleted_at")
+    private Date deletedAt;
 
 }
