@@ -13,4 +13,5 @@ public class AddVendorRequestRestDTO {
     private String email;
     private String address;
     private String service;
+    private String description;
 }

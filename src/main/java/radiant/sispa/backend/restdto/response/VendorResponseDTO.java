@@ -18,6 +18,7 @@ public class VendorResponseDTO {
     private String email;
     private String address;
     private String service;
+    private String description;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Jakarta")
     private Date createdAt;

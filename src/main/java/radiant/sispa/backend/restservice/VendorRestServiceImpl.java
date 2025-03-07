@@ -55,6 +55,7 @@ public class VendorRestServiceImpl implements VendorRestService {
         newVendor.setAddress(vendorDTO.getAddress());
         newVendor.setContact(vendorDTO.getContact());
         newVendor.setService(vendorDTO.getService());
+        newVendor.setDescription(vendorDTO.getDescription());
         newVendor.setCreatedAt(new Date());
         newVendor.setUpdatedAt(new Date());
         newVendor.setUpdatedBy(username);
@@ -73,6 +74,7 @@ public class VendorRestServiceImpl implements VendorRestService {
         vendorResponseDTO.setAddress(vendor.getAddress());
         vendorResponseDTO.setEmail(vendor.getEmail());
         vendorResponseDTO.setService(vendor.getService());
+        vendorResponseDTO.setDescription(vendor.getDescription());
         vendorResponseDTO.setCreatedAt(vendor.getCreatedAt());
         vendorResponseDTO.setUpdatedAt(vendor.getUpdatedAt());
         vendorResponseDTO.setCreatedBy(vendor.getCreatedBy());

@@ -43,6 +43,10 @@ public class Vendor {
     @Column(name = "service", nullable = false)
     private String service;
 
+    @NotNull
+    @Column(name = "description", nullable = false)
+    private String description;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false, nullable = false)
