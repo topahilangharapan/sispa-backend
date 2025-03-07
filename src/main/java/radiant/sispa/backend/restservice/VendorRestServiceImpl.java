@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Vendor;
 import radiant.sispa.backend.repository.VendorDb;
 import radiant.sispa.backend.restdto.request.AddVendorRequestRestDTO;
+import radiant.sispa.backend.restdto.request.UpdateVendorRequestRestDTO;
 import radiant.sispa.backend.restdto.response.VendorResponseDTO;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -99,6 +99,35 @@ public class VendorRestServiceImpl implements VendorRestService {
         String vendorNumber = String.format("%03d", totalVendor + 1);
 
         return prefix + vendorInitials + vendorNumber;
+    }
+
+    @Override
+    public VendorResponseDTO updateVendor(String id, UpdateVendorRequestRestDTO vendorDTO) {
+        Vendor vendor = vendorDb.findById(id).orElse(null);
+        if (vendor == null || vendor.getDeletedAt() != null){
+            return null;
+        }
+
+        vendor.setName(vendorDTO.getName());
+        vendor.setContact(vendorDTO.getContact());
+        vendor.setAddress(vendorDTO.getAddress());
+        vendor.setEmail(vendorDTO.getEmail());
+        vendor.setService(vendorDTO.getService());
+        vendor.setDescription(vendorDTO.getDescription());
+
+        Vendor updatedVendor = vendorDb.save(vendor);
+        return vendorToVendorResponseDTO(updatedVendor);
+    }
+
+    @Override
+    public VendorResponseDTO getVendorById(String id) {
+        Vendor vendor = vendorDb.findById(id).orElse(null);
+
+        if (vendor == null || vendor.getDeletedAt() != null){
+            return null;
+        }
+
+        return vendorToVendorResponseDTO(vendor);
     }
 
 }
