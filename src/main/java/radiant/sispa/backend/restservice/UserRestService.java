@@ -9,7 +9,7 @@ import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 
 public interface UserRestService {
-    CreateUserResponseDTO addUser(CreateUserRequestDTO createUserRequestDTO) throws RoleNotFoundException;
+    CreateUserResponseDTO addUser(CreateUserRequestDTO createUserRequestDTO, String authHeader) throws RoleNotFoundException;
     String hashPassword(String password);
     List<UserResponseDTO> getUser(UserRequestDTO userRequestDTO) throws RoleNotFoundException;
 }

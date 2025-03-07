@@ -25,10 +25,12 @@ public class RoleRestController {
     RoleRestService roleService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody CreateRoleRequestDTO roleRequestDTO) {
+    public ResponseEntity<?> addUser(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody CreateRoleRequestDTO roleRequestDTO) {
         var baseResponseDTO = new BaseResponseDTO<CreateRoleRequestDTO>();
         try {
-            CreateRoleResponseDTO roleResponseDTO = roleService.addRole(roleRequestDTO);
+            CreateRoleResponseDTO roleResponseDTO = roleService.addRole(roleRequestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(roleRequestDTO);
             baseResponseDTO.setTimestamp(new Date());

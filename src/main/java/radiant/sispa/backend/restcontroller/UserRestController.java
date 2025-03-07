@@ -1,6 +1,7 @@
 package radiant.sispa.backend.restcontroller;
 
 import jakarta.persistence.EntityExistsException;
+import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
 import radiant.sispa.backend.restdto.request.UserRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
@@ -10,10 +11,6 @@ import radiant.sispa.backend.restservice.UserRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.Date;
@@ -27,10 +24,13 @@ public class UserRestController {
     UserRestService userService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody CreateUserRequestDTO userRequestDTO) {
+    public ResponseEntity<?> addUser(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody CreateUserRequestDTO userRequestDTO) {
         var baseResponseDTO = new BaseResponseDTO<CreateUserResponseDTO>();
+
         try {
-            CreateUserResponseDTO userResponseDTO = userService.addUser(userRequestDTO);
+            CreateUserResponseDTO userResponseDTO = userService.addUser(userRequestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(userResponseDTO);
             baseResponseDTO.setTimestamp(new Date());
@@ -53,7 +53,7 @@ public class UserRestController {
     }
 
     @PostMapping("/get")
-    public ResponseEntity<?> addUser(@RequestBody UserRequestDTO userRequestDTO) {
+    public ResponseEntity<?> getUser(@RequestBody UserRequestDTO userRequestDTO) {
         var baseResponseDTO = new BaseResponseDTO<List<UserResponseDTO>>();
         try {
             List<UserResponseDTO> userResponseDTO = userService.getUser(userRequestDTO);
