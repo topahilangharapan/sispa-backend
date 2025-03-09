@@ -9,32 +9,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import radiant.sispa.backend.restdto.request.AddVendorRequestRestDTO;
-import radiant.sispa.backend.restdto.request.UpdateVendorRequestRestDTO;
+import radiant.sispa.backend.restdto.request.AddClientRequestRestDTO;
+import radiant.sispa.backend.restdto.request.UpdateClientRequestRestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.VendorResponseDTO;
-import radiant.sispa.backend.restservice.VendorRestService;
+import radiant.sispa.backend.restdto.response.ClientResponseDTO;
+import radiant.sispa.backend.restservice.ClientRestService;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-
-
 @RestController
-@RequestMapping("/api/vendor")
-public class VendorRestController {
+@RequestMapping("/api/client")
+public class ClientRestController {
     @Autowired
-    VendorRestService vendorRestService;
+    ClientRestService clientRestService;
 
     @Autowired
     JwtUtils jwtUtils;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addVendor(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @Valid @RequestBody AddVendorRequestRestDTO vendorDTO, BindingResult bindingResult) {
-        var baseResponseDTO = new BaseResponseDTO<VendorResponseDTO>();
+    public ResponseEntity<?> addClient(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @Valid @RequestBody AddClientRequestRestDTO clientDTO, BindingResult bindingResult) {
+        var baseResponseDTO = new BaseResponseDTO<ClientResponseDTO>();
 
         String token = "";
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
@@ -54,36 +51,24 @@ public class VendorRestController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
         }
 
-        VendorResponseDTO vendor = vendorRestService.addVendor(vendorDTO, jwtUtils.getUserNameFromJwtToken(token));
+        ClientResponseDTO client = clientRestService.addClient(clientDTO, jwtUtils.getUserNameFromJwtToken(token));
 
         baseResponseDTO.setStatus(HttpStatus.CREATED.value());
-        baseResponseDTO.setData(vendor);
-        baseResponseDTO.setMessage(String.format("Berhasil menambahkan vendor dengan ID %s", vendor.getId()));
+        baseResponseDTO.setData(client);
+        baseResponseDTO.setMessage(String.format("Berhasil menambahkan klien dengan ID %s", client.getId()));
         baseResponseDTO.setTimestamp(new Date());
 
         return new ResponseEntity<>(baseResponseDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping("/viewall")
-    public ResponseEntity<BaseResponseDTO<List<VendorResponseDTO>>> listVendor() {
-        List<VendorResponseDTO> listVendor = vendorRestService.getAllVendor();
-
-        var baseResponseDTO = new BaseResponseDTO<List<VendorResponseDTO>>();
-        baseResponseDTO.setStatus(HttpStatus.OK.value());
-        baseResponseDTO.setData(listVendor);
-        baseResponseDTO.setMessage("Berhasil mengambil daftar vendor");
-        baseResponseDTO.setTimestamp(new Date());
-        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
-    }
-
     @PutMapping("/{id}/delete")
-    public ResponseEntity<?> deleteVendor(@PathVariable String id) {
-        var baseResponseDTO = new BaseResponseDTO<List<VendorResponseDTO>>();
+    public ResponseEntity<?> deleteClient(@PathVariable String id) {
+        var baseResponseDTO = new BaseResponseDTO<List<ClientResponseDTO>>();
 
         try {
-            vendorRestService.deleteVendor(id);
+            clientRestService.deleteClient(id);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
-            baseResponseDTO.setMessage(String.format("Berhasil menghapus vendor dengan ID %s", id));
+            baseResponseDTO.setMessage(String.format("Berhasil menghapus klien dengan ID %s", id));
             baseResponseDTO.setTimestamp(new Date());
 
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
@@ -103,8 +88,8 @@ public class VendorRestController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateVendor(@Valid @RequestBody UpdateVendorRequestRestDTO vendorDTO, BindingResult bindingResult) {
-        var baseResponseDTO = new BaseResponseDTO<VendorResponseDTO>();
+    public ResponseEntity<?> updateClient(@Valid @RequestBody UpdateClientRequestRestDTO clientDTO, BindingResult bindingResult) {
+        var baseResponseDTO = new BaseResponseDTO<ClientResponseDTO>();
 
         if (bindingResult.hasFieldErrors()) {
             String errorMessages = bindingResult.getFieldErrors()
@@ -118,32 +103,31 @@ public class VendorRestController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
         }
         
-        VendorResponseDTO updatedVendor = vendorRestService.updateVendor(vendorDTO.getId(), vendorDTO);
+        ClientResponseDTO updatedClient = clientRestService.updateClient(clientDTO.getId(), clientDTO);
 
-        if (updatedVendor == null){
+        if (updatedClient == null){
             baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
-            baseResponseDTO.setMessage("Vendor not found or cannot be updated");
+            baseResponseDTO.setMessage("Client not found or cannot be updated");
             baseResponseDTO.setTimestamp(new Date());
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
         }
 
         baseResponseDTO.setStatus(HttpStatus.OK.value());
-        baseResponseDTO.setMessage(String.format("Vendor with ID %s has been updated", updatedVendor.getId()));
+        baseResponseDTO.setMessage(String.format("Client with ID %s has been updated", updatedClient.getId()));
         baseResponseDTO.setTimestamp(new Date());
-        baseResponseDTO.setData(updatedVendor);
+        baseResponseDTO.setData(updatedClient);
 
         return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
-
-
+    
     @GetMapping("/{id}")
-    public ResponseEntity<?> getVendorById(@PathVariable("id") String id) {
-        var baseResponseDTO = new BaseResponseDTO<VendorResponseDTO>();
-        VendorResponseDTO vendor = vendorRestService.getVendorById(id);
+    public ResponseEntity<?> getClientById(@PathVariable("id") String id) {
+        var baseResponseDTO = new BaseResponseDTO<ClientResponseDTO>();
+        ClientResponseDTO client = clientRestService.getClientById(id);
 
-        if (vendor == null){
+        if (client == null){
             baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
-            baseResponseDTO.setMessage("Vendor not found");
+            baseResponseDTO.setMessage("Client not found");
             baseResponseDTO.setTimestamp(new Date());
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
         }
@@ -151,11 +135,21 @@ public class VendorRestController {
         baseResponseDTO.setStatus(HttpStatus.OK.value());
         baseResponseDTO.setMessage("Success");
         baseResponseDTO.setTimestamp(new Date());
-        baseResponseDTO.setData(vendor);
+        baseResponseDTO.setData(client);
 
         return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
-    
 
+    @GetMapping("/viewall")
+    public ResponseEntity<BaseResponseDTO<List<ClientResponseDTO>>> listClient() {
+        List<ClientResponseDTO> listClient = clientRestService.getAllClient();
+
+        var baseResponseDTO = new BaseResponseDTO<List<ClientResponseDTO>>();
+        baseResponseDTO.setStatus(HttpStatus.OK.value());
+        baseResponseDTO.setData(listClient);
+        baseResponseDTO.setMessage("Berhasil mengambil daftar client");
+        baseResponseDTO.setTimestamp(new Date());
+        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+    }
 
 }
