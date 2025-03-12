@@ -51,6 +51,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/role/add").hasAuthority("admin".toUpperCase())
                         .requestMatchers("/api/role/all").hasAuthority("admin".toUpperCase())
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/vendor/**").permitAll()
+                        .requestMatchers("/api/client/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
