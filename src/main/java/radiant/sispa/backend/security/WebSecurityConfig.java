@@ -50,6 +50,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/user/add").hasAuthority("admin".toUpperCase())
                         .requestMatchers("/api/role/add").hasAuthority("admin".toUpperCase())
                         .requestMatchers("/api/role/all").hasAuthority("admin".toUpperCase())
+                        .requestMatchers("/api/purchase-order/sample").permitAll()
+                        .requestMatchers("/api/purchase-order/create").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
