@@ -3,9 +3,11 @@ package radiant.sispa.backend.restcontroller;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
+import radiant.sispa.backend.restdto.request.UserProfileRequestDTO;
 import radiant.sispa.backend.restdto.request.UserRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
+import radiant.sispa.backend.restdto.response.UserProfileResponseDTO;
 import radiant.sispa.backend.restdto.response.UserResponseDTO;
 import radiant.sispa.backend.restservice.UserRestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +75,26 @@ public class UserRestController {
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage("Failed to retrieve User!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/update-profile")
+    public ResponseEntity<?> updateUserProfile(@RequestBody UserRequestDTO userRequestDTO,
+                                               @RequestBody UserProfileRequestDTO profileRequestDTO) {
+        var baseResponseDTO = new BaseResponseDTO<UserProfileResponseDTO>();
+
+        try {
+            UserProfileResponseDTO updatedProfile = userService.updateUserProfile(userRequestDTO, profileRequestDTO);
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(updatedProfile);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("User profile updated successfully!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
         }
     }
 }

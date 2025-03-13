@@ -49,6 +49,12 @@ public class UserModel implements Serializable {
     @JsonIgnore
     private Role role;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false, nullable = false)
