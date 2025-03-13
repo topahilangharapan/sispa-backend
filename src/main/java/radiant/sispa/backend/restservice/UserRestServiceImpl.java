@@ -8,8 +8,10 @@ import radiant.sispa.backend.model.Role;
 import radiant.sispa.backend.model.UserModel;
 import radiant.sispa.backend.repository.UserDb;
 import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
+import radiant.sispa.backend.restdto.request.UserProfileRequestDTO;
 import radiant.sispa.backend.restdto.request.UserRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
+import radiant.sispa.backend.restdto.response.UserProfileResponseDTO;
 import radiant.sispa.backend.restdto.response.UserResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
@@ -148,6 +150,29 @@ public class UserRestServiceImpl implements UserRestService {
                 .ifPresent(userResponseDTO::setDeletedAt);
 
         return userResponseDTO;
+    }
+
+    @Override
+    public UserProfileResponseDTO updateUserProfile(UserRequestDTO userRequestDTO, UserProfileRequestDTO profileRequestDTO) {
+        Optional<UserModel> optionalUser = userDb.findById(userRequestDTO.getId());
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        UserModel user = optionalUser.get();
+        user.setEmail(profileRequestDTO.getEmail());
+        user.setName(profileRequestDTO.getName());
+        user.setAddress(profileRequestDTO.getAddress());
+        user.setPhoneNumber(profileRequestDTO.getPhoneNumber());
+
+        userDb.save(user);
+
+        return new UserProfileResponseDTO(
+                user.getEmail(),
+                user.getName(),
+                user.getAddress(),
+                user.getPhoneNumber()
+        );
     }
 
 
