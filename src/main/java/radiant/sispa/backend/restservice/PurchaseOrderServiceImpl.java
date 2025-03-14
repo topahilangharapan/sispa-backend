@@ -12,6 +12,8 @@ import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.repository.PurchaseOrderItemDb;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
+import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.InputStream;
@@ -232,6 +234,72 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         }
 
         return result.trim();
+    }
+
+    @Override
+    public List<PurchaseOrderResponseDTO> getAllPurchaseOrders() {
+        List<PurchaseOrder> purchaseOrders = purchaseOrderDb.findAll();
+        
+        // Convert each to a response DTO
+        List<PurchaseOrderResponseDTO> result = new ArrayList<>();
+        for (PurchaseOrder po : purchaseOrders) {
+            result.add(convertToResponse(po));
+        }
+        return result;
+    }
+
+    @Override
+    public PurchaseOrderResponseDTO getPurchaseOrderById(Long id) {
+        PurchaseOrder po = purchaseOrderDb.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+        return convertToResponse(po);
+    }
+
+    @Override
+    public void deletePurchaseOrder(Long id) {
+        PurchaseOrder po = purchaseOrderDb.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+
+        // If you want to do "soft delete," set 'deletedAt' and 'deletedBy' instead
+        // For a real physical delete:
+        purchaseOrderDb.delete(po);
+    }
+
+    /**
+     * Helper method to convert a PurchaseOrder entity into a PurchaseOrderResponseDTO
+     */
+    private PurchaseOrderResponseDTO convertToResponse(PurchaseOrder entity) {
+        PurchaseOrderResponseDTO dto = new PurchaseOrderResponseDTO();
+        dto.setId(entity.getId());
+        dto.setCompanyName(entity.getCompanyName());
+        dto.setCompanyAddress(entity.getCompanyAddress());
+        dto.setNoPo(entity.getNoPo());
+        dto.setDateCreated(entity.getDateCreated());
+        dto.setTotal(entity.getTotal());
+        dto.setSpelledOut(entity.getSpelledOut());
+        dto.setTerms(entity.getTerms());
+        dto.setPlaceSigned(entity.getPlaceSigned());
+        dto.setDateSigned(entity.getDateSigned());
+        dto.setSignee(entity.getSignee());
+
+        // Convert items
+        List<PurchaseOrderItemResponseDTO> itemDTOs = new ArrayList<>();
+        if (entity.getItems() != null) {
+            for (PurchaseOrderItem item : entity.getItems()) {
+                PurchaseOrderItemResponseDTO itemDTO = new PurchaseOrderItemResponseDTO();
+                itemDTO.setId(item.getId());
+                itemDTO.setTitle(item.getTitle());
+                itemDTO.setVolume(item.getVolume());
+                itemDTO.setUnit(item.getUnit());
+                itemDTO.setPricePerUnit(item.getPricePerUnit());
+                itemDTO.setSum(item.getSum());
+                itemDTO.setDescription(item.getDescription());
+                itemDTOs.add(itemDTO);
+            }
+        }
+        dto.setItems(itemDTOs);
+
+        return dto;
     }
 
 }
