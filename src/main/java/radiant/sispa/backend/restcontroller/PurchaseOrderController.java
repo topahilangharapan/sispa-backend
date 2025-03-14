@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.restservice.PurchaseOrderService;
 
 import java.util.*;
@@ -73,4 +74,72 @@ public class PurchaseOrderController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllPurchaseOrders() {
+        var baseResponseDTO = new BaseResponseDTO<List<PurchaseOrderResponseDTO>>();
+        try {
+            List<PurchaseOrderResponseDTO> allOrders = purchaseOrderService.getAllPurchaseOrders();
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(allOrders);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("List of purchase orders retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve purchase orders!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPurchaseOrderDetail(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<PurchaseOrderResponseDTO>();
+        try {
+            PurchaseOrderResponseDTO purchaseOrder = purchaseOrderService.getPurchaseOrderById(id);
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(purchaseOrder);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Purchase order retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve purchase order detail!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePurchaseOrder(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<String>();
+        try {
+            purchaseOrderService.deletePurchaseOrder(id);
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData("Deleted");
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Purchase order deleted successfully!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to delete purchase order!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

@@ -17,6 +17,7 @@ import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import javax.management.relation.RoleNotFoundException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -160,19 +161,38 @@ public class UserRestServiceImpl implements UserRestService {
         }
 
         UserModel user = optionalUser.get();
+
+        // Existing updates
         user.setEmail(profileRequestDTO.getEmail());
         user.setName(profileRequestDTO.getName());
         user.setAddress(profileRequestDTO.getAddress());
         user.setPhoneNumber(profileRequestDTO.getPhoneNumber());
 
+        // NEW: placeOfBirth
+        if (profileRequestDTO.getPlaceOfBirth() != null) {
+            user.setPlaceOfBirth(profileRequestDTO.getPlaceOfBirth());
+        }
+
+        // NEW: dateOfBirth
+        // The dateOfBirth is a String in the request. We can parse it:
+        if (profileRequestDTO.getDateOfBirth() != null) {
+            // e.g. "2025-03-14"
+            user.setDateOfBirth(LocalDate.parse(profileRequestDTO.getDateOfBirth()));
+            // you could handle exceptions if the format is invalid
+        }
+
         userDb.save(user);
 
-        return new UserProfileResponseDTO(
-                user.getEmail(),
-                user.getName(),
-                user.getAddress(),
-                user.getPhoneNumber()
-        );
+        // Return the updated user
+        UserProfileResponseDTO response = new UserProfileResponseDTO();
+        response.setEmail(user.getEmail());
+        response.setName(user.getName());
+        response.setAddress(user.getAddress());
+        response.setPhoneNumber(user.getPhoneNumber());
+        response.setPlaceOfBirth(user.getPlaceOfBirth());
+        response.setDateOfBirth(user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : null);
+
+        return response;
     }
 
 

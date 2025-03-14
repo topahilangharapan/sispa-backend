@@ -3,6 +3,7 @@ package radiant.sispa.backend.restcontroller;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
+import radiant.sispa.backend.restdto.request.UpdateProfileRequestDTO;
 import radiant.sispa.backend.restdto.request.UserProfileRequestDTO;
 import radiant.sispa.backend.restdto.request.UserRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
@@ -79,12 +80,15 @@ public class UserRestController {
     }
 
     @PutMapping("/update-profile")
-    public ResponseEntity<?> updateUserProfile(@RequestBody UserRequestDTO userRequestDTO,
-                                               @RequestBody UserProfileRequestDTO profileRequestDTO) {
+    public ResponseEntity<?> updateUserProfile(@RequestBody UpdateProfileRequestDTO updateProfileRequest) {
         var baseResponseDTO = new BaseResponseDTO<UserProfileResponseDTO>();
-
+    
         try {
+            UserRequestDTO userRequestDTO = updateProfileRequest.getUserRequestDTO();
+            UserProfileRequestDTO profileRequestDTO = updateProfileRequest.getProfileRequestDTO();
+    
             UserProfileResponseDTO updatedProfile = userService.updateUserProfile(userRequestDTO, profileRequestDTO);
+    
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(updatedProfile);
             baseResponseDTO.setTimestamp(new Date());
