@@ -17,6 +17,7 @@ import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.InputStream;
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -58,16 +59,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
                 row.put("no", String.valueOf(count++));
                 row.put("uraianJudul", purchaseOrderItem.getTitle());
-                row.put("volume", String.valueOf(purchaseOrderItem.getVolume()));
+                row.put("volume", formatWithThousandSeparator(purchaseOrderItem.getVolume()));
                 row.put("satuan", purchaseOrderItem.getUnit());
-                row.put("hargaSatuan", String.valueOf(purchaseOrderItem.getPricePerUnit()));
-                row.put("jumlah", String.valueOf(purchaseOrderItem.getSum()));
+                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getSum()));
                 row.put("blank", "");
                 row.put("uraianDeskripsi", purchaseOrderItem.getDescription());
 
                 data.add(row);
             }
-
 
             if (purchaseOrder.getItems().isEmpty()) {
                 Map<String, Object> row = new HashMap<>();
@@ -92,12 +92,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             parameters.put("alamatPerusahaan", purchaseOrder.getCompanyAddress());
             parameters.put("tanggalDibuat", purchaseOrder.getDateCreated());
             parameters.put("noPo", purchaseOrder.getNoPo());
-            parameters.put("total", String.valueOf(purchaseOrder.getTotal()));
+            parameters.put("total", formatWithThousandSeparator(purchaseOrder.getTotal()));
             parameters.put("terbilang", purchaseOrder.getSpelledOut());
             parameters.put("ketentuan", purchaseOrder.getTerms());
             parameters.put("tempat", purchaseOrder.getPlaceSigned());
             parameters.put("tanggalDitandatangani", purchaseOrder.getDateSigned());
-            parameters.put("tandaTangan", "static/images/ttd-po.jpg");
+            parameters.put("tandaTangan", "static/images/ttd_po.jpg");
             parameters.put("yangMenandatangani", purchaseOrder.getSignee());
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
@@ -107,7 +107,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
             CreatePurchaseOrderResponseDTO createPurchaseOrderResponseDTO = new CreatePurchaseOrderResponseDTO();
             createPurchaseOrderResponseDTO.setPdf(pdfBytes);
-            createPurchaseOrderResponseDTO.setFileName(purchaseOrder.getNoPo());
+            createPurchaseOrderResponseDTO.setFileName(purchaseOrder.getFileName());
 
             return createPurchaseOrderResponseDTO;
 
@@ -138,6 +138,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setPlaceSigned(createPurchaseOrderRequestDTO.getPlaceSigned());
         purchaseOrder.setDateSigned(createPurchaseOrderRequestDTO.getDateSigned());
         purchaseOrder.setSignee(createPurchaseOrderRequestDTO.getSignee());
+        purchaseOrder.setFileName(createFileName(purchaseOrder));
 
         return purchaseOrderDb.save(purchaseOrder);
     }
@@ -174,7 +175,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
         String formattedDate = today.format(formatter);
 
-        return String.format("PO/%s/%s/%s_%s", numberOfPurchaseOrdersToday, companyAbbreviation, formattedDate, createPurchaseOrderRequestDTO.getCompanyName());
+        return String.format("PO/%s/%s/%s", numberOfPurchaseOrdersToday, companyAbbreviation, formattedDate);
+    }
+
+    private String createFileName(PurchaseOrder purchaseOrder) {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
+        String formattedDate = today.format(formatter);
+
+        return String.format("%s_%s", purchaseOrder.getNoPo(), formattedDate);
     }
 
     public String getAbbreviation(String companyName) {
@@ -235,6 +244,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         return result.trim();
     }
+
+    private static String formatWithThousandSeparator(long number) {
+        NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+        return formatter.format(number);
+    }
+
 
     @Override
     public List<PurchaseOrderResponseDTO> getAllPurchaseOrders() {
