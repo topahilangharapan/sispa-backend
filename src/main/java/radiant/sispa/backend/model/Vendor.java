@@ -43,7 +43,6 @@ public class Vendor {
     @Column(name = "service", nullable = false)
     private String service;
 
-    @NotNull
     @Column(name = "description", nullable = false)
     private String description;
 
