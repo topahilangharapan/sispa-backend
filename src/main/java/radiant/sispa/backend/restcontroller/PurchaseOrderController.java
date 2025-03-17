@@ -2,11 +2,14 @@ package radiant.sispa.backend.restcontroller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
@@ -27,15 +30,20 @@ public class PurchaseOrderController {
 //        return purchaseOrderService.generatePdfReport();
 //    }
 
-//    @PostMapping("/create")
-//    public ResponseEntity<?> createPdfReport(
-//            @Valid
-//            @RequestHeader(value = "Authorization", required = false) String authHeader,
-//            @RequestBody CreatePurchaseOrderDTO createPurchaseOrderDTO,
-//            BindingResult bindingResult) {
-//
-//        return purchaseOrderService.generatePdfReport(createPurchaseOrderDTO, authHeader);
-//    }
+    @PostMapping("/test/create")
+    public ResponseEntity<byte[]> createPdfReportTest(
+            @Valid
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO,
+            BindingResult bindingResult) {
+
+        byte[] pdfBytes = purchaseOrderService.generatePdfReport(createPurchaseOrderRequestDTO, authHeader).getPdf();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=invoice.pdf") // Menampilkan langsung di Postman
+                .body(pdfBytes);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<?> createPdfReport(

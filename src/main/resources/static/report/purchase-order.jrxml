@@ -100,7 +100,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="true" isItalic="true" isUnderline="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Up " +  $P{perusahaan}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Up. " +  $P{perusahaan}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement mode="Transparent" x="254" y="90" width="54" height="16" forecolor="#030000" backcolor="#65161D" uuid="4be8f942-efd1-411c-af30-fc89cabc5e33"/>
@@ -133,7 +133,7 @@
 	<columnHeader>
 		<band height="16">
 			<staticText>
-				<reportElement mode="Opaque" x="1" y="-1" width="30" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="d6e8d785-ac07-40c3-98c2-2a3b99b4fba9"/>
+				<reportElement mode="Opaque" x="1" y="0" width="30" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="d6e8d785-ac07-40c3-98c2-2a3b99b4fba9"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineColor="#030000"/>
 					<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#030000"/>
@@ -147,7 +147,7 @@
 				<text><![CDATA[No.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="30" y="-1" width="170" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="d10216fc-0596-4817-87ae-01a07a735f89"/>
+				<reportElement mode="Opaque" x="30" y="0" width="170" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="d10216fc-0596-4817-87ae-01a07a735f89"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineColor="#030000"/>
 					<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#030000"/>
@@ -161,7 +161,7 @@
 				<text><![CDATA[Uraian]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="230" y="-1" width="30" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="4550cff9-a9f0-4d83-aad3-817c2e778a50"/>
+				<reportElement mode="Opaque" x="230" y="0" width="30" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="4550cff9-a9f0-4d83-aad3-817c2e778a50"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineColor="#030000"/>
 					<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#030000"/>
@@ -175,7 +175,7 @@
 				<text><![CDATA[Sat.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="200" y="-1" width="30" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="1071dfb3-618e-42fa-8239-274d4bc705bf"/>
+				<reportElement mode="Opaque" x="200" y="0" width="30" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="1071dfb3-618e-42fa-8239-274d4bc705bf"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineColor="#030000"/>
 					<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#030000"/>
@@ -189,7 +189,7 @@
 				<text><![CDATA[Vol.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="260" y="-1" width="100" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="ad44ac55-4b1f-4b6c-92da-28d6ddfd7193"/>
+				<reportElement mode="Opaque" x="260" y="0" width="100" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="ad44ac55-4b1f-4b6c-92da-28d6ddfd7193"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineColor="#030000"/>
 					<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#030000"/>
@@ -203,7 +203,7 @@
 				<text><![CDATA[Hrg.Sat.(Rp.)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="360" y="-1" width="98" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="b60b01cc-8ad0-4062-8fbb-939664049d4a">
+				<reportElement mode="Opaque" x="360" y="0" width="98" height="16" forecolor="#FFFFFF" backcolor="#65161D" uuid="b60b01cc-8ad0-4062-8fbb-939664049d4a">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<box padding="1">
