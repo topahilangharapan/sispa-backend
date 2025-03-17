@@ -10,6 +10,7 @@ import radiant.sispa.backend.repository.ClientDb;
 import radiant.sispa.backend.restdto.request.AddClientRequestRestDTO;
 import radiant.sispa.backend.restdto.request.UpdateClientRequestRestDTO;
 import radiant.sispa.backend.restdto.response.ClientResponseDTO;
+import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,6 +22,9 @@ public class ClientRestServiceImpl implements ClientRestService {
 
     @Autowired
     ClientDb clientDb;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Override
     public void deleteClient(String id) throws EntityNotFoundException {
@@ -35,7 +39,15 @@ public class ClientRestServiceImpl implements ClientRestService {
     }
 
     @Override
-    public ClientResponseDTO addClient(AddClientRequestRestDTO clientDTO, String username) {
+    public ClientResponseDTO addClient(AddClientRequestRestDTO clientDTO, String username) throws IllegalArgumentException {
+
+        List<Client> existingClient = clientDb.findByNameAndContact(clientDTO.getName(), clientDTO.getContact());
+
+        for (var client : existingClient) {
+            if (client.getName().equals(clientDTO.getName()) && client.getContact().equals(clientDTO.getContact())) {
+                throw new IllegalArgumentException("Klien dengan nama dan kontak ini sudah terdaftar.");
+            }
+        }
         Client newClient = new Client();
 
         newClient.setId(generateClientId(clientDTO.getName()));
