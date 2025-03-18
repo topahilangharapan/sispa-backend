@@ -9,4 +9,6 @@ public interface ClientDb extends JpaRepository<Client, String> {
     List<Client> findByDeletedAtNull();
 
     Client findByIdAndDeletedAtNull(String id);
+
+    List<Client> findByNameAndContact(String name, String contact);
 }

@@ -43,7 +43,6 @@ public class Client {
     @Column(name = "industry", nullable = false)
     private String industry;
 
-    @NotNull
     @Column(name = "description", nullable = false)
     private String description;
 
