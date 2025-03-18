@@ -15,6 +15,8 @@ public class CreatePurchaseOrderRequestDTO {
 
     private String companyAddress;
 
+    private String receiver;
+
     private List<Map<String, String>> items;
 
     private String terms;
