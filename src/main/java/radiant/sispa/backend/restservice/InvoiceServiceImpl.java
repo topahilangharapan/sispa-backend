@@ -55,11 +55,9 @@ public class InvoiceServiceImpl implements InvoiceService {
                 throw new FileNotFoundException("Purchase Order tidak ditemukan.");
             }
 
-            System.out.println(purchaseOrder);
 
             Invoice invoice = createInvoiceToInvoice(createInvoiceRequestDTO, purchaseOrder, createdBy);
 
-            System.out.println(invoice);
 
             InputStream reportStream = new ClassPathResource("/static/report/invoice.jrxml").getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
