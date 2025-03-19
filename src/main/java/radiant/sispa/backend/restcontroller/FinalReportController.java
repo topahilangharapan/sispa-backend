@@ -20,6 +20,7 @@ import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
 import radiant.sispa.backend.restservice.FinalReportService;
 import radiant.sispa.backend.restservice.InvoiceService;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -35,20 +36,21 @@ public class FinalReportController {
     private ImageDb imageDb;
 
 
-//    @PostMapping("/test/create")
-//    public ResponseEntity<byte[]> createPdfReportTest(
-//            @Valid
-//            @RequestHeader(value = "Authorization", required = false) String authHeader,
-//            @RequestParam("data") String data,
-//            @RequestPart("images") List<MultipartFile> images) {
-//
-//        byte[] pdfBytes = finalReportService.generatePdfReport(data, images, authHeader).getPdf();
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.APPLICATION_PDF)
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=final_report.pdf") // Menampilkan langsung di Postman
-//                .body(pdfBytes);
-//    }
+    @PostMapping("/test/create")
+    public ResponseEntity<byte[]> createPdfReportTest(
+            @Valid
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestParam("data") String data,
+            @RequestPart("images") List<MultipartFile> images) throws IOException {
+
+        CreateFinalReportRequestDTO createFinalReportRequestDTO = finalReportService.convertToCreateFinalReportRequestDTO(data, images, authHeader);
+        byte[] pdfBytes = finalReportService.generatePdfReport(createFinalReportRequestDTO, authHeader).getPdf();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=final_report.pdf") // Menampilkan langsung di Postman
+                .body(pdfBytes);
+    }
 //
 //    @GetMapping("/{id}")
 //    public ResponseEntity<byte[]> getImage(@PathVariable Long id) throws Exception {
@@ -68,26 +70,14 @@ public class FinalReportController {
             @Valid
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam("data") String data,
-            @RequestPart("images") List<MultipartFile> images,
-            BindingResult bindingResult) {
+            @RequestPart("images") List<MultipartFile> images
+            ) {
 
         var baseResponseDTO = new BaseResponseDTO<CreateFinalReportResponseDTO>();
 
-        if (bindingResult.hasFieldErrors()) {
-            String errorMessages = "";
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessages += error.getDefaultMessage() + "; ";
-            }
-
-            baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
-            baseResponseDTO.setMessage(errorMessages);
-            baseResponseDTO.setTimestamp(new Date());
-            return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
-        }
-
         try {
-            CreateFinalReportResponseDTO pdfReport = finalReportService.generatePdfReport(data, images, authHeader);
+            CreateFinalReportRequestDTO createFinalReportRequestDTO = finalReportService.convertToCreateFinalReportRequestDTO(data, images, authHeader);
+            CreateFinalReportResponseDTO pdfReport = finalReportService.generatePdfReport(createFinalReportRequestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(pdfReport);
             baseResponseDTO.setTimestamp(new Date());
