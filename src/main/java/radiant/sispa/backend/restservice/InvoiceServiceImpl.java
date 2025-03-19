@@ -1,5 +1,6 @@
 package radiant.sispa.backend.restservice;
 
+import jakarta.persistence.EntityNotFoundException;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +11,9 @@ import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.PurchaseOrderItem;
 import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
-import radiant.sispa.backend.repository.PurchaseOrderItemDb;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
-import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
@@ -56,7 +55,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             }
 
 
-            Invoice invoice = createInvoiceToInvoice(createInvoiceRequestDTO, purchaseOrder, createdBy);
+            Invoice invoice = createInvoiceRequestDTOToInvoice(createInvoiceRequestDTO, purchaseOrder, createdBy);
 
 
             InputStream reportStream = new ClassPathResource("/static/report/invoice.jrxml").getInputStream();
@@ -132,7 +131,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
 
-    private Invoice createInvoiceToInvoice(CreateInvoiceRequestDTO createInvoiceRequestDTO, PurchaseOrder purchaseOrder, String createdBy) {
+    private Invoice createInvoiceRequestDTOToInvoice(CreateInvoiceRequestDTO createInvoiceRequestDTO, PurchaseOrder purchaseOrder, String createdBy) {
         Invoice invoice = new Invoice();
 
         invoice.setCreatedBy(createdBy);
@@ -251,4 +250,77 @@ public class InvoiceServiceImpl implements InvoiceService {
         return formatter.format(number);
     }
 
+    @Override
+    public List<InvoiceResponseDTO> getAllInvoices() {
+        List<Invoice> invoices = invoiceDb.findAll();
+
+        // Convert each to a response DTO
+        List<InvoiceResponseDTO> result = new ArrayList<>();
+        for (Invoice inv : invoices) {
+            result.add(convertToResponse(inv));
+        }
+        return result;
+    }
+
+    @Override
+    public InvoiceResponseDTO getInvoiceById(Long id) {
+        Invoice invoice = invoiceDb.findById(id);
+//                .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+        return convertToResponse(invoice);
+    }
+
+    @Override
+    public void deleteInvoice(Long id){
+        Invoice invoice = invoiceDb.findById(id);
+//                .orElseThrow(() -> new NoSuchElementException("Invoice not found with id: " + id));
+
+        // If you want to do "soft delete," set 'deletedAt' and 'deletedBy' instead
+        // For a real physical delete:
+        invoiceDb.delete(invoice);
+    }
+
+    private InvoiceResponseDTO convertToResponse(Invoice entity) {
+        InvoiceResponseDTO dto = new InvoiceResponseDTO();
+        dto.setId(entity.getId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setCreatedBy(entity.getCreatedBy());
+        dto.setReceiver(entity.getReceiver());
+        dto.setDateCreated(entity.getDateCreated());
+        dto.setNoInvoice(entity.getNoInvoice());
+        dto.setNoPo(entity.getNoPo());
+        dto.setDatePaid(entity.getDatePaid());
+        dto.setSubTotal(entity.getSubTotal());
+        dto.setPpnPercentage(entity.getPpnPercentage());
+        dto.setPpn(entity.getPpn());
+        dto.setTotal(entity.getTotal());
+        dto.setSpelledOut(entity.getSpelledOut());
+        dto.setBankName(entity.getBankName());
+        dto.setAccountNumber(entity.getAccountNumber());
+        dto.setOnBehalf(entity.getOnBehalf());
+        dto.setPlaceSigned(entity.getPlaceSigned());
+        dto.setDateSigned(entity.getDateSigned());
+        dto.setSignee(entity.getSignee());
+        dto.setEvent(entity.getEvent());
+        dto.setFileName(entity.getFileName());
+
+        // Convert items
+        List<PurchaseOrderItemResponseDTO> itemDTOs = new ArrayList<>();
+        PurchaseOrder po = purchaseOrderDb.findPurchaseOrderByNoPo(entity.getNoPo());
+        if (po.getItems() != null) {
+            for (PurchaseOrderItem item : po.getItems()) {
+                PurchaseOrderItemResponseDTO itemDTO = new PurchaseOrderItemResponseDTO();
+                itemDTO.setId(item.getId());
+                itemDTO.setTitle(item.getTitle());
+                itemDTO.setVolume(item.getVolume());
+                itemDTO.setUnit(item.getUnit());
+                itemDTO.setPricePerUnit(item.getPricePerUnit());
+                itemDTO.setSum(item.getSum());
+                itemDTO.setDescription(item.getDescription());
+                itemDTOs.add(itemDTO);
+            }
+        }
+        dto.setItems(itemDTOs);
+
+        return dto;
+    }
 }
