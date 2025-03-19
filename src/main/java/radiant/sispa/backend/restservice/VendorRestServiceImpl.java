@@ -2,6 +2,7 @@ package radiant.sispa.backend.restservice;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Vendor;
@@ -9,6 +10,7 @@ import radiant.sispa.backend.repository.VendorDb;
 import radiant.sispa.backend.restdto.request.AddVendorRequestRestDTO;
 import radiant.sispa.backend.restdto.request.UpdateVendorRequestRestDTO;
 import radiant.sispa.backend.restdto.response.VendorResponseDTO;
+import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,6 +22,9 @@ public class VendorRestServiceImpl implements VendorRestService {
 
     @Autowired
     VendorDb vendorDb;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Override
     public List<VendorResponseDTO> getAllVendor() {
@@ -46,7 +51,18 @@ public class VendorRestServiceImpl implements VendorRestService {
     }
 
     @Override
-    public VendorResponseDTO addVendor(AddVendorRequestRestDTO vendorDTO, String username) {
+    public VendorResponseDTO addVendor(AddVendorRequestRestDTO vendorDTO, String authHeader) throws IllegalArgumentException {
+        String token = authHeader.substring(7);
+        String username = jwtUtils.getUserNameFromJwtToken(token);
+
+        List<Vendor> existingVendor = vendorDb.findByNameAndContact(vendorDTO.getName(), vendorDTO.getContact());
+
+        for (var vendor : existingVendor) {
+            if (vendor.getName().equals(vendorDTO.getName()) && vendor.getContact().equals(vendorDTO.getContact())) {
+                throw new IllegalArgumentException("Vendor dengan nama dan kontak ini sudah terdaftar.");
+            }
+        }
+
         Vendor newVendor = new Vendor();
 
         newVendor.setId(generateVendorId(vendorDTO.getName()));

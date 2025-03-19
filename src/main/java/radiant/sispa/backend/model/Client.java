@@ -17,8 +17,8 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "vendor")
-public class Vendor {
+@Table(name = "client")
+public class Client {
 
     @Id
     private String id;
@@ -40,9 +40,10 @@ public class Vendor {
     private String address;
 
     @NotNull
-    @Column(name = "service", nullable = false)
-    private String service;
+    @Column(name = "industry", nullable = false)
+    private String industry;
 
+    @NotNull
     @Column(name = "description", nullable = false)
     private String description;
 
