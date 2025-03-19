@@ -55,6 +55,8 @@ dependencies {
 
 	// Tambahkan OpenPDF secara eksplisit untuk menghindari error
 	implementation 'com.github.librepdf:openpdf:1.3.30'
+
+	implementation 'org.postgresql:postgresql:42.7.1'
 }
 
 tasks.named('test') {

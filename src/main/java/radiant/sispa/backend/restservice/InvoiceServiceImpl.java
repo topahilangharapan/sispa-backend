@@ -56,7 +56,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             }
 
 
-            Invoice invoice = createInvoiceToInvoice(createInvoiceRequestDTO, purchaseOrder, createdBy);
+            Invoice invoice = createInvoiceRequestDTOToInvoice(createInvoiceRequestDTO, purchaseOrder, createdBy);
 
 
             InputStream reportStream = new ClassPathResource("/static/report/invoice.jrxml").getInputStream();
@@ -132,7 +132,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
 
-    private Invoice createInvoiceToInvoice(CreateInvoiceRequestDTO createInvoiceRequestDTO, PurchaseOrder purchaseOrder, String createdBy) {
+    private Invoice createInvoiceRequestDTOToInvoice(CreateInvoiceRequestDTO createInvoiceRequestDTO, PurchaseOrder purchaseOrder, String createdBy) {
         Invoice invoice = new Invoice();
 
         invoice.setCreatedBy(createdBy);
