@@ -24,6 +24,8 @@ variables:
 build:
   image: gradle:8.11.1-jdk21-alpine
   stage: build
+  only:
+    - deployment
   script:
     - echo "Compile project to .jar"
     - cd $CI_PROJECT_DIR
