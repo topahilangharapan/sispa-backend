@@ -51,9 +51,17 @@ public class VendorRestServiceImpl implements VendorRestService {
     }
 
     @Override
-    public VendorResponseDTO addVendor(AddVendorRequestRestDTO vendorDTO, String authHeader) {
+    public VendorResponseDTO addVendor(AddVendorRequestRestDTO vendorDTO, String authHeader) throws IllegalArgumentException {
         String token = authHeader.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);
+
+        List<Vendor> existingVendor = vendorDb.findByNameAndContact(vendorDTO.getName(), vendorDTO.getContact());
+
+        for (var vendor : existingVendor) {
+            if (vendor.getName().equals(vendorDTO.getName()) && vendor.getContact().equals(vendorDTO.getContact())) {
+                throw new IllegalArgumentException("Vendor dengan nama dan kontak ini sudah terdaftar.");
+            }
+        }
 
         Vendor newVendor = new Vendor();
 

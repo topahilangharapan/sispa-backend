@@ -13,6 +13,7 @@ public class PurchaseOrderResponseDTO {
     private Long id;
     private String companyName;
     private String companyAddress;
+    private String receiver;
     private String noPo;
     private String dateCreated;
     private Long total;
