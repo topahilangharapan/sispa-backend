@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @RestController
 @RequestMapping("/api/vendor")
 public class VendorRestController {
@@ -103,7 +102,7 @@ public class VendorRestController {
             baseResponseDTO.setTimestamp(new Date());
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
         }
-        
+
         VendorResponseDTO updatedVendor = vendorRestService.updateVendor(vendorDTO.getId(), vendorDTO);
 
         if (updatedVendor == null){
@@ -141,7 +140,7 @@ public class VendorRestController {
 
         return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
-    
+
 
 
 }
