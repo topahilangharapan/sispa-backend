@@ -55,7 +55,7 @@ public class VendorRestServiceImpl implements VendorRestService {
         String token = authHeader.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);
 
-        List<Vendor> existingVendor = vendorDb.findByNameAndContact(vendorDTO.getName(), vendorDTO.getContact());
+        List<Vendor> existingVendor = vendorDb.findByNameAndContactAndDeletedAtNull(vendorDTO.getName(), vendorDTO.getContact());
 
         for (var vendor : existingVendor) {
             if (vendor.getName().equals(vendorDTO.getName()) && vendor.getContact().equals(vendorDTO.getContact())) {

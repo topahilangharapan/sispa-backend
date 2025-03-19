@@ -41,7 +41,7 @@ public class ClientRestServiceImpl implements ClientRestService {
     @Override
     public ClientResponseDTO addClient(AddClientRequestRestDTO clientDTO, String username) throws IllegalArgumentException {
 
-        List<Client> existingClient = clientDb.findByNameAndContact(clientDTO.getName(), clientDTO.getContact());
+        List<Client> existingClient = clientDb.findByNameAndContactAndDeletedAtNull(clientDTO.getName(), clientDTO.getContact());
 
         for (var client : existingClient) {
             if (client.getName().equals(clientDTO.getName()) && client.getContact().equals(clientDTO.getContact())) {

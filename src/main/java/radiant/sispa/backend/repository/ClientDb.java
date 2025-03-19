@@ -2,6 +2,7 @@ package radiant.sispa.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import radiant.sispa.backend.model.Client;
+import radiant.sispa.backend.model.Vendor;
 
 import java.util.List;
 
@@ -10,5 +11,5 @@ public interface ClientDb extends JpaRepository<Client, String> {
 
     Client findByIdAndDeletedAtNull(String id);
 
-    List<Client> findByNameAndContact(String name, String contact);
+    List<Client> findByNameAndContactAndDeletedAtNull(String name, String contact);
 }

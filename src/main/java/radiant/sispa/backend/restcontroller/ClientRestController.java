@@ -62,7 +62,7 @@ public class ClientRestController {
     }
 
     @PutMapping("/{id}/delete")
-    public ResponseEntity<?> deleteClient(@PathVariable String id) {
+    public ResponseEntity<?> deleteClient(@PathVariable("id") String id) {
         var baseResponseDTO = new BaseResponseDTO<List<ClientResponseDTO>>();
 
         try {

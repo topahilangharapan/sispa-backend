@@ -10,13 +10,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
-import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.restservice.InvoiceService;
-import radiant.sispa.backend.restservice.PurchaseOrderService;
 
 import java.util.Date;
 import java.util.List;
@@ -82,4 +80,70 @@ public class InvoiceController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllInvoice() {
+        var baseResponseDTO = new BaseResponseDTO<List<InvoiceResponseDTO>>();
+        try {
+            List<InvoiceResponseDTO> allOrders = invoiceService.getAllInvoices();
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(allOrders);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("List of invoices retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve invoices!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getInvoiceDetail(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<InvoiceResponseDTO>();
+        try {
+            InvoiceResponseDTO invoice = invoiceService.getInvoiceById(id);
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(invoice);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Invoice retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve invoice detail!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteInvoice(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<String>();
+        try {
+            invoiceService.deleteInvoice(id);
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData("Deleted");
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Invoice deleted successfully!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to delete Invoice!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

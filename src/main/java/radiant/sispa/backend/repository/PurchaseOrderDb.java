@@ -19,4 +19,5 @@ public interface PurchaseOrderDb extends JpaRepository<PurchaseOrder, Long> {
     List<PurchaseOrder> findPurchaseOrdersToday(@Param("startOfDay") Instant startOfDay, @Param("endOfDay") Instant endOfDay);
 
     PurchaseOrder findPurchaseOrderById(Long id);
+    PurchaseOrder findPurchaseOrderByNoPo(String id);
 }
