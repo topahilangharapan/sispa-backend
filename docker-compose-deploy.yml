@@ -1,0 +1,19 @@
+services:
+  insurance:
+    image: ${IMAGE_NAME}:latest
+    container_name: backend-sispa
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      - DATABASE_URL_DEV=jdbc:postgresql://db:5432/${DATABASE_DEV}
+      - DEV_USERNAME=${DATABASE_USERNAME_DEV}
+      - DEV_PASSWORD=${DATABASE_PASSWORD_DEV}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    name: sispa-radiant-backend-network
+    external: true
