@@ -10,16 +10,20 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreatePurchaseOrderRequestDTO {
-    private String companyName;
-
-    private String companyAddress;
+public class CreateInvoiceRequestDTO {
+    private Long purchaseOrderId;
 
     private String receiver;
 
-    private List<Map<String, String>> items;
+    private String datePaid;
 
-    private String terms;
+    private String ppnPercentage;
+
+    private String bankName;
+
+    private String accountNumber;
+
+    private String onBehalf;
 
     private String placeSigned;
 
@@ -28,4 +32,6 @@ public class CreatePurchaseOrderRequestDTO {
     private String dateSigned;
 
     private String signee;
+
+    private String event;
 }

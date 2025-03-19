@@ -1,6 +1,5 @@
 package radiant.sispa.backend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,13 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -22,8 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "purchase_order")
-public class PurchaseOrder implements Serializable {
+@Table(name = "invoice")
+public class Invoice implements Serializable {
     @Id
     @GeneratedValue(generator = "system-uuid")
     private Long id;
@@ -52,29 +48,40 @@ public class PurchaseOrder implements Serializable {
     private String deletedBy;
 
     @NotNull
-    @Column(name = "company_name", nullable = false)
-    private String companyName;
-
-    @NotNull
-    @Column(name = "company_address", nullable = false)
-    private String companyAddress;
-
-    @NotNull
     @Column(name = "receiver", nullable = false)
     private String receiver;
-
-    @NotNull
-    @Column(name = "no_po", nullable = false, unique = true)
-    private String noPo;
 
     @NotNull
     @Column(name = "date_created", nullable = false)
     private String dateCreated;
 
-    @ManyToMany
-    @JoinTable(name = "purchase_order_purchase_order_item", joinColumns = @JoinColumn(name = "id_purchase_order"),
-            inverseJoinColumns = @JoinColumn(name = "id_purchase_order_item"))
-    private List<PurchaseOrderItem> items;
+    @NotNull
+    @Column(name = "no_invoice", nullable = false, unique = true)
+    private String noInvoice;
+
+    @NotNull
+    @Column(name = "no_po", nullable = false)
+    private String noPo;
+
+    @NotNull
+    @Column(name = "date_paid", nullable = false)
+    private String datePaid;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_purchase_order", referencedColumnName = "id")
+    private PurchaseOrder purchaseOrder;
+
+    @NotNull
+    @Column(name = "sub_total", nullable = false)
+    private Long subTotal;
+
+    @NotNull
+    @Column(name = "ppn_pecentage", nullable = false)
+    private Double ppnPercentage;
+
+    @NotNull
+    @Column(name = "ppn", nullable = false)
+    private Long ppn;
 
     @NotNull
     @Column(name = "total", nullable = false)
@@ -85,8 +92,16 @@ public class PurchaseOrder implements Serializable {
     private String spelledOut;
 
     @NotNull
-    @Column(name = "terms", nullable = false)
-    private String terms;
+    @Column(name = "bank_name", nullable = false)
+    private String bankName;
+
+    @NotNull
+    @Column(name = "accountNumber", nullable = false)
+    private String accountNumber;
+
+    @NotNull
+    @Column(name = "onBehalf", nullable = false)
+    private String onBehalf;
 
     @NotNull
     @Column(name = "place_signed", nullable = false)
@@ -99,6 +114,10 @@ public class PurchaseOrder implements Serializable {
     @NotNull
     @Column(name = "signee", nullable = false)
     private String signee;
+
+    @NotNull
+    @Column(name = "event", nullable = false)
+    private String event;
 
     @NotNull
     @Column(name = "fileName", nullable = false)

@@ -12,9 +12,12 @@ import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.repository.PurchaseOrderItemDb;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
+import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.InputStream;
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -56,16 +59,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
                 row.put("no", String.valueOf(count++));
                 row.put("uraianJudul", purchaseOrderItem.getTitle());
-                row.put("volume", String.valueOf(purchaseOrderItem.getVolume()));
+                row.put("volume", formatWithThousandSeparator(purchaseOrderItem.getVolume()));
                 row.put("satuan", purchaseOrderItem.getUnit());
-                row.put("hargaSatuan", String.valueOf(purchaseOrderItem.getPricePerUnit()));
-                row.put("jumlah", String.valueOf(purchaseOrderItem.getSum()));
+                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getSum()));
                 row.put("blank", "");
                 row.put("uraianDeskripsi", purchaseOrderItem.getDescription());
 
                 data.add(row);
             }
-
 
             if (purchaseOrder.getItems().isEmpty()) {
                 Map<String, Object> row = new HashMap<>();
@@ -88,14 +90,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             parameters.put("logoSPA", "static/images/logo_spa_with_text.png");
             parameters.put("perusahaan", purchaseOrder.getCompanyName());
             parameters.put("alamatPerusahaan", purchaseOrder.getCompanyAddress());
+            parameters.put("penerima", purchaseOrder.getReceiver());
             parameters.put("tanggalDibuat", purchaseOrder.getDateCreated());
             parameters.put("noPo", purchaseOrder.getNoPo());
-            parameters.put("total", String.valueOf(purchaseOrder.getTotal()));
+            parameters.put("total", formatWithThousandSeparator(purchaseOrder.getTotal()));
             parameters.put("terbilang", purchaseOrder.getSpelledOut());
             parameters.put("ketentuan", purchaseOrder.getTerms());
             parameters.put("tempat", purchaseOrder.getPlaceSigned());
             parameters.put("tanggalDitandatangani", purchaseOrder.getDateSigned());
-            parameters.put("tandaTangan", "static/images/ttd-po.jpg");
+            parameters.put("tandaTangan", "static/images/ttd_po.jpg");
             parameters.put("yangMenandatangani", purchaseOrder.getSignee());
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
@@ -105,7 +108,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
             CreatePurchaseOrderResponseDTO createPurchaseOrderResponseDTO = new CreatePurchaseOrderResponseDTO();
             createPurchaseOrderResponseDTO.setPdf(pdfBytes);
-            createPurchaseOrderResponseDTO.setFileName(purchaseOrder.getNoPo());
+            createPurchaseOrderResponseDTO.setFileName(purchaseOrder.getFileName());
 
             return createPurchaseOrderResponseDTO;
 
@@ -121,6 +124,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setCreatedBy(createdBy);
         purchaseOrder.setCompanyName(createPurchaseOrderRequestDTO.getCompanyName());
         purchaseOrder.setCompanyAddress(createPurchaseOrderRequestDTO.getCompanyAddress());
+        purchaseOrder.setReceiver(createPurchaseOrderRequestDTO.getReceiver());
         purchaseOrder.setDateCreated(createPurchaseOrderRequestDTO.getDateCreated());
         purchaseOrder.setNoPo(createNoPo(createPurchaseOrderRequestDTO));
         purchaseOrder.setItems(items);
@@ -136,6 +140,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setPlaceSigned(createPurchaseOrderRequestDTO.getPlaceSigned());
         purchaseOrder.setDateSigned(createPurchaseOrderRequestDTO.getDateSigned());
         purchaseOrder.setSignee(createPurchaseOrderRequestDTO.getSignee());
+        purchaseOrder.setFileName(createFileName(purchaseOrder));
 
         return purchaseOrderDb.save(purchaseOrder);
     }
@@ -172,7 +177,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
         String formattedDate = today.format(formatter);
 
-        return String.format("PO/%s/%s/%s_%s", numberOfPurchaseOrdersToday, companyAbbreviation, formattedDate, createPurchaseOrderRequestDTO.getCompanyName());
+        return String.format("PO/%s/%s/%s", numberOfPurchaseOrdersToday, companyAbbreviation, formattedDate);
+    }
+
+    private String createFileName(PurchaseOrder purchaseOrder) {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
+        String formattedDate = today.format(formatter);
+
+        return String.format("%s_%s", purchaseOrder.getNoPo(), formattedDate);
     }
 
     public String getAbbreviation(String companyName) {
@@ -232,6 +245,79 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         }
 
         return result.trim();
+    }
+
+    private static String formatWithThousandSeparator(long number) {
+        NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+        return formatter.format(number);
+    }
+
+
+    @Override
+    public List<PurchaseOrderResponseDTO> getAllPurchaseOrders() {
+        List<PurchaseOrder> purchaseOrders = purchaseOrderDb.findAll();
+        
+        // Convert each to a response DTO
+        List<PurchaseOrderResponseDTO> result = new ArrayList<>();
+        for (PurchaseOrder po : purchaseOrders) {
+            result.add(convertToResponse(po));
+        }
+        return result;
+    }
+
+    @Override
+    public PurchaseOrderResponseDTO getPurchaseOrderById(Long id) {
+        PurchaseOrder po = purchaseOrderDb.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+        return convertToResponse(po);
+    }
+
+    @Override
+    public void deletePurchaseOrder(Long id) {
+        PurchaseOrder po = purchaseOrderDb.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+
+        // If you want to do "soft delete," set 'deletedAt' and 'deletedBy' instead
+        // For a real physical delete:
+        purchaseOrderDb.delete(po);
+    }
+
+    /**
+     * Helper method to convert a PurchaseOrder entity into a PurchaseOrderResponseDTO
+     */
+    private PurchaseOrderResponseDTO convertToResponse(PurchaseOrder entity) {
+        PurchaseOrderResponseDTO dto = new PurchaseOrderResponseDTO();
+        dto.setId(entity.getId());
+        dto.setCompanyName(entity.getCompanyName());
+        dto.setCompanyAddress(entity.getCompanyAddress());
+        dto.setReceiver(entity.getReceiver());
+        dto.setNoPo(entity.getNoPo());
+        dto.setDateCreated(entity.getDateCreated());
+        dto.setTotal(entity.getTotal());
+        dto.setSpelledOut(entity.getSpelledOut());
+        dto.setTerms(entity.getTerms());
+        dto.setPlaceSigned(entity.getPlaceSigned());
+        dto.setDateSigned(entity.getDateSigned());
+        dto.setSignee(entity.getSignee());
+
+        // Convert items
+        List<PurchaseOrderItemResponseDTO> itemDTOs = new ArrayList<>();
+        if (entity.getItems() != null) {
+            for (PurchaseOrderItem item : entity.getItems()) {
+                PurchaseOrderItemResponseDTO itemDTO = new PurchaseOrderItemResponseDTO();
+                itemDTO.setId(item.getId());
+                itemDTO.setTitle(item.getTitle());
+                itemDTO.setVolume(item.getVolume());
+                itemDTO.setUnit(item.getUnit());
+                itemDTO.setPricePerUnit(item.getPricePerUnit());
+                itemDTO.setSum(item.getSum());
+                itemDTO.setDescription(item.getDescription());
+                itemDTOs.add(itemDTO);
+            }
+        }
+        dto.setItems(itemDTOs);
+
+        return dto;
     }
 
 }
