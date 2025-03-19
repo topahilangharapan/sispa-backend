@@ -21,22 +21,23 @@ variables:
   IMAGE_NAME: registry.gitlab.com/musthofa.joko/b01-radiant-be
   IMAGE_TAG: latest
 
-build:
-  before_script:
-    - echo "Checking permissions..."
-    - whoami
-    - ls -lah $CI_PROJECT_DIR
+bbuild:
   image: gradle:8.11.1-jdk21-alpine
   stage: build
-  only:
-    - deployment
+  before_script:
+    - echo "CI_PROJECT_DIR is: $CI_PROJECT_DIR"
+    - ls -lah $(dirname $CI_PROJECT_DIR) # Check if the directory exists
+    - rm -rf $CI_PROJECT_DIR
+    - mkdir -p $CI_PROJECT_DIR
+    - git clone "$CI_REPOSITORY_URL" "$CI_PROJECT_DIR"
+    - ls -lah $CI_PROJECT_DIR
   script:
     - echo "Compile project to .jar"
     - cd $CI_PROJECT_DIR
     - sh gradlew clean assemble
   artifacts:
     paths:
-      - build/libs/*.jar
+      - build/libs/backend-0.0.1-SNAPSHOT.jar
 
 publish:
   image: docker:27.3.1-alpine3.20
