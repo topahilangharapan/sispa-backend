@@ -1,5 +1,6 @@
 package radiant.sispa.backend.restservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.transaction.Transactional;
@@ -46,17 +47,31 @@ public class FinalReportServiceImpl implements FinalReportService {
     private FinalReportDb finalReportDb;
 
     @Override
-    public CreateFinalReportResponseDTO generatePdfReport(String rawData, List<MultipartFile> images, String authHeader) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
+    public CreateFinalReportRequestDTO convertToCreateFinalReportRequestDTO(String rawData, List<MultipartFile> images, String createdBy) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-            JsonNode jsonNode = objectMapper.readTree(rawData);
-            CreateFinalReportRequestDTO createFinalReportRequestDTO = objectMapper.treeToValue(jsonNode, CreateFinalReportRequestDTO.class);
+        JsonNode jsonNode = objectMapper.readTree(rawData);
+        CreateFinalReportRequestDTO createFinalReportRequestDTO = objectMapper.treeToValue(jsonNode, CreateFinalReportRequestDTO.class);
+
+        List<Image> imageList = saveImages(images, createdBy);
+
+        List<Long> imageIdList = new ArrayList<>();
+        for (Image image : imageList) {
+            imageIdList.add(image.getId());
+        }
+
+        createFinalReportRequestDTO.setImageListId(imageIdList);
+        return createFinalReportRequestDTO;
+    }
+
+    @Override
+    public CreateFinalReportResponseDTO generatePdfReport(CreateFinalReportRequestDTO createFinalReportRequestDTO, String authHeader) {
+        try {
 
             String token = authHeader.substring(7);
             String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
-            FinalReport finalReport = createFinalReportRequestToFinalReport(createFinalReportRequestDTO, images, createdBy);
+            FinalReport finalReport = createFinalReportRequestToFinalReport(createFinalReportRequestDTO, createdBy);
 
             InputStream reportStream = new ClassPathResource("/static/report/final-report.jrxml").getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
@@ -127,11 +142,21 @@ public class FinalReportServiceImpl implements FinalReportService {
         return imageList;
     }
 
-    private FinalReport createFinalReportRequestToFinalReport(CreateFinalReportRequestDTO createFinalReportRequestDTO, List<MultipartFile> images, String createdBy) throws IOException {
+    private List<Image> getImages(List<Long> imagesId)  {
+        List<Image> imageList = new ArrayList<>();
+
+        for (Long id: imagesId) {
+            imageList.add(imageDb.findById(id));
+        }
+
+        return imageList;
+    }
+
+    private FinalReport createFinalReportRequestToFinalReport(CreateFinalReportRequestDTO createFinalReportRequestDTO, String createdBy) throws IOException {
         FinalReport finalReport = new FinalReport();
 
         finalReport.setCreatedBy(createdBy);
-        finalReport.setImages(saveImages(images, createdBy));
+        finalReport.setImages(getImages(createFinalReportRequestDTO.getImageListId()));
         finalReport.setEvent(createFinalReportRequestDTO.getEvent());
         finalReport.setCompany(createFinalReportRequestDTO.getPerusahaan());
         finalReport.setEventDate(createFinalReportRequestDTO.getTanggal());
