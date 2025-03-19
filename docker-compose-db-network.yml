@@ -1,0 +1,26 @@
+services:
+  db:
+    container_name: db-tk-36
+    image: postgres:16.4-alpine
+    ports:
+      - '20118:5432'
+    restart: 'no'
+    labels:
+      tk: "36"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret99
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - backend-network
+volumes:
+  db:
+    driver: local
+networks:
+  backend-network:
+    name: apap-tk-36_backend-network
+    driver: bridge
+  frontend-network:
+    name: apap-tk-36_frontend-network
+    driver: bridge

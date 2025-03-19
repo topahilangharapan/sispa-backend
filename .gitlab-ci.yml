@@ -21,15 +21,15 @@ variables:
   IMAGE_NAME: registry.gitlab.com/musthofa.joko/b01-radiant-be
   IMAGE_TAG: latest
 
-bbuild:
+build:
+  before_script:
+    - git remote -v
+    - git branch
+    - git status
   image: gradle:8.11.1-jdk21-alpine
   stage: build
-  before_script:
-    - ls -lah $(dirname $CI_PROJECT_DIR) # Check if the directory exists
-    - rm -rf $CI_PROJECT_DIR
-    - mkdir -p $CI_PROJECT_DIR
-    - git clone "$CI_REPOSITORY_URL" "$CI_PROJECT_DIR"
-    - ls -lah $CI_PROJECT_DIR
+  only:
+    - deployment
   script:
     - echo "Compile project to .jar"
     - cd $CI_PROJECT_DIR
