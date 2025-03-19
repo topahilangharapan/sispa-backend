@@ -90,6 +90,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             parameters.put("logoSPA", "static/images/logo_spa_with_text.png");
             parameters.put("perusahaan", purchaseOrder.getCompanyName());
             parameters.put("alamatPerusahaan", purchaseOrder.getCompanyAddress());
+            parameters.put("penerima", purchaseOrder.getReceiver());
             parameters.put("tanggalDibuat", purchaseOrder.getDateCreated());
             parameters.put("noPo", purchaseOrder.getNoPo());
             parameters.put("total", formatWithThousandSeparator(purchaseOrder.getTotal()));
@@ -123,6 +124,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setCreatedBy(createdBy);
         purchaseOrder.setCompanyName(createPurchaseOrderRequestDTO.getCompanyName());
         purchaseOrder.setCompanyAddress(createPurchaseOrderRequestDTO.getCompanyAddress());
+        purchaseOrder.setReceiver(createPurchaseOrderRequestDTO.getReceiver());
         purchaseOrder.setDateCreated(createPurchaseOrderRequestDTO.getDateCreated());
         purchaseOrder.setNoPo(createNoPo(createPurchaseOrderRequestDTO));
         purchaseOrder.setItems(items);
@@ -288,6 +290,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         dto.setId(entity.getId());
         dto.setCompanyName(entity.getCompanyName());
         dto.setCompanyAddress(entity.getCompanyAddress());
+        dto.setReceiver(entity.getReceiver());
         dto.setNoPo(entity.getNoPo());
         dto.setDateCreated(entity.getDateCreated());
         dto.setTotal(entity.getTotal());

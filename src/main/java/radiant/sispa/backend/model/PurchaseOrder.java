@@ -60,6 +60,10 @@ public class PurchaseOrder implements Serializable {
     private String companyAddress;
 
     @NotNull
+    @Column(name = "receiver", nullable = false)
+    private String receiver;
+
+    @NotNull
     @Column(name = "no_po", nullable = false, unique = true)
     private String noPo;
 

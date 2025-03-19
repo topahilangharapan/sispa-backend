@@ -17,6 +17,7 @@
 	<parameter name="tempat" class="java.lang.String"/>
 	<parameter name="tandaTangan" class="java.lang.String"/>
 	<parameter name="yangMenandatangani" class="java.lang.String"/>
+	<parameter name="penerima" class="java.lang.String"/>
 	<field name="no" class="java.lang.String"/>
 	<field name="uraianJudul" class="java.lang.String"/>
 	<field name="volume" class="java.lang.String"/>
@@ -100,7 +101,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="true" isItalic="true" isUnderline="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Up. " +  $P{perusahaan}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Up. " +  $P{penerima}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement mode="Transparent" x="254" y="90" width="54" height="16" forecolor="#030000" backcolor="#65161D" uuid="4be8f942-efd1-411c-af30-fc89cabc5e33"/>
