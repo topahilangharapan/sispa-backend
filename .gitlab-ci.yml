@@ -22,6 +22,10 @@ variables:
   IMAGE_TAG: latest
 
 build:
+  before_script:
+    - echo "Checking permissions..."
+    - whoami
+    - ls -lah $CI_PROJECT_DIR
   image: gradle:8.11.1-jdk21-alpine
   stage: build
   only:
