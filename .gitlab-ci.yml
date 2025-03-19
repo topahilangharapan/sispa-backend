@@ -25,7 +25,6 @@ bbuild:
   image: gradle:8.11.1-jdk21-alpine
   stage: build
   before_script:
-    - echo "CI_PROJECT_DIR is: $CI_PROJECT_DIR"
     - ls -lah $(dirname $CI_PROJECT_DIR) # Check if the directory exists
     - rm -rf $CI_PROJECT_DIR
     - mkdir -p $CI_PROJECT_DIR
