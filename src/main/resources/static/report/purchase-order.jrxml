@@ -114,14 +114,14 @@
 			<staticText>
 				<reportElement mode="Transparent" x="309" y="106" width="15" height="16" forecolor="#030000" backcolor="#65161D" uuid="aacde5cf-7f50-42b1-b7d1-c7453a27019d"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Gill Sans" size="11"/>
+					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Transparent" x="309" y="90" width="15" height="16" forecolor="#030000" backcolor="#65161D" uuid="85741f8c-376c-46bd-9a5f-efaa3445552f"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Gill Sans" size="11"/>
+					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
