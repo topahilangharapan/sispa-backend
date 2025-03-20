@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Invoice;
 import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.PurchaseOrderItem;
+import radiant.sispa.backend.model.Vendor;
 import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
-import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.FileNotFoundException;
@@ -252,9 +252,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceResponseDTO> getAllInvoices() {
-        List<Invoice> invoices = invoiceDb.findAll();
+        List<Invoice> invoices = invoiceDb.findAllByDeletedAtNull();
 
-        // Convert each to a response DTO
         List<InvoiceResponseDTO> result = new ArrayList<>();
         for (Invoice inv : invoices) {
             result.add(convertToResponse(inv));
@@ -264,15 +263,20 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceResponseDTO getInvoiceById(Long id) {
-        Invoice invoice = invoiceDb.findById(id);
-//                .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+        Invoice invoice = invoiceDb.findByIdAndDeletedAtNull(id);
         return convertToResponse(invoice);
     }
 
     @Override
-    public void deleteInvoice(Long id){
-        Invoice invoice = invoiceDb.findById(id);
-        invoiceDb.delete(invoice);
+    public void deleteInvoice(Long id) throws EntityNotFoundException {
+        Invoice invoiceToDelete = invoiceDb.findByIdAndDeletedAtNull(id);
+
+        if (invoiceToDelete == null) {
+            throw new EntityNotFoundException("Invoice not found");
+        }
+
+        invoiceToDelete.setDeletedAt(new Date().toInstant());
+        invoiceDb.save(invoiceToDelete);
     }
 
     private InvoiceResponseDTO convertToResponse(Invoice entity) {

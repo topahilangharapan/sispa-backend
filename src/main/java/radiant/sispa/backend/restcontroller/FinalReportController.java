@@ -53,7 +53,7 @@ public class FinalReportController {
 //
 //    @GetMapping("/{id}")
 //    public ResponseEntity<byte[]> getImage(@PathVariable Long id) throws Exception {
-//        Image image = imageDb.findById(id);
+//        Image image = imageDb.findByIdAndDeletedAtNull(id);
 //        if (image != null) {
 //            return ResponseEntity.ok()
 //                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getFileName() + "\"")
