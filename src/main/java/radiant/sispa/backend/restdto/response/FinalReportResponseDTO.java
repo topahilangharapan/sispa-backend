@@ -6,6 +6,11 @@ import lombok.NoArgsConstructor;
 import radiant.sispa.backend.model.Image;
 
 import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.List;
 
 @Data
@@ -20,4 +25,6 @@ public class FinalReportResponseDTO {
     private String company;
     private String event;
     private String eventDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Jakarta")
+    private Date deletedAt;
 }
