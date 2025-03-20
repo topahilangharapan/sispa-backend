@@ -44,7 +44,7 @@ public class ClientRestServiceImpl implements ClientRestService {
         List<Client> existingClient = clientDb.findByNameAndContactAndDeletedAtNull(clientDTO.getName(), clientDTO.getContact());
 
         for (var client : existingClient) {
-            if (client.getName().equals(clientDTO.getName()) && client.getContact().equals(clientDTO.getContact())) {
+            if (client.getName().equalsIgnoreCase(clientDTO.getName()) && client.getContact().equalsIgnoreCase(clientDTO.getContact())) {
                 throw new IllegalArgumentException("Klien dengan nama dan kontak ini sudah terdaftar.");
             }
         }
