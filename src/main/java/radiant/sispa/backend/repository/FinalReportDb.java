@@ -7,5 +7,5 @@ import radiant.sispa.backend.model.Image;
 
 @Transactional
 public interface FinalReportDb extends JpaRepository<FinalReport, String> {
-
+    FinalReport findById(Long id);
 }

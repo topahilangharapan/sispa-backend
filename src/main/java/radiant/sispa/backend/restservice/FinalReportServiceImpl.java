@@ -17,8 +17,7 @@ import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateFinalReportRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.response.CreateFinalReportResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import javax.imageio.ImageIO;
@@ -170,4 +169,46 @@ public class FinalReportServiceImpl implements FinalReportService {
         return String.format("Final Report %s", finalReport.getEvent());
     }
 
+    @Override
+    public List<FinalReportResponseDTO> getAllFinalReports() {
+        List<FinalReport> finalReports = finalReportDb.findAll();
+
+        List<FinalReportResponseDTO> result = new ArrayList<>();
+        for (FinalReport report : finalReports) {
+            result.add(convertToResponse(report));
+        }
+        return result;
+    }
+
+    @Override
+    public FinalReportResponseDTO getReportsById(Long id) {
+        FinalReport report = finalReportDb.findById(id);
+        return convertToResponse(report);
+    }
+
+    private FinalReportResponseDTO convertToResponse(FinalReport entity) {
+        FinalReportResponseDTO dto = new FinalReportResponseDTO();
+        dto.setId(entity.getId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setCreatedBy(entity.getCreatedBy());
+        dto.setFileName(entity.getFileName());
+        dto.setEvent(entity.getEvent());
+        dto.setEventDate(entity.getEventDate());
+        dto.setCompany(entity.getCompany());
+
+        // Convert items
+        List<ImageResponseDTO> itemDTOs = new ArrayList<>();
+        if (entity.getImages() != null) {
+            for (Image item : entity.getImages()) {
+                ImageResponseDTO itemDTO = new ImageResponseDTO();
+                itemDTO.setId(item.getId());
+                itemDTO.setFileName(item.getFileName());
+                itemDTO.setFileData(item.getFileData());
+                itemDTOs.add(itemDTO);
+            }
+        }
+        dto.setImages(itemDTOs);
+
+        return dto;
+    }
 }
