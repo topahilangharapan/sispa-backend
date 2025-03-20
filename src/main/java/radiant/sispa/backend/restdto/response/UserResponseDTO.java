@@ -15,6 +15,10 @@ public class UserResponseDTO {
     private String username;
     private String name;
     private String role;
+    private String address;
+    private String phoneNumber;
+    private String placeOfBirth;
+    private String dateOfBirth;
     private Timestamp createdAt;
     private String createdBy;
     private Timestamp updatedAt;
