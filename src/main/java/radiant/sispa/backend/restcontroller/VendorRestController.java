@@ -88,7 +88,7 @@ public class VendorRestController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateVendor(@Valid @RequestBody UpdateVendorRequestRestDTO vendorDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> updateVendor(@RequestHeader(value = "Authorization", required = false) String authHeader, @Valid @RequestBody UpdateVendorRequestRestDTO vendorDTO, BindingResult bindingResult) {
         var baseResponseDTO = new BaseResponseDTO<VendorResponseDTO>();
 
         if (bindingResult.hasFieldErrors()) {
@@ -103,7 +103,7 @@ public class VendorRestController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
         }
 
-        VendorResponseDTO updatedVendor = vendorRestService.updateVendor(vendorDTO.getId(), vendorDTO);
+        VendorResponseDTO updatedVendor = vendorRestService.updateVendor(vendorDTO.getId(), vendorDTO, authHeader);
 
         if (updatedVendor == null){
             baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());

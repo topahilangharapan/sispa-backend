@@ -15,7 +15,7 @@ public interface VendorRestService {
 
     VendorResponseDTO addVendor(AddVendorRequestRestDTO vendorDTO, String username);
 
-    VendorResponseDTO updateVendor(String id, UpdateVendorRequestRestDTO vendorDTO);
+    VendorResponseDTO updateVendor(String id, UpdateVendorRequestRestDTO vendorDTO, String username);
 
     VendorResponseDTO getVendorById(String id);
 }
