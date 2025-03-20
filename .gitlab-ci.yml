@@ -67,6 +67,7 @@ deploy:
     - echo "Deploying to Hostinger VPS..."
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "mkdir -p ~/backend/"
     - rsync -rahv /root/$CI_PROJECT_DIR/docker-compose.yml "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:~/backend/"
+    - pwd
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "
       export IMAGE_NAME=${IMAGE_NAME} &&
       export DATABASE_URL_DEV=${DATABASE_URL_DEV} &&
