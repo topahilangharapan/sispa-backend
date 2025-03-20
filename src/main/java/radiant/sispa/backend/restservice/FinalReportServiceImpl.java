@@ -3,6 +3,8 @@ package radiant.sispa.backend.restservice;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Base64;
+
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -206,7 +208,8 @@ public class FinalReportServiceImpl implements FinalReportService {
                 ImageResponseDTO itemDTO = new ImageResponseDTO();
                 itemDTO.setId(item.getId());
                 itemDTO.setFileName(item.getFileName());
-                itemDTO.setFileData(item.getFileData());
+                itemDTO.setFileData(item.getFileData() != null ? Base64.getEncoder().encodeToString(item.getFileData()) : null);
+
                 itemDTOs.add(itemDTO);
             }
         }
