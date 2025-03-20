@@ -65,7 +65,6 @@ deploy:
   extends: .setup-ssh
   script:
     - echo "Deploying to Hostinger VPS..."
-    - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "echo $CI_JOB_TOKEN | docker login $CI_REGISTRY -u gitlab-ci-token --password-stdin"
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "mkdir -p ~/backend/"
     - rsync -rahv /root/$CI_PROJECT_DIR/docker-compose.yml "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:~/backend/"
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "
