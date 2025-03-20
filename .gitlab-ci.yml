@@ -22,10 +22,6 @@ variables:
   IMAGE_TAG: latest
 
 build:
-  before_script:
-    - git remote -v
-    - git branch
-    - git status
   image: gradle:8.11.1-jdk21-alpine
   stage: build
   only:
@@ -46,8 +42,10 @@ publish:
   only:
     - deployment
   script:
+    - echo "Current directory $CI_PROJECT_DIR"
+    - ls -lah $CI_PROJECT_DIR
     - echo "Build Docker image..."
-    - cd $CI_PROJECT_DIR
+    - cd /root/builds/t3_BAqY4-/0/propensi-2024-2025-genap/kelas-b/b01-radiant-be
     - docker build -t $IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
     - echo "Push image to registry..."
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
