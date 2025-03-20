@@ -8,9 +8,11 @@ import radiant.sispa.backend.model.Role;
 import radiant.sispa.backend.model.UserModel;
 import radiant.sispa.backend.repository.UserDb;
 import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
+import radiant.sispa.backend.restdto.request.PasswordChangeRequestDTO;
 import radiant.sispa.backend.restdto.request.UserProfileRequestDTO;
 import radiant.sispa.backend.restdto.request.UserRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
+import radiant.sispa.backend.restdto.response.PasswordChangeResponseDTO;
 import radiant.sispa.backend.restdto.response.UserProfileResponseDTO;
 import radiant.sispa.backend.restdto.response.UserResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
@@ -138,6 +140,10 @@ public class UserRestServiceImpl implements UserRestService {
         userResponseDTO.setName(user.getName());
         userResponseDTO.setRole(user.getRole().getRole());
         userResponseDTO.setCreatedBy(user.getCreatedBy());
+        userResponseDTO.setAddress(user.getAddress());
+        userResponseDTO.setPhoneNumber(user.getPhoneNumber());
+        userResponseDTO.setPlaceOfBirth(user.getPlaceOfBirth());
+        userResponseDTO.setDateOfBirth(user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : null);
         Optional.ofNullable(user.getCreatedAt())
                 .map(Timestamp::from)
                 .ifPresent(userResponseDTO::setCreatedAt);
@@ -195,5 +201,32 @@ public class UserRestServiceImpl implements UserRestService {
         return response;
     }
 
+    @Override
+    public PasswordChangeResponseDTO changePassword(PasswordChangeRequestDTO requestDTO) {
+        // Get user by ID
+        Optional<UserModel> optionalUser = userDb.findById(requestDTO.getUserId());
+        
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
 
+        UserModel user = optionalUser.get();
+        
+        // Hash the new password
+        String hashedPassword = hashPassword(requestDTO.getNewPassword());
+        
+        // Update user's password
+        user.setPassword(hashedPassword);
+        user.setUpdatedAt(java.time.Instant.now());
+        
+        // Save the updated user
+        userDb.save(user);
+        
+        // Return success response
+        PasswordChangeResponseDTO response = new PasswordChangeResponseDTO();
+        response.setSuccess(true);
+        response.setMessage("Password changed successfully");
+        
+        return response;
+    }
 }
