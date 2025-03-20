@@ -138,4 +138,24 @@ public class FinalReportController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseDTO);
         }
     }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadFinalReport(@PathVariable("id") Long id) {
+        try {
+            byte[] pdfData = finalReportService.getPdfFile(id);
+            String fileName = "Final_Report_" + id + ".pdf";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", fileName);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfData);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

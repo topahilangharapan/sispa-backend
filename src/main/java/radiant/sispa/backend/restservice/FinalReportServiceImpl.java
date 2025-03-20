@@ -228,4 +228,31 @@ public class FinalReportServiceImpl implements FinalReportService {
         reportToDelete.setDeletedAt(new Date());
         finalReportDb.save(reportToDelete);
     }
+
+    @Override
+    public byte[] getPdfFile(Long id) {
+        FinalReport report = finalReportDb.findById(id);
+        if (report == null) {
+            throw new NoSuchElementException("Final Report not found!");
+        }
+
+        // Konversi FinalReport menjadi CreateFinalReportRequestDTO
+        CreateFinalReportRequestDTO dto = new CreateFinalReportRequestDTO();
+        dto.setEvent(report.getEvent());
+        dto.setPerusahaan(report.getCompany());
+        dto.setTanggal(report.getEventDate());
+
+        List<Long> imageIds = new ArrayList<>();
+        for (Image img : report.getImages()) {
+            imageIds.add(img.getId());
+        }
+        dto.setImageListId(imageIds);
+
+        // Panggil method generatePdfReport yang sudah ada
+        CreateFinalReportResponseDTO responseDTO = generatePdfReport(dto, null);
+
+        return responseDTO.getPdf();
+    }
+
+
 }

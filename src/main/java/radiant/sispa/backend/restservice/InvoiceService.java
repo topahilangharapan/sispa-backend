@@ -13,4 +13,5 @@ public interface InvoiceService {
     List<InvoiceResponseDTO> getAllInvoices();
     InvoiceResponseDTO getInvoiceById(Long id);
     void deleteInvoice(Long id);
+    CreateInvoiceResponseDTO generatePdfByInvoiceId(Long invoiceId, String authHeader);
 }

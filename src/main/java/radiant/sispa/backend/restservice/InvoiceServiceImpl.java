@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Invoice;
 import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.PurchaseOrderItem;
-import radiant.sispa.backend.model.Vendor;
 import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
@@ -127,6 +126,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             return createInvoiceResponseDTO;
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Error generating PDF report", e.getCause());
         }
     }
@@ -323,4 +323,31 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         return dto;
     }
+
+    @Override
+    public CreateInvoiceResponseDTO generatePdfByInvoiceId(Long invoiceId, String authHeader) {
+        Invoice invoice = invoiceDb.findByIdAndDeletedAtNull(invoiceId);
+        if (invoice == null) {
+            throw new EntityNotFoundException("Invoice tidak ditemukan.");
+        }
+
+        CreateInvoiceRequestDTO dto = new CreateInvoiceRequestDTO();
+        dto.setPurchaseOrderId(invoice.getPurchaseOrder().getId());
+        dto.setReceiver(invoice.getReceiver());
+        dto.setDateCreated(invoice.getDateCreated());
+        dto.setDatePaid(invoice.getDatePaid());
+        dto.setPpnPercentage(String.valueOf(invoice.getPpnPercentage() * 100));
+        dto.setBankName(invoice.getBankName());
+        dto.setAccountNumber(invoice.getAccountNumber());
+        dto.setOnBehalf(invoice.getOnBehalf());
+        dto.setPlaceSigned(invoice.getPlaceSigned());
+        dto.setDateSigned(invoice.getDateSigned());
+        dto.setSignee(invoice.getSignee());
+        dto.setEvent(invoice.getEvent());
+
+        System.out.println("Generating PDF for invoice ID: " + invoiceId);
+
+        return generatePdfReport(dto, authHeader);
+    }
+
 }
