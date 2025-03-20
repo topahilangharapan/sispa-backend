@@ -11,11 +11,15 @@ spring:
           lob:
             non_contextual_creation: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   mvc:
     hiddenmethod:
       filter:
         enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
 manpromanpro:
   app:
     jwtSecret: "${JWT_SECRET_KEY}"

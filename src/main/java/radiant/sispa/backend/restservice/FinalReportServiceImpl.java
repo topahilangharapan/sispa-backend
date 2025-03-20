@@ -1,7 +1,12 @@
 package radiant.sispa.backend.restservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Base64;
+
+
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -16,8 +21,8 @@ import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateFinalReportRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.response.CreateFinalReportResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import javax.imageio.ImageIO;
@@ -46,17 +51,31 @@ public class FinalReportServiceImpl implements FinalReportService {
     private FinalReportDb finalReportDb;
 
     @Override
-    public CreateFinalReportResponseDTO generatePdfReport(String rawData, List<MultipartFile> images, String authHeader) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
+    public CreateFinalReportRequestDTO convertToCreateFinalReportRequestDTO(String rawData, List<MultipartFile> images, String createdBy) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-            JsonNode jsonNode = objectMapper.readTree(rawData);
-            CreateFinalReportRequestDTO createFinalReportRequestDTO = objectMapper.treeToValue(jsonNode, CreateFinalReportRequestDTO.class);
+        JsonNode jsonNode = objectMapper.readTree(rawData);
+        CreateFinalReportRequestDTO createFinalReportRequestDTO = objectMapper.treeToValue(jsonNode, CreateFinalReportRequestDTO.class);
+
+        List<Image> imageList = saveImages(images, createdBy);
+
+        List<Long> imageIdList = new ArrayList<>();
+        for (Image image : imageList) {
+            imageIdList.add(image.getId());
+        }
+
+        createFinalReportRequestDTO.setImageListId(imageIdList);
+        return createFinalReportRequestDTO;
+    }
+
+    @Override
+    public CreateFinalReportResponseDTO generatePdfReport(CreateFinalReportRequestDTO createFinalReportRequestDTO, String authHeader) {
+        try {
 
             String token = authHeader.substring(7);
             String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
-            FinalReport finalReport = createFinalReportRequestToFinalReport(createFinalReportRequestDTO, images, createdBy);
+            FinalReport finalReport = createFinalReportRequestToFinalReport(createFinalReportRequestDTO, createdBy);
 
             InputStream reportStream = new ClassPathResource("/static/report/final-report.jrxml").getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
@@ -127,11 +146,21 @@ public class FinalReportServiceImpl implements FinalReportService {
         return imageList;
     }
 
-    private FinalReport createFinalReportRequestToFinalReport(CreateFinalReportRequestDTO createFinalReportRequestDTO, List<MultipartFile> images, String createdBy) throws IOException {
+    private List<Image> getImages(List<Long> imagesId)  {
+        List<Image> imageList = new ArrayList<>();
+
+        for (Long id: imagesId) {
+            imageList.add(imageDb.findById(id));
+        }
+
+        return imageList;
+    }
+
+    private FinalReport createFinalReportRequestToFinalReport(CreateFinalReportRequestDTO createFinalReportRequestDTO, String createdBy) throws IOException {
         FinalReport finalReport = new FinalReport();
 
         finalReport.setCreatedBy(createdBy);
-        finalReport.setImages(saveImages(images, createdBy));
+        finalReport.setImages(getImages(createFinalReportRequestDTO.getImageListId()));
         finalReport.setEvent(createFinalReportRequestDTO.getEvent());
         finalReport.setCompany(createFinalReportRequestDTO.getPerusahaan());
         finalReport.setEventDate(createFinalReportRequestDTO.getTanggal());
@@ -144,5 +173,86 @@ public class FinalReportServiceImpl implements FinalReportService {
     private String createFileName(FinalReport finalReport) {
         return String.format("Final Report %s", finalReport.getEvent());
     }
+
+    @Override
+    public List<FinalReportResponseDTO> getAllFinalReports() {
+        List<FinalReport> finalReports = finalReportDb.findByDeletedAtNull();
+
+        List<FinalReportResponseDTO> result = new ArrayList<>();
+        for (FinalReport report : finalReports) {
+            result.add(convertToResponse(report));
+        }
+        return result;
+    }
+
+    @Override
+    public FinalReportResponseDTO getReportsById(Long id) {
+        FinalReport report = finalReportDb.findById(id);
+        return convertToResponse(report);
+    }
+
+    private FinalReportResponseDTO convertToResponse(FinalReport entity) {
+        FinalReportResponseDTO dto = new FinalReportResponseDTO();
+        dto.setId(entity.getId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setCreatedBy(entity.getCreatedBy());
+        dto.setFileName(entity.getFileName());
+        dto.setEvent(entity.getEvent());
+        dto.setEventDate(entity.getEventDate());
+        dto.setCompany(entity.getCompany());
+
+        // Convert items
+        List<ImageResponseDTO> itemDTOs = new ArrayList<>();
+        if (entity.getImages() != null) {
+            for (Image item : entity.getImages()) {
+                ImageResponseDTO itemDTO = new ImageResponseDTO();
+                itemDTO.setId(item.getId());
+                itemDTO.setFileName(item.getFileName());
+                itemDTO.setFileData(item.getFileData() != null ? Base64.getEncoder().encodeToString(item.getFileData()) : null);
+
+                itemDTOs.add(itemDTO);
+            }
+        }
+        dto.setImages(itemDTOs);
+
+        return dto;
+    }
+
+    @Override
+    public void deleteFinalReport(Long id) throws EntityNotFoundException {
+        FinalReport reportToDelete = finalReportDb.findByIdAndDeletedAtNull(id);
+        if (reportToDelete == null) {
+            throw new EntityNotFoundException("Klien tidak ditemukan");
+        }
+
+        reportToDelete.setDeletedAt(new Date());
+        finalReportDb.save(reportToDelete);
+    }
+
+    @Override
+    public byte[] getPdfFile(Long id) {
+        FinalReport report = finalReportDb.findById(id);
+        if (report == null) {
+            throw new NoSuchElementException("Final Report not found!");
+        }
+
+        // Konversi FinalReport menjadi CreateFinalReportRequestDTO
+        CreateFinalReportRequestDTO dto = new CreateFinalReportRequestDTO();
+        dto.setEvent(report.getEvent());
+        dto.setPerusahaan(report.getCompany());
+        dto.setTanggal(report.getEventDate());
+
+        List<Long> imageIds = new ArrayList<>();
+        for (Image img : report.getImages()) {
+            imageIds.add(img.getId());
+        }
+        dto.setImageListId(imageIds);
+
+        // Panggil method generatePdfReport yang sudah ada
+        CreateFinalReportResponseDTO responseDTO = generatePdfReport(dto, null);
+
+        return responseDTO.getPdf();
+    }
+
 
 }

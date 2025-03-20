@@ -1,105 +1,161 @@
 package radiant.sispa.backend.restcontroller;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import radiant.sispa.backend.model.Image;
-import radiant.sispa.backend.repository.ImageDb;
 import radiant.sispa.backend.restdto.request.CreateFinalReportRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateFinalReportResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.FinalReportService;
-import radiant.sispa.backend.restservice.InvoiceService;
+import radiant.sispa.backend.repository.ImageDb;
 
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/final-report")
 public class FinalReportController {
+
     @Autowired
     private FinalReportService finalReportService;
 
     @Autowired
     private ImageDb imageDb;
 
-
-//    @PostMapping("/test/create")
-//    public ResponseEntity<byte[]> createPdfReportTest(
-//            @Valid
-//            @RequestHeader(value = "Authorization", required = false) String authHeader,
-//            @RequestParam("data") String data,
-//            @RequestPart("images") List<MultipartFile> images) {
-//
-//        byte[] pdfBytes = finalReportService.generatePdfReport(data, images, authHeader).getPdf();
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.APPLICATION_PDF)
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=final_report.pdf") // Menampilkan langsung di Postman
-//                .body(pdfBytes);
-//    }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<byte[]> getImage(@PathVariable Long id) throws Exception {
-//        Image image = imageDb.findById(id);
-//        if (image != null) {
-//            return ResponseEntity.ok()
-//                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getFileName() + "\"")
-//                    .contentType(MediaType.IMAGE_JPEG) // Atur tipe konten sesuai format gambar
-//                    .body(image.getFileData());
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-
     @PostMapping("/create")
-    public ResponseEntity<?> createPdfReport(
+    public ResponseEntity<BaseResponseDTO<CreateFinalReportResponseDTO>> createPdfReport(
             @Valid
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam("data") String data,
-            @RequestPart("images") List<MultipartFile> images,
-            BindingResult bindingResult) {
-
-        var baseResponseDTO = new BaseResponseDTO<CreateFinalReportResponseDTO>();
-
-        if (bindingResult.hasFieldErrors()) {
-            String errorMessages = "";
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessages += error.getDefaultMessage() + "; ";
-            }
-
-            baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
-            baseResponseDTO.setMessage(errorMessages);
-            baseResponseDTO.setTimestamp(new Date());
-            return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
-        }
+            @RequestPart("images") List<MultipartFile> images
+    ) {
+        BaseResponseDTO<CreateFinalReportResponseDTO> responseDTO = new BaseResponseDTO<>();
 
         try {
-            CreateFinalReportResponseDTO pdfReport = finalReportService.generatePdfReport(data, images, authHeader);
-            baseResponseDTO.setStatus(HttpStatus.OK.value());
-            baseResponseDTO.setData(pdfReport);
-            baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Final Report generated!"));
-            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+            CreateFinalReportRequestDTO createFinalReportRequestDTO = finalReportService.convertToCreateFinalReportRequestDTO(data, images, authHeader);
+            CreateFinalReportResponseDTO pdfReport = finalReportService.generatePdfReport(createFinalReportRequestDTO, authHeader);
+
+            responseDTO.setStatus(HttpStatus.OK.value());
+            responseDTO.setData(pdfReport);
+            responseDTO.setTimestamp(new Date());
+            responseDTO.setMessage("Final Report generated!");
+            return ResponseEntity.ok(responseDTO);
 
         } catch (Exception e) {
-            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Failed to generate Final Report: %s !", e.getMessage()));
-            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+            responseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            responseDTO.setTimestamp(new Date());
+            responseDTO.setMessage("Failed to generate Final Report: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<BaseResponseDTO<List<FinalReportResponseDTO>>> getAllFinalReports() {
+        BaseResponseDTO<List<FinalReportResponseDTO>> responseDTO = new BaseResponseDTO<>();
+
+        try {
+            List<FinalReportResponseDTO> allReports = finalReportService.getAllFinalReports();
+            responseDTO.setStatus(HttpStatus.OK.value());
+            responseDTO.setData(allReports);
+            responseDTO.setTimestamp(new Date());
+            responseDTO.setMessage("List of final reports retrieved!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            responseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            responseDTO.setTimestamp(new Date());
+            responseDTO.setMessage("Failed to retrieve final reports!");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponseDTO<FinalReportResponseDTO>> getFinalReportDetail(@PathVariable("id") Long id) {
+        BaseResponseDTO<FinalReportResponseDTO> responseDTO = new BaseResponseDTO<>();
+
+        try {
+            FinalReportResponseDTO report = finalReportService.getReportsById(id);
+
+            List<ImageResponseDTO> imageResponses = report.getImages().stream()
+                    .map(image -> new ImageResponseDTO(
+                            image.getId(),
+                            image.getFileName(),
+                            image.getFileData()
+                    ))
+                    .collect(Collectors.toList());
+
+            report.setImages(imageResponses);
+
+            responseDTO.setStatus(HttpStatus.OK.value());
+            responseDTO.setData(report);
+            responseDTO.setTimestamp(new Date());
+            responseDTO.setMessage("Final report retrieved!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (NoSuchElementException e) {
+            responseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            responseDTO.setTimestamp(new Date());
+            responseDTO.setMessage("Final report not found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseDTO);
+        } catch (Exception e) {
+            responseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            responseDTO.setTimestamp(new Date());
+            responseDTO.setMessage("Failed to retrieve final report detail!");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
+        }
+    }
+
+    @PutMapping("/{id}/delete")
+    public ResponseEntity<BaseResponseDTO<Void>> deleteFinalReport(@PathVariable("id") Long id) {
+        BaseResponseDTO<Void> responseDTO = new BaseResponseDTO<>();
+
+        try {
+            finalReportService.deleteFinalReport(id);
+            responseDTO.setStatus(HttpStatus.OK.value());
+            responseDTO.setMessage("Final report successfully deleted!");
+            responseDTO.setTimestamp(new Date());
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (ConstraintViolationException e) {
+            responseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setTimestamp(new Date());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
+        } catch (EntityNotFoundException e) {
+            responseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setTimestamp(new Date());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseDTO);
+        }
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadFinalReport(@PathVariable("id") Long id) {
+        try {
+            byte[] pdfData = finalReportService.getPdfFile(id);
+            String fileName = "Final_Report_" + id + ".pdf";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", fileName);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfData);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

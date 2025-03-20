@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -40,7 +41,7 @@ public class FinalReport implements Serializable {
     private String updatedBy;
 
     @Column(name = "deleted_at")
-    private Instant deletedAt;
+    private Date deletedAt;
 
     @Column(name = "deleted_by")
     private String deletedBy;

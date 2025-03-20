@@ -146,4 +146,30 @@ public class InvoiceController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+//    @GetMapping("/{id}/download")
+//    public ResponseEntity<byte[]> downloadInvoicePdf(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+//        try {
+//            CreateInvoiceRequestDTO requestDTO = new CreateInvoiceRequestDTO();
+//            requestDTO.setPurchaseOrderId(id);
+//
+//            CreateInvoiceResponseDTO responseDTO = invoiceService.generatePdfReport(requestDTO, authHeader);
+//
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.APPLICATION_PDF)
+//                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + responseDTO.getFileName())
+//                    .body(responseDTO.getPdf());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//    }
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadInvoice(@PathVariable("id") Long id,  @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        CreateInvoiceResponseDTO responseDTO = invoiceService.generatePdfByInvoiceId(id, authHeader);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + responseDTO.getFileName())
+                .body(responseDTO.getPdf());
+    }
 }

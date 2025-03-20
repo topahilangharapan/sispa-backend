@@ -6,14 +6,17 @@ import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
 import radiant.sispa.backend.restdto.request.UpdateProfileRequestDTO;
 import radiant.sispa.backend.restdto.request.UserProfileRequestDTO;
 import radiant.sispa.backend.restdto.request.UserRequestDTO;
+import radiant.sispa.backend.restdto.request.PasswordChangeRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
 import radiant.sispa.backend.restdto.response.UserProfileResponseDTO;
 import radiant.sispa.backend.restdto.response.UserResponseDTO;
+import radiant.sispa.backend.restdto.response.PasswordChangeResponseDTO;
 import radiant.sispa.backend.restservice.UserRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.Date;
@@ -99,6 +102,34 @@ public class UserRestController {
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage(e.getMessage());
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequestDTO requestDTO) {
+        var baseResponseDTO = new BaseResponseDTO<PasswordChangeResponseDTO>();
+        
+        try {
+            PasswordChangeResponseDTO response = userService.changePassword(requestDTO);
+            
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(response);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Password changed successfully");
+            
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Error changing password: " + e.getMessage());
+            
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

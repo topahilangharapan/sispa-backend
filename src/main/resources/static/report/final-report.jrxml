@@ -28,57 +28,57 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="160">
+		<band height="172">
 			<image>
 				<reportElement x="1" y="14" width="174" height="49" uuid="479d4f78-d3ec-4524-aecc-3180d402708d"/>
 				<imageExpression><![CDATA[$P{logoSPA}]]></imageExpression>
 			</image>
 			<frame>
-				<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="113" width="240" height="16" uuid="fa7d871d-9be4-4809-8dc2-a5ed28ec36f0"/>
+				<reportElement positionType="Float" x="0" y="113" width="240" height="16" uuid="fa7d871d-9be4-4809-8dc2-a5ed28ec36f0"/>
 				<staticText>
 					<reportElement stretchType="ContainerHeight" mode="Transparent" x="0" y="0" width="80" height="16" forecolor="#030000" backcolor="#65161D" uuid="1012fe8a-8305-49a5-b8cf-ac7fbde5774d"/>
 					<box topPadding="2" leftPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="SansSerif" size="10"/>
+						<font fontName="DejaVu Sans" size="10"/>
 					</textElement>
 					<text><![CDATA[Perusahaan]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="172d8eb7-15af-4cdc-900c-570e73838386"/>
+					<reportElement stretchType="ContainerHeight" mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="172d8eb7-15af-4cdc-900c-570e73838386"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="DejaVu Sans" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
 				<textField textAdjust="StretchHeight">
-					<reportElement x="90" y="0" width="150" height="16" uuid="fe175ea1-a0eb-4162-a78f-9a3645426f5f"/>
+					<reportElement stretchType="ContainerHeight" x="90" y="0" width="150" height="16" uuid="fe175ea1-a0eb-4162-a78f-9a3645426f5f"/>
 					<box topPadding="2" leftPadding="2">
 						<pen lineWidth="0.5"/>
 					</box>
 					<textElement textAlignment="Left" verticalAlignment="Top">
-						<font fontName="SansSerif" size="10" isBold="false"/>
+						<font fontName="DejaVu Sans" size="10" isBold="false"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{perusahaan}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>
-				<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="97" width="240" height="16" uuid="60e34639-331b-496e-acff-b256960ed203"/>
+				<reportElement positionType="Float" x="0" y="97" width="240" height="16" uuid="60e34639-331b-496e-acff-b256960ed203"/>
 				<textField textAdjust="StretchHeight">
-					<reportElement x="90" y="0" width="150" height="16" uuid="68e6e0bf-e929-44af-8ad4-29b5b103a0a4"/>
+					<reportElement stretchType="ContainerHeight" x="90" y="0" width="150" height="16" uuid="68e6e0bf-e929-44af-8ad4-29b5b103a0a4"/>
 					<box topPadding="2" leftPadding="2">
 						<pen lineWidth="0.5"/>
 					</box>
 					<textElement textAlignment="Left" verticalAlignment="Top">
-						<font fontName="SansSerif" size="10" isBold="false"/>
+						<font fontName="DejaVu Sans" size="10" isBold="false"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{tanggal}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="785974a1-5479-4e51-8ea6-102d868950c2"/>
+					<reportElement stretchType="ContainerHeight" mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="785974a1-5479-4e51-8ea6-102d868950c2"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="DejaVu Sans" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
@@ -86,38 +86,38 @@
 					<reportElement stretchType="ContainerHeight" mode="Transparent" x="0" y="0" width="80" height="16" forecolor="#030000" backcolor="#65161D" uuid="a69e34d3-b030-4976-91d9-351d77355baf"/>
 					<box topPadding="2" leftPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="SansSerif" size="10"/>
+						<font fontName="DejaVu Sans" size="10"/>
 					</textElement>
 					<text><![CDATA[Tanggal]]></text>
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="81" width="240" height="16" uuid="51856187-8a92-44c8-acbc-e16a91df7fda">
+				<reportElement positionType="Float" x="0" y="81" width="240" height="16" uuid="51856187-8a92-44c8-acbc-e16a91df7fda">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<staticText>
 					<reportElement stretchType="ContainerHeight" mode="Transparent" x="0" y="0" width="80" height="16" forecolor="#030000" backcolor="#65161D" uuid="6423d900-1a51-46e1-b627-8fbfa464f897"/>
 					<box topPadding="2" leftPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="SansSerif" size="10"/>
+						<font fontName="DejaVu Sans" size="10"/>
 					</textElement>
 					<text><![CDATA[Event]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="8c374f39-6780-4d1c-bf44-b6de1122cb50"/>
+					<reportElement stretchType="ContainerHeight" mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="8c374f39-6780-4d1c-bf44-b6de1122cb50"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="DejaVu Sans" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
 				<textField textAdjust="StretchHeight">
-					<reportElement x="90" y="0" width="150" height="16" uuid="d1210ede-b111-4de9-9359-38d508b714eb"/>
+					<reportElement stretchType="ContainerHeight" x="90" y="0" width="150" height="16" uuid="d1210ede-b111-4de9-9359-38d508b714eb"/>
 					<box topPadding="2" leftPadding="2">
 						<pen lineWidth="0.5"/>
 					</box>
 					<textElement textAlignment="Left" verticalAlignment="Top">
-						<font fontName="SansSerif" size="10" isBold="false"/>
+						<font fontName="DejaVu Sans" size="10" isBold="false"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{event}]]></textFieldExpression>
 				</textField>
@@ -125,18 +125,22 @@
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="156">
+		<band height="191">
 			<frame>
-				<reportElement x="1" y="1" width="458" height="130" uuid="ce2aaf22-9ba9-4315-ae13-8f6b6e4a5dd6"/>
+				<reportElement x="1" y="1" width="475" height="173" uuid="ce2aaf22-9ba9-4315-ae13-8f6b6e4a5dd6"/>
 				<image scaleImage="FillFrame">
-					<reportElement x="-1" y="0" width="213" height="120" uuid="baeaf3a7-d6fc-4b68-9438-d94fdbc76bb2">
+					<reportElement x="-1" y="0" width="230" height="173" uuid="baeaf3a7-d6fc-4b68-9438-d94fdbc76bb2">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<imageExpression><![CDATA[$F{imageLeft}]]></imageExpression>
 				</image>
 				<image scaleImage="FillFrame">
-					<reportElement x="245" y="0" width="213" height="120" uuid="23519f65-04e5-40ad-a498-31c6c32350a9">
+					<reportElement x="245" y="0" width="230" height="173" uuid="23519f65-04e5-40ad-a498-31c6c32350a9">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<imageExpression><![CDATA[$F{imageRight}]]></imageExpression>
 				</image>

@@ -62,7 +62,6 @@ public class VendorRestServiceImpl implements VendorRestService {
                 throw new IllegalArgumentException("Vendor dengan nama dan kontak ini sudah terdaftar.");
             }
         }
-
         Vendor newVendor = new Vendor();
 
         newVendor.setId(generateVendorId(vendorDTO.getName()));
@@ -133,6 +132,7 @@ public class VendorRestServiceImpl implements VendorRestService {
         vendor.setEmail(vendorDTO.getEmail());
         vendor.setService(vendorDTO.getService());
         vendor.setDescription(vendorDTO.getDescription());
+        vendor.setUpdatedBy(username);
         vendor.setUpdatedBy(username);
 
         Vendor updatedVendor = vendorDb.save(vendor);
