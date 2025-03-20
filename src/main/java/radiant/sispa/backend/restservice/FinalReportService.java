@@ -8,6 +8,7 @@ import radiant.sispa.backend.restdto.request.CreateFinalReportRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
 import radiant.sispa.backend.restdto.request.UpdateClientRequestRestDTO;
 import radiant.sispa.backend.restdto.response.*;
+import radiant.sispa.backend.restdto.response.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,4 +18,5 @@ public interface FinalReportService {
     CreateFinalReportRequestDTO convertToCreateFinalReportRequestDTO(String data, List<MultipartFile> images, String createdBy) throws IOException;
     List<FinalReportResponseDTO> getAllFinalReports();
     FinalReportResponseDTO getReportsById(Long id);
+    void deleteFinalReport(Long id) throws EntityNotFoundException;
 }

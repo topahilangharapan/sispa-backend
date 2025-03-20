@@ -3,6 +3,8 @@ package radiant.sispa.backend.restservice;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -17,6 +19,7 @@ import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateFinalReportRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
@@ -171,7 +174,7 @@ public class FinalReportServiceImpl implements FinalReportService {
 
     @Override
     public List<FinalReportResponseDTO> getAllFinalReports() {
-        List<FinalReport> finalReports = finalReportDb.findAll();
+        List<FinalReport> finalReports = finalReportDb.findByDeletedAtNull();
 
         List<FinalReportResponseDTO> result = new ArrayList<>();
         for (FinalReport report : finalReports) {
@@ -210,5 +213,16 @@ public class FinalReportServiceImpl implements FinalReportService {
         dto.setImages(itemDTOs);
 
         return dto;
+    }
+
+    @Override
+    public void deleteFinalReport(Long id) throws EntityNotFoundException {
+        FinalReport reportToDelete = finalReportDb.findByIdAndDeletedAtNull(id);
+        if (reportToDelete == null) {
+            throw new EntityNotFoundException("Klien tidak ditemukan");
+        }
+
+        reportToDelete.setDeletedAt(new Date());
+        finalReportDb.save(reportToDelete);
     }
 }
