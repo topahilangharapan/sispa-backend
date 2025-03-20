@@ -1,5 +1,7 @@
 package radiant.sispa.backend.restcontroller;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,12 +17,14 @@ import radiant.sispa.backend.repository.ImageDb;
 import radiant.sispa.backend.restdto.request.CreateFinalReportRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.FinalReportService;
 import radiant.sispa.backend.restservice.InvoiceService;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -133,5 +137,32 @@ public class FinalReportController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/{id}/delete")
+    public ResponseEntity<?> deleteFinalReport(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<List<FinalReportResponseDTO>>();
+
+        try {
+            finalReportService.deleteFinalReport(id);
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setMessage(String.format("Berhasil menghapus laporan akhir dengan ID %s", id));
+            baseResponseDTO.setTimestamp(new Date());
+
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+
+        } catch (ConstraintViolationException e) {
+            baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+            baseResponseDTO.setMessage(String.format(e.getMessage()));
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
+
+        } catch (EntityNotFoundException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(String.format(e.getMessage()));
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 }
