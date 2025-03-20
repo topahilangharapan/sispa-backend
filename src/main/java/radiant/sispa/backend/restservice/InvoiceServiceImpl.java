@@ -272,10 +272,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void deleteInvoice(Long id){
         Invoice invoice = invoiceDb.findById(id);
-//                .orElseThrow(() -> new NoSuchElementException("Invoice not found with id: " + id));
-
-        // If you want to do "soft delete," set 'deletedAt' and 'deletedBy' instead
-        // For a real physical delete:
         invoiceDb.delete(invoice);
     }
 
