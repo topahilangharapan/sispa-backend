@@ -47,7 +47,7 @@
 					<reportElement stretchType="ContainerHeight" mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="172d8eb7-15af-4cdc-900c-570e73838386"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="SansSerif" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
@@ -78,7 +78,7 @@
 					<reportElement stretchType="ContainerHeight" mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="785974a1-5479-4e51-8ea6-102d868950c2"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="SansSerif" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
@@ -107,7 +107,7 @@
 					<reportElement stretchType="ContainerHeight" mode="Transparent" x="81" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="8c374f39-6780-4d1c-bf44-b6de1122cb50"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="SansSerif" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
