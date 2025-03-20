@@ -18,7 +18,7 @@ stages:
   - clean
 
 variables:
-  IMAGE_NAME: registry.gitlab.com/musthofa.joko/b01-radiant-be
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
   IMAGE_TAG: latest
 
 build:
@@ -28,7 +28,7 @@ build:
     - deployment
   script:
     - echo "Compile project to .jar"
-    - cd /root/builds/t3_BAqY4-/0/propensi-2024-2025-genap/kelas-b/b01-radiant-be
+    - cd /root/$CI_PROJECT_DIR
     - ./gradlew clean assemble
   artifacts:
     paths:
@@ -45,8 +45,9 @@ publish:
     - echo "Build Docker image..."
     - cd /root/$CI_PROJECT_DIR
     - docker build -t $IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
+    - echo "Login to GitLab Container Registry..."
+    - echo $CI_JOB_TOKEN | docker login $CI_REGISTRY -u gitlab-ci-token --password-stdin
     - echo "Push image to registry..."
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
     - docker push $IMAGE_NAME:$IMAGE_TAG
 
 deploy:
@@ -58,7 +59,7 @@ deploy:
   extends: .setup-ssh
   script:
     - echo "Deploying to Hostinger VPS..."
-    - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "docker login -u $CI_REGISTRY_USER --password-stdin <<< '$CI_REGISTRY_PASSWORD'"
+    - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "echo $CI_JOB_TOKEN | docker login $CI_REGISTRY -u gitlab-ci-token --password-stdin"
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "mkdir -p ~/backend/"
     - rsync -rahv /root/$CI_PROJECT_DIR/docker-compose.yml "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:~/backend/"
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "
