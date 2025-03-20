@@ -74,7 +74,7 @@ deploy:
       export DATABASE_USERNAME_DEV=${DATABASE_USERNAME_DEV} &&
       export DATABASE_PASSWORD_DEV=${DATABASE_PASSWORD_DEV} &&
       export JWT_SECRET_KEY=${JWT_SECRET_KEY} &&
-      cd ~/backend/ &&
+      cd /root/$CI_PROJECT_DIR &&
       docker compose -f docker-compose-deploy.yml up -d --pull always
       "
 
