@@ -119,7 +119,7 @@
 					<reportElement mode="Transparent" x="117" y="0" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="05bc1562-16d8-4558-bb53-4dfb62e5e3ba"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="SansSerif" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
@@ -135,7 +135,7 @@
 					<reportElement mode="Transparent" x="117" y="-16" width="8" height="16" forecolor="#030000" backcolor="#65161D" uuid="785974a1-5479-4e51-8ea6-102d868950c2"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="SansSerif" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
@@ -168,7 +168,7 @@
 					</reportElement>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="SansSerif" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>
@@ -199,7 +199,7 @@
 					<reportElement stretchType="ContainerHeight" mode="Transparent" x="117" y="0" width="7" height="16" forecolor="#030000" backcolor="#65161D" uuid="b27cafda-cc11-47f6-93c5-8c87fc0d0a18"/>
 					<box topPadding="2"/>
 					<textElement verticalAlignment="Top">
-						<font fontName="Gill Sans" size="11"/>
+						<font fontName="SansSerif" size="11"/>
 					</textElement>
 					<text><![CDATA[:]]></text>
 				</staticText>

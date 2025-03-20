@@ -18,7 +18,7 @@ stages:
   - clean
 
 variables:
-  IMAGE_NAME: registry.gitlab.com/musthofa.joko/b01-radiant-be
+  IMAGE_NAME: topahilangharapan/b01-radiant-be
   IMAGE_TAG: latest
 
 build:
@@ -28,11 +28,19 @@ build:
     - deployment
   script:
     - echo "Compile project to .jar"
-    - cd $CI_PROJECT_DIR
-    - sh gradlew clean assemble
+    - cd /root/$CI_PROJECT_DIR
+    - ./gradlew clean assemble
   artifacts:
     paths:
-      - build/libs/*.jar
+      - build/libs/backend-0.0.1-SNAPSHOT.jar
+
+login:
+  stage: publish
+  only:
+    - deployment
+  script:
+    - echo "Login to Docker Hub..."
+    - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
 publish:
   image: docker:27.3.1-alpine3.20
@@ -43,10 +51,9 @@ publish:
     - deployment
   script:
     - echo "Build Docker image..."
-    - cd $CI_PROJECT_DIR
+    - cd /root/$CI_PROJECT_DIR
     - docker build -t $IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
     - echo "Push image to registry..."
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
     - docker push $IMAGE_NAME:$IMAGE_TAG
 
 deploy:
@@ -58,16 +65,16 @@ deploy:
   extends: .setup-ssh
   script:
     - echo "Deploying to Hostinger VPS..."
-    - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "docker login -u $CI_REGISTRY_USER --password-stdin <<< '$CI_REGISTRY_PASSWORD'"
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "mkdir -p ~/backend/"
-    - rsync -rahv $CI_PROJECT_DIR/docker-compose.yml "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:~/backend/"
+    - rsync -rahv /root/$CI_PROJECT_DIR/docker-compose.yml "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:~/backend/"
+    - pwd
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "
       export IMAGE_NAME=${IMAGE_NAME} &&
       export DATABASE_URL_DEV=${DATABASE_URL_DEV} &&
       export DATABASE_USERNAME_DEV=${DATABASE_USERNAME_DEV} &&
       export DATABASE_PASSWORD_DEV=${DATABASE_PASSWORD_DEV} &&
       export JWT_SECRET_KEY=${JWT_SECRET_KEY} &&
-      cd ~/backend/ &&
+      cd /root/$CI_PROJECT_DIR &&
       docker compose -f docker-compose-deploy.yml up -d --pull always
       "
 
