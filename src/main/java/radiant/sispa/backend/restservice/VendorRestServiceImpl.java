@@ -58,7 +58,7 @@ public class VendorRestServiceImpl implements VendorRestService {
         List<Vendor> existingVendor = vendorDb.findByNameAndContactAndDeletedAtNull(vendorDTO.getName(), vendorDTO.getContact());
 
         for (var vendor : existingVendor) {
-            if (vendor.getName().equals(vendorDTO.getName()) && vendor.getContact().equals(vendorDTO.getContact())) {
+            if (vendor.getName().equalsIgnoreCase(vendorDTO.getName()) && vendor.getContact().equalsIgnoreCase(vendorDTO.getContact())) {
                 throw new IllegalArgumentException("Vendor dengan nama dan kontak ini sudah terdaftar.");
             }
         }
