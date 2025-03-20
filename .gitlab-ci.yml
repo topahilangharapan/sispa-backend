@@ -42,10 +42,8 @@ publish:
   only:
     - deployment
   script:
-    - echo "Current directory $CI_PROJECT_DIR"
-    - ls -lah $CI_PROJECT_DIR
     - echo "Build Docker image..."
-    - cd /root/builds/t3_BAqY4-/0/propensi-2024-2025-genap/kelas-b/b01-radiant-be
+    - cd /root/$CI_PROJECT_DIR
     - docker build -t $IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
     - echo "Push image to registry..."
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
@@ -62,7 +60,7 @@ deploy:
     - echo "Deploying to Hostinger VPS..."
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "docker login -u $CI_REGISTRY_USER --password-stdin <<< '$CI_REGISTRY_PASSWORD'"
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "mkdir -p ~/backend/"
-    - rsync -rahv $CI_PROJECT_DIR/docker-compose.yml "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:~/backend/"
+    - rsync -rahv /root/$CI_PROJECT_DIR/docker-compose.yml "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:~/backend/"
     - ssh "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" "
       export IMAGE_NAME=${IMAGE_NAME} &&
       export DATABASE_URL_DEV=${DATABASE_URL_DEV} &&
