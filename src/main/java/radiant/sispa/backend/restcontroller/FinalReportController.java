@@ -14,15 +14,14 @@ import radiant.sispa.backend.model.Image;
 import radiant.sispa.backend.repository.ImageDb;
 import radiant.sispa.backend.restdto.request.CreateFinalReportRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateFinalReportResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.FinalReportService;
 import radiant.sispa.backend.restservice.InvoiceService;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
@@ -88,6 +87,49 @@ public class FinalReportController {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage(String.format("Failed to generate Final Report: %s !", e.getMessage()));
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllFinalReports() {
+        var baseResponseDTO = new BaseResponseDTO<List<FinalReportResponseDTO>>();
+        try {
+            List<FinalReportResponseDTO> allOrders = finalReportService.getAllFinalReports();
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(allOrders);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("List of final report retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve final reports!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getFinalReportDetail(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<FinalReportResponseDTO>();
+        try {
+            FinalReportResponseDTO report = finalReportService.getReportsById(id);
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(report);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Final report retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve final report detail!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
