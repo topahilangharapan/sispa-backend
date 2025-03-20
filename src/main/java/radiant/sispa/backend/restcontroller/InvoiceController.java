@@ -10,34 +10,31 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
+import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
-import radiant.sispa.backend.restservice.PurchaseOrderService;
+import radiant.sispa.backend.restservice.InvoiceService;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 
 @RestController
-@RequestMapping("/api/purchase-order")
-public class PurchaseOrderController {
+@RequestMapping("/api/invoice")
+public class InvoiceController {
     @Autowired
-    private PurchaseOrderService purchaseOrderService;
-
-//    @GetMapping("/sample")
-//    public ResponseEntity<byte[]> getPdfReport() {
-//        return purchaseOrderService.generatePdfReport();
-//    }
+    private InvoiceService invoiceService;
 
     @PostMapping("/test/create")
     public ResponseEntity<byte[]> createPdfReportTest(
             @Valid
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO,
+            @RequestBody CreateInvoiceRequestDTO createInvoiceRequestDTO,
             BindingResult bindingResult) {
 
-        byte[] pdfBytes = purchaseOrderService.generatePdfReport(createPurchaseOrderRequestDTO, authHeader).getPdf();
+        byte[] pdfBytes = invoiceService.generatePdfReport(createInvoiceRequestDTO, authHeader).getPdf();
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
@@ -49,10 +46,10 @@ public class PurchaseOrderController {
     public ResponseEntity<?> createPdfReport(
             @Valid
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO,
+            @RequestBody CreateInvoiceRequestDTO createInvoiceRequestDTO,
             BindingResult bindingResult) {
 
-        var baseResponseDTO = new BaseResponseDTO<CreatePurchaseOrderResponseDTO>();
+        var baseResponseDTO = new BaseResponseDTO<CreateInvoiceResponseDTO>();
 
         if (bindingResult.hasFieldErrors()) {
             String errorMessages = "";
@@ -68,50 +65,50 @@ public class PurchaseOrderController {
         }
 
         try {
-            CreatePurchaseOrderResponseDTO pdfReport = purchaseOrderService.generatePdfReport(createPurchaseOrderRequestDTO, authHeader);
+            CreateInvoiceResponseDTO pdfReport = invoiceService.generatePdfReport(createInvoiceRequestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(pdfReport);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Purchase order generated!"));
+            baseResponseDTO.setMessage(String.format("Invoice generated!"));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
 
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Failed to generate purchase order: %s !", e.getMessage()));
+            baseResponseDTO.setMessage(String.format("Failed to generate invoice: %s !", e.getMessage()));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllPurchaseOrders() {
-        var baseResponseDTO = new BaseResponseDTO<List<PurchaseOrderResponseDTO>>();
+    public ResponseEntity<?> getAllInvoice() {
+        var baseResponseDTO = new BaseResponseDTO<List<InvoiceResponseDTO>>();
         try {
-            List<PurchaseOrderResponseDTO> allOrders = purchaseOrderService.getAllPurchaseOrders();
+            List<InvoiceResponseDTO> allOrders = invoiceService.getAllInvoices();
 
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(allOrders);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("List of purchase orders retrieved!");
+            baseResponseDTO.setMessage("List of invoices retrieved!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to retrieve purchase orders!");
+            baseResponseDTO.setMessage("Failed to retrieve invoices!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPurchaseOrderDetail(@PathVariable("id") Long id) {
-        var baseResponseDTO = new BaseResponseDTO<PurchaseOrderResponseDTO>();
+    public ResponseEntity<?> getInvoiceDetail(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<InvoiceResponseDTO>();
         try {
-            PurchaseOrderResponseDTO purchaseOrder = purchaseOrderService.getPurchaseOrderById(id);
+            InvoiceResponseDTO invoice = invoiceService.getInvoiceById(id);
 
             baseResponseDTO.setStatus(HttpStatus.OK.value());
-            baseResponseDTO.setData(purchaseOrder);
+            baseResponseDTO.setData(invoice);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Purchase order retrieved!");
+            baseResponseDTO.setMessage("Invoice retrieved!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
@@ -121,21 +118,21 @@ public class PurchaseOrderController {
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to retrieve purchase order detail!");
+            baseResponseDTO.setMessage("Failed to retrieve invoice detail!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePurchaseOrder(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteInvoice(@PathVariable("id") Long id) {
         var baseResponseDTO = new BaseResponseDTO<String>();
         try {
-            purchaseOrderService.deletePurchaseOrder(id);
+            invoiceService.deleteInvoice(id);
 
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData("Deleted");
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Purchase order deleted successfully!");
+            baseResponseDTO.setMessage("Invoice deleted successfully!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
@@ -145,9 +142,8 @@ public class PurchaseOrderController {
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to delete purchase order!");
+            baseResponseDTO.setMessage("Failed to delete Invoice!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

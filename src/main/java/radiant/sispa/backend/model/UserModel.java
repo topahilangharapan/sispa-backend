@@ -15,6 +15,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.io.Serializable;
 import java.sql.Time;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -48,6 +49,18 @@ public class UserModel implements Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Role role;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "place_of_birth")
+    private String placeOfBirth;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

@@ -17,4 +17,7 @@ public interface PurchaseOrderDb extends JpaRepository<PurchaseOrder, Long> {
 
     @Query("SELECT p FROM PurchaseOrder p WHERE p.createdAt >= :startOfDay AND p.createdAt < :endOfDay")
     List<PurchaseOrder> findPurchaseOrdersToday(@Param("startOfDay") Instant startOfDay, @Param("endOfDay") Instant endOfDay);
+
+    PurchaseOrder findPurchaseOrderById(Long id);
+    PurchaseOrder findPurchaseOrderByNoPo(String id);
 }

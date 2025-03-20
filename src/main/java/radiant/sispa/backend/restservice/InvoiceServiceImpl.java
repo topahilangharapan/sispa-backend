@@ -1,21 +1,24 @@
 package radiant.sispa.backend.restservice;
 
+import jakarta.persistence.EntityNotFoundException;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import radiant.sispa.backend.model.Invoice;
 import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.PurchaseOrderItem;
+import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
-import radiant.sispa.backend.repository.PurchaseOrderItemDb;
-import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
-import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
+import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
+import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.time.Instant;
@@ -25,15 +28,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
-public class PurchaseOrderServiceImpl implements PurchaseOrderService {
+public class InvoiceServiceImpl implements InvoiceService {
     @Autowired
-    private PurchaseOrderDb purchaseOrderDb;
+    private InvoiceDb invoiceDb;
 
     @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
-    private PurchaseOrderItemDb purchaseOrderItemDb;
+    private PurchaseOrderDb purchaseOrderDb;
 
     private static final String[] SATUAN = {"", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"};
     private static final String[] BELASAN = {"Sepuluh", "Sebelas", "Dua Belas", "Tiga Belas", "Empat Belas", "Lima Belas", "Enam Belas", "Tujuh Belas", "Delapan Belas", "Sembilan Belas"};
@@ -41,14 +44,21 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private static final String[] RIBUAN = {"", "Ribu", "Juta", "Miliar", "Triliun"};
 
     @Override
-    public CreatePurchaseOrderResponseDTO generatePdfReport(CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO, String authHeader) {
+    public CreateInvoiceResponseDTO generatePdfReport(CreateInvoiceRequestDTO createInvoiceRequestDTO, String authHeader) {
         try {
             String token = authHeader.substring(7);
             String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
-            PurchaseOrder purchaseOrder = createPurchaseOrderToPurchaseOrder(createPurchaseOrderRequestDTO, createdBy);
+            PurchaseOrder purchaseOrder = purchaseOrderDb.findPurchaseOrderById(createInvoiceRequestDTO.getPurchaseOrderId());
+            if (purchaseOrder == null) {
+                throw new FileNotFoundException("Purchase Order tidak ditemukan.");
+            }
 
-            InputStream reportStream = new ClassPathResource("/static/report/purchase-order.jrxml").getInputStream();
+
+            Invoice invoice = createInvoiceRequestDTOToInvoice(createInvoiceRequestDTO, purchaseOrder, createdBy);
+
+
+            InputStream reportStream = new ClassPathResource("/static/report/invoice.jrxml").getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
 
             List<Map<String, Object>> data = new ArrayList<>();
@@ -63,11 +73,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 row.put("satuan", purchaseOrderItem.getUnit());
                 row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getPricePerUnit()));
                 row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getSum()));
-                row.put("blank", "");
-                row.put("uraianDeskripsi", purchaseOrderItem.getDescription());
 
                 data.add(row);
             }
+
 
             if (purchaseOrder.getItems().isEmpty()) {
                 Map<String, Object> row = new HashMap<>();
@@ -78,8 +87,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 row.put("satuan", "");
                 row.put("hargaSatuan", "");
                 row.put("jumlah", "");
-                row.put("blank", "");
-                row.put("uraianDeskripsi", "");
 
                 data.add(row);
             }
@@ -90,102 +97,93 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             parameters.put("logoSPA", "static/images/logo_spa_with_text.png");
             parameters.put("perusahaan", purchaseOrder.getCompanyName());
             parameters.put("alamatPerusahaan", purchaseOrder.getCompanyAddress());
-            parameters.put("penerima", purchaseOrder.getReceiver());
-            parameters.put("tanggalDibuat", purchaseOrder.getDateCreated());
+            parameters.put("penerima", invoice.getReceiver());
+            parameters.put("tanggalDibuat", invoice.getDateCreated());
+            parameters.put("noInvoice", invoice.getNoInvoice());
             parameters.put("noPo", purchaseOrder.getNoPo());
-            parameters.put("total", formatWithThousandSeparator(purchaseOrder.getTotal()));
-            parameters.put("terbilang", purchaseOrder.getSpelledOut());
-            parameters.put("ketentuan", purchaseOrder.getTerms());
-            parameters.put("tempat", purchaseOrder.getPlaceSigned());
-            parameters.put("tanggalDitandatangani", purchaseOrder.getDateSigned());
+            parameters.put("tanggalPembayaran", invoice.getDatePaid());
+            parameters.put("subTotal", formatWithThousandSeparator(invoice.getSubTotal()));
+            parameters.put("ppnPersen", String.valueOf(Math.round(invoice.getPpnPercentage() * 100)));
+            parameters.put("ppn", formatWithThousandSeparator(invoice.getPpn()));
+            parameters.put("total", formatWithThousandSeparator(invoice.getTotal()));
+            parameters.put("terbilang", invoice.getSpelledOut());
+            parameters.put("namaBank", invoice.getBankName());
+            parameters.put("noRek", invoice.getAccountNumber());
+            parameters.put("atasNama", invoice.getOnBehalf());
+            parameters.put("tempat", invoice.getPlaceSigned());
+            parameters.put("tanggalDitandatangani", invoice.getDateSigned());
             parameters.put("tandaTangan", "static/images/ttd_po.jpg");
-            parameters.put("yangMenandatangani", purchaseOrder.getSignee());
+            parameters.put("yangMenandatangani", invoice.getSignee());
+            parameters.put("footerSpa", "static/images/footer_spa.jpg");
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-
             byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
 
-            CreatePurchaseOrderResponseDTO createPurchaseOrderResponseDTO = new CreatePurchaseOrderResponseDTO();
-            createPurchaseOrderResponseDTO.setPdf(pdfBytes);
-            createPurchaseOrderResponseDTO.setFileName(purchaseOrder.getFileName());
+            CreateInvoiceResponseDTO createInvoiceResponseDTO = new CreateInvoiceResponseDTO();
+            createInvoiceResponseDTO.setPdf(pdfBytes);
+            createInvoiceResponseDTO.setFileName(invoice.getFileName());
 
-            return createPurchaseOrderResponseDTO;
+            return createInvoiceResponseDTO;
 
         } catch (Exception e) {
             throw new RuntimeException("Error generating PDF report", e.getCause());
         }
     }
 
-    private PurchaseOrder createPurchaseOrderToPurchaseOrder(CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO, String createdBy) {
-        PurchaseOrder purchaseOrder = new PurchaseOrder();
-        List<PurchaseOrderItem> items = savePurchaseOrderItem(createPurchaseOrderRequestDTO.getItems(), createdBy);
+    private Invoice createInvoiceRequestDTOToInvoice(CreateInvoiceRequestDTO createInvoiceRequestDTO, PurchaseOrder purchaseOrder, String createdBy) {
+        Invoice invoice = new Invoice();
 
-        purchaseOrder.setCreatedBy(createdBy);
-        purchaseOrder.setCompanyName(createPurchaseOrderRequestDTO.getCompanyName());
-        purchaseOrder.setCompanyAddress(createPurchaseOrderRequestDTO.getCompanyAddress());
-        purchaseOrder.setReceiver(createPurchaseOrderRequestDTO.getReceiver());
-        purchaseOrder.setDateCreated(createPurchaseOrderRequestDTO.getDateCreated());
-        purchaseOrder.setNoPo(createNoPo(createPurchaseOrderRequestDTO));
-        purchaseOrder.setItems(items);
+        invoice.setCreatedBy(createdBy);
+        invoice.setReceiver(createInvoiceRequestDTO.getReceiver());
+        invoice.setDateCreated(createInvoiceRequestDTO.getDateCreated());
+        invoice.setNoInvoice(createNoInvoice(createInvoiceRequestDTO, purchaseOrder));
+        invoice.setNoPo(purchaseOrder.getNoPo());
+        invoice.setDatePaid(createInvoiceRequestDTO.getDatePaid());
+        invoice.setPurchaseOrder(purchaseOrder);
+        invoice.setSubTotal(purchaseOrder.getTotal());
+        invoice.setPpnPercentage(Double.parseDouble(createInvoiceRequestDTO.getPpnPercentage()) / 100);
+        invoice.setPpn(Math.round(invoice.getSubTotal() * invoice.getPpnPercentage()));
+        invoice.setTotal(invoice.getSubTotal() + invoice.getPpn());
+        invoice.setSpelledOut(spellItOut(invoice.getTotal()));
+        invoice.setBankName(createInvoiceRequestDTO.getBankName());
+        invoice.setAccountNumber(createInvoiceRequestDTO.getAccountNumber());
+        invoice.setOnBehalf(createInvoiceRequestDTO.getOnBehalf());
+        invoice.setPlaceSigned(createInvoiceRequestDTO.getPlaceSigned());
+        invoice.setDateSigned(createInvoiceRequestDTO.getDateSigned());
+        invoice.setSignee(createInvoiceRequestDTO.getSignee());
+        invoice.setEvent(createInvoiceRequestDTO.getEvent());
+        invoice.setFileName(createFileName(invoice));
 
-        Long total = 0L;
-        for (PurchaseOrderItem item : items) {
-            total += item.getSum();
-        }
-
-        purchaseOrder.setTotal(total);
-        purchaseOrder.setSpelledOut(spellItOut(total));
-        purchaseOrder.setTerms(createPurchaseOrderRequestDTO.getTerms());
-        purchaseOrder.setPlaceSigned(createPurchaseOrderRequestDTO.getPlaceSigned());
-        purchaseOrder.setDateSigned(createPurchaseOrderRequestDTO.getDateSigned());
-        purchaseOrder.setSignee(createPurchaseOrderRequestDTO.getSignee());
-        purchaseOrder.setFileName(createFileName(purchaseOrder));
-
-        return purchaseOrderDb.save(purchaseOrder);
+        return invoiceDb.save(invoice);
     }
 
-    private List<PurchaseOrderItem> savePurchaseOrderItem(List<Map<String, String>> items, String createdBy) {
-        List<PurchaseOrderItem> result = new ArrayList<>();
-
-        for (Map<String, String> item : items) {
-            PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
-
-            purchaseOrderItem.setCreatedBy(createdBy);
-            purchaseOrderItem.setTitle(item.get("title"));
-            purchaseOrderItem.setVolume(Long.parseLong(item.get("volume")));
-            purchaseOrderItem.setUnit(item.get("unit"));
-            purchaseOrderItem.setPricePerUnit(Long.parseLong(item.get("pricePerUnit")));
-            purchaseOrderItem.setSum(purchaseOrderItem.getVolume() * purchaseOrderItem.getPricePerUnit());
-            purchaseOrderItem.setDescription(item.get("description"));
-
-            result.add(purchaseOrderItemDb.save(purchaseOrderItem));
-        }
-
-        return result;
-    }
-
-    private String createNoPo(CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO) {
-        String companyAbbreviation = getAbbreviation(createPurchaseOrderRequestDTO.getCompanyName());
+    private String createNoInvoice(CreateInvoiceRequestDTO createInvoiceRequestDTO, PurchaseOrder purchaseOrder) {
+        String companyAbbreviation = getAbbreviation(purchaseOrder.getCompanyName());
 
         LocalDate today = LocalDate.now();
         Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
         Instant endOfDay = today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
-        List<PurchaseOrder> purchaseOrdersToday = purchaseOrderDb.findPurchaseOrdersToday(startOfDay, endOfDay);
-        String numberOfPurchaseOrdersToday = String.format("%03d", purchaseOrdersToday.size());
+        List<Invoice> invoicesToday = invoiceDb.findInvoicesToday(startOfDay, endOfDay);
+        String numberOfInvoicesToday = String.format("%03d", invoicesToday.size());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
-        String formattedDate = today.format(formatter);
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("ddMMyy");
+        String formattedDate1 = today.format(formatter1);
 
-        return String.format("PO/%s/%s/%s", numberOfPurchaseOrdersToday, companyAbbreviation, formattedDate);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("dd MMMM yyyy", new Locale("id", "ID"));
+        String formattedDate2 = today.format(formatter2);
+
+
+        return String.format("I/%s/%s/%s", numberOfInvoicesToday, companyAbbreviation, formattedDate1);
     }
 
-    private String createFileName(PurchaseOrder purchaseOrder) {
+    private String createFileName(Invoice invoice) {
         LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
-        String formattedDate = today.format(formatter);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("dd MMMM yyyy", new Locale("id", "ID"));
+        String formattedDate2 = today.format(formatter2);
 
-        return String.format("%s_%s", purchaseOrder.getNoPo(), formattedDate);
+
+        return String.format("%s - %s - %s %s", invoice.getNoInvoice(), invoice.getPurchaseOrder().getCompanyName(), invoice.getEvent(), formattedDate2);
     }
 
     public String getAbbreviation(String companyName) {
@@ -252,58 +250,64 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return formatter.format(number);
     }
 
-
     @Override
-    public List<PurchaseOrderResponseDTO> getAllPurchaseOrders() {
-        List<PurchaseOrder> purchaseOrders = purchaseOrderDb.findAll();
-        
+    public List<InvoiceResponseDTO> getAllInvoices() {
+        List<Invoice> invoices = invoiceDb.findAll();
+
         // Convert each to a response DTO
-        List<PurchaseOrderResponseDTO> result = new ArrayList<>();
-        for (PurchaseOrder po : purchaseOrders) {
-            result.add(convertToResponse(po));
+        List<InvoiceResponseDTO> result = new ArrayList<>();
+        for (Invoice inv : invoices) {
+            result.add(convertToResponse(inv));
         }
         return result;
     }
 
     @Override
-    public PurchaseOrderResponseDTO getPurchaseOrderById(Long id) {
-        PurchaseOrder po = purchaseOrderDb.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
-        return convertToResponse(po);
+    public InvoiceResponseDTO getInvoiceById(Long id) {
+        Invoice invoice = invoiceDb.findById(id);
+//                .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+        return convertToResponse(invoice);
     }
 
     @Override
-    public void deletePurchaseOrder(Long id) {
-        PurchaseOrder po = purchaseOrderDb.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+    public void deleteInvoice(Long id){
+        Invoice invoice = invoiceDb.findById(id);
+//                .orElseThrow(() -> new NoSuchElementException("Invoice not found with id: " + id));
 
         // If you want to do "soft delete," set 'deletedAt' and 'deletedBy' instead
         // For a real physical delete:
-        purchaseOrderDb.delete(po);
+        invoiceDb.delete(invoice);
     }
 
-    /**
-     * Helper method to convert a PurchaseOrder entity into a PurchaseOrderResponseDTO
-     */
-    private PurchaseOrderResponseDTO convertToResponse(PurchaseOrder entity) {
-        PurchaseOrderResponseDTO dto = new PurchaseOrderResponseDTO();
+    private InvoiceResponseDTO convertToResponse(Invoice entity) {
+        InvoiceResponseDTO dto = new InvoiceResponseDTO();
         dto.setId(entity.getId());
-        dto.setCompanyName(entity.getCompanyName());
-        dto.setCompanyAddress(entity.getCompanyAddress());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setCreatedBy(entity.getCreatedBy());
         dto.setReceiver(entity.getReceiver());
-        dto.setNoPo(entity.getNoPo());
         dto.setDateCreated(entity.getDateCreated());
+        dto.setNoInvoice(entity.getNoInvoice());
+        dto.setNoPo(entity.getNoPo());
+        dto.setDatePaid(entity.getDatePaid());
+        dto.setSubTotal(entity.getSubTotal());
+        dto.setPpnPercentage(entity.getPpnPercentage());
+        dto.setPpn(entity.getPpn());
         dto.setTotal(entity.getTotal());
         dto.setSpelledOut(entity.getSpelledOut());
-        dto.setTerms(entity.getTerms());
+        dto.setBankName(entity.getBankName());
+        dto.setAccountNumber(entity.getAccountNumber());
+        dto.setOnBehalf(entity.getOnBehalf());
         dto.setPlaceSigned(entity.getPlaceSigned());
         dto.setDateSigned(entity.getDateSigned());
         dto.setSignee(entity.getSignee());
+        dto.setEvent(entity.getEvent());
+        dto.setFileName(entity.getFileName());
 
         // Convert items
         List<PurchaseOrderItemResponseDTO> itemDTOs = new ArrayList<>();
-        if (entity.getItems() != null) {
-            for (PurchaseOrderItem item : entity.getItems()) {
+        PurchaseOrder po = purchaseOrderDb.findPurchaseOrderByNoPo(entity.getNoPo());
+        if (po.getItems() != null) {
+            for (PurchaseOrderItem item : po.getItems()) {
                 PurchaseOrderItemResponseDTO itemDTO = new PurchaseOrderItemResponseDTO();
                 itemDTO.setId(item.getId());
                 itemDTO.setTitle(item.getTitle());
@@ -319,5 +323,4 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         return dto;
     }
-
 }
