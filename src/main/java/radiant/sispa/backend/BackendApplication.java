@@ -29,26 +29,42 @@ public class BackendApplication {
 	@Transactional
 	CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService) {
 		return args -> {
-			if (roleDb.findByRole("ADMIN").orElse(null) == null) {
-				Role role = new Role();
-				role.setRole("ADMIN");
-				role.setCreatedBy("hilangharapan");
-				roleDb.save(role);
-			}
-			UserModel user;
+			createRole(roleDb, "ADMIN");
+			createRole(roleDb, "MARKETING");
+			createRole(roleDb, "FINANCE");
+			createRole(roleDb, "PURCHASING");
+			createRole(roleDb, "MANAGEMENT");
 
-			if (userDb.findByUsername("admin") == null) {
-				user = new UserModel();
-				user.setEmail("admin@gmail.com");
-				user.setName("Admin");
-				user.setUsername("admin");
-				user.setPassword(userService.hashPassword("admin"));
-				user.setRole(roleDb.findByRole("ADMIN").orElse(null));
-				user.setCreatedBy("hilangharapan");
-				userDb.save(user);
-			}
+			createUser(userDb, userService, roleDb, "ADMIN");
+			createUser(userDb, userService, roleDb, "MARKETING");
+			createUser(userDb, userService, roleDb, "FINANCE");
+			createUser(userDb, userService, roleDb, "PURCHASING");
+			createUser(userDb, userService, roleDb, "MANAGEMENT");
 
 			var faker = new Faker(new Locale("in-ID"));
 		};
+	}
+
+	private void createRole(RoleDb roleDb, String roleName) {
+		if (roleDb.findByRole(roleName).orElse(null) == null) {
+			Role role = new Role();
+			role.setRole(roleName);
+			role.setCreatedBy("hilangharapan");
+			roleDb.save(role);
+		}
+	}
+
+	private void createUser(UserDb userDb, UserRestService userService, RoleDb roleDb, String role) {
+		UserModel user;
+		if (userDb.findByUsername(role) == null) {
+			user = new UserModel();
+			user.setEmail(role + "@gmail.com");
+			user.setName(role);
+			user.setUsername(role.toLowerCase());
+			user.setPassword(userService.hashPassword(role.toLowerCase()));
+			user.setRole(roleDb.findByRole(role).orElse(null));
+			user.setCreatedBy("hilangharapan");
+			userDb.save(user);
+		}
 	}
 }
