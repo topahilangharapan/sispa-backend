@@ -44,7 +44,7 @@ public class ClientRestServiceImpl implements ClientRestService {
         List<Client> existingClient = clientDb.findByNameAndContactAndDeletedAtNull(clientDTO.getName(), clientDTO.getContact());
 
         for (var client : existingClient) {
-            if (client.getName().equals(clientDTO.getName()) && client.getContact().equals(clientDTO.getContact())) {
+            if (client.getName().equalsIgnoreCase(clientDTO.getName()) && client.getContact().equalsIgnoreCase(clientDTO.getContact())) {
                 throw new IllegalArgumentException("Klien dengan nama dan kontak ini sudah terdaftar.");
             }
         }
@@ -103,7 +103,7 @@ public class ClientRestServiceImpl implements ClientRestService {
     }
 
     @Override
-    public ClientResponseDTO updateClient(String id, UpdateClientRequestRestDTO clientDTO) {
+    public ClientResponseDTO updateClient(String id, UpdateClientRequestRestDTO clientDTO, String username) {
         Client client = clientDb.findById(id).orElse(null);
         if (client == null || client.getDeletedAt() != null){
             return null;
@@ -115,6 +115,8 @@ public class ClientRestServiceImpl implements ClientRestService {
         client.setEmail(clientDTO.getEmail());
         client.setIndustry(clientDTO.getIndustry());
         client.setDescription(clientDTO.getDescription());
+
+        client.setUpdatedBy(username);
 
         Client updatedClient = clientDb.save(client);
         return clientToClientResponseDTO(updatedClient);

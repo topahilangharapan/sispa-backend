@@ -19,4 +19,5 @@ public interface FinalReportService {
     List<FinalReportResponseDTO> getAllFinalReports();
     FinalReportResponseDTO getReportsById(Long id);
     void deleteFinalReport(Long id) throws EntityNotFoundException;
+    byte[] getPdfFile(Long id);
 }

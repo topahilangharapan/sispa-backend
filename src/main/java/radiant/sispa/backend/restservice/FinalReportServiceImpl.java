@@ -3,6 +3,8 @@ package radiant.sispa.backend.restservice;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Base64;
+
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -206,7 +208,8 @@ public class FinalReportServiceImpl implements FinalReportService {
                 ImageResponseDTO itemDTO = new ImageResponseDTO();
                 itemDTO.setId(item.getId());
                 itemDTO.setFileName(item.getFileName());
-                itemDTO.setFileData(item.getFileData());
+                itemDTO.setFileData(item.getFileData() != null ? Base64.getEncoder().encodeToString(item.getFileData()) : null);
+
                 itemDTOs.add(itemDTO);
             }
         }
@@ -225,4 +228,31 @@ public class FinalReportServiceImpl implements FinalReportService {
         reportToDelete.setDeletedAt(new Date());
         finalReportDb.save(reportToDelete);
     }
+
+    @Override
+    public byte[] getPdfFile(Long id) {
+        FinalReport report = finalReportDb.findById(id);
+        if (report == null) {
+            throw new NoSuchElementException("Final Report not found!");
+        }
+
+        // Konversi FinalReport menjadi CreateFinalReportRequestDTO
+        CreateFinalReportRequestDTO dto = new CreateFinalReportRequestDTO();
+        dto.setEvent(report.getEvent());
+        dto.setPerusahaan(report.getCompany());
+        dto.setTanggal(report.getEventDate());
+
+        List<Long> imageIds = new ArrayList<>();
+        for (Image img : report.getImages()) {
+            imageIds.add(img.getId());
+        }
+        dto.setImageListId(imageIds);
+
+        // Panggil method generatePdfReport yang sudah ada
+        CreateFinalReportResponseDTO responseDTO = generatePdfReport(dto, null);
+
+        return responseDTO.getPdf();
+    }
+
+
 }
