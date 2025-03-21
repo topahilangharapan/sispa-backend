@@ -127,7 +127,7 @@ public class PurchaseOrderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePurchaseOrder(@PathVariable("id") Long id) {
+    public ResponseEntity<?> softDeletePurchaseOrder(@PathVariable("id") Long id, @RequestHeader("Authorization") String authHeader) {
         var baseResponseDTO = new BaseResponseDTO<String>();
         try {
             purchaseOrderService.deletePurchaseOrder(id);
@@ -135,7 +135,7 @@ public class PurchaseOrderController {
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData("Deleted");
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Purchase order deleted successfully!");
+            baseResponseDTO.setMessage("Purchase order marked as deleted successfully!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
@@ -145,9 +145,8 @@ public class PurchaseOrderController {
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to delete purchase order!");
+            baseResponseDTO.setMessage("Failed to mark purchase order as deleted!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

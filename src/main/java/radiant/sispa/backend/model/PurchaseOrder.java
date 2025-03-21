@@ -46,7 +46,7 @@ public class PurchaseOrder implements Serializable {
     private String updatedBy;
 
     @Column(name = "deleted_at")
-    private Instant deletedAt;
+    private Date deletedAt;
 
     @Column(name = "deleted_by")
     private String deletedBy;

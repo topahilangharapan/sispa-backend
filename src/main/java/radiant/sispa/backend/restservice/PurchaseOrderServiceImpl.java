@@ -255,7 +255,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     public List<PurchaseOrderResponseDTO> getAllPurchaseOrders() {
-        List<PurchaseOrder> purchaseOrders = purchaseOrderDb.findAll();
+        List<PurchaseOrder> purchaseOrders = purchaseOrderDb.findByDeletedAtIsNull();
         
         // Convert each to a response DTO
         List<PurchaseOrderResponseDTO> result = new ArrayList<>();
@@ -272,14 +272,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return convertToResponse(po);
     }
 
-    @Override
-    public void deletePurchaseOrder(Long id) {
-        PurchaseOrder po = purchaseOrderDb.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
-
-        // If you want to do "soft delete," set 'deletedAt' and 'deletedBy' instead
-        // For a real physical delete:
-        purchaseOrderDb.delete(po);
+    public void deletePurchaseOrder(Long id) throws NoSuchElementException {
+        Optional<PurchaseOrder> purchaseOrderOptional = purchaseOrderDb.findById(id);
+        if (!purchaseOrderOptional.isPresent()) {
+            throw new NoSuchElementException("Purchase order not found");
+        }
+        
+        PurchaseOrder purchaseOrder = purchaseOrderOptional.get();
+        purchaseOrder.setDeletedAt(new Date());
+        purchaseOrderDb.save(purchaseOrder); 
     }
 
     /**
