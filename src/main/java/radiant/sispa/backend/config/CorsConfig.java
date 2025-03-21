@@ -14,7 +14,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173", "http://82.25.108.76")
+                        .allowedOrigins("http://localhost:5173", "http://82.25.108.76", "https://proxy.hoppscotch.io", "https://hoppscotch.io")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true);
