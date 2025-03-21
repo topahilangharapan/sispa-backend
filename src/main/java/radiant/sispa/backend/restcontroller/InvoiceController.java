@@ -16,6 +16,8 @@ import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.restservice.InvoiceService;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -164,12 +166,15 @@ public class InvoiceController {
 //        }
 //    }
     @GetMapping("/{id}/download")
-    public ResponseEntity<byte[]> downloadInvoice(@PathVariable("id") Long id,  @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        CreateInvoiceResponseDTO responseDTO = invoiceService.generatePdfByInvoiceId(id, authHeader);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + responseDTO.getFileName())
-                .body(responseDTO.getPdf());
+    public ResponseEntity<byte[]> downloadInvoice(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            CreateInvoiceResponseDTO responseDTO = invoiceService.generatePdfByInvoiceId(id, authHeader);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + responseDTO.getFileName() + ".pdf")
+                    .body(responseDTO.getPdf());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }
