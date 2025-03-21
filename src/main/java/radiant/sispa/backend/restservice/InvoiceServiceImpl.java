@@ -331,23 +331,80 @@ public class InvoiceServiceImpl implements InvoiceService {
             throw new EntityNotFoundException("Invoice tidak ditemukan.");
         }
 
-        CreateInvoiceRequestDTO dto = new CreateInvoiceRequestDTO();
-        dto.setPurchaseOrderId(invoice.getPurchaseOrder().getId());
-        dto.setReceiver(invoice.getReceiver());
-        dto.setDateCreated(invoice.getDateCreated());
-        dto.setDatePaid(invoice.getDatePaid());
-        dto.setPpnPercentage(String.valueOf(invoice.getPpnPercentage() * 100));
-        dto.setBankName(invoice.getBankName());
-        dto.setAccountNumber(invoice.getAccountNumber());
-        dto.setOnBehalf(invoice.getOnBehalf());
-        dto.setPlaceSigned(invoice.getPlaceSigned());
-        dto.setDateSigned(invoice.getDateSigned());
-        dto.setSignee(invoice.getSignee());
-        dto.setEvent(invoice.getEvent());
+        try {
+            PurchaseOrder purchaseOrder = invoice.getPurchaseOrder();
 
-        System.out.println("Generating PDF for invoice ID: " + invoiceId);
+            InputStream reportStream = new ClassPathResource("/static/report/invoice.jrxml").getInputStream();
+            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
 
-        return generatePdfReport(dto, authHeader);
+            List<Map<String, Object>> data = new ArrayList<>();
+
+            Long count = 1L;
+            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getItems()) {
+                Map<String, Object> row = new HashMap<>();
+
+                row.put("no", String.valueOf(count++));
+                row.put("uraianJudul", purchaseOrderItem.getTitle());
+                row.put("volume", formatWithThousandSeparator(purchaseOrderItem.getVolume()));
+                row.put("satuan", purchaseOrderItem.getUnit());
+                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getSum()));
+
+                data.add(row);
+            }
+
+            if (purchaseOrder.getItems().isEmpty()) {
+                Map<String, Object> row = new HashMap<>();
+
+                row.put("no", "");
+                row.put("uraianJudul","");
+                row.put("volume", "");
+                row.put("satuan", "");
+                row.put("hargaSatuan", "");
+                row.put("jumlah", "");
+
+                data.add(row);
+            }
+
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(data);
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("logoSPA", "static/images/logo_spa_with_text.png");
+            parameters.put("perusahaan", purchaseOrder.getCompanyName());
+            parameters.put("alamatPerusahaan", purchaseOrder.getCompanyAddress());
+            parameters.put("penerima", invoice.getReceiver());
+            parameters.put("tanggalDibuat", invoice.getDateCreated());
+            parameters.put("noInvoice", invoice.getNoInvoice());
+            parameters.put("noPo", purchaseOrder.getNoPo());
+            parameters.put("tanggalPembayaran", invoice.getDatePaid());
+            parameters.put("subTotal", formatWithThousandSeparator(invoice.getSubTotal()));
+            parameters.put("ppnPersen", String.valueOf(Math.round(invoice.getPpnPercentage() * 100)));
+            parameters.put("ppn", formatWithThousandSeparator(invoice.getPpn()));
+            parameters.put("total", formatWithThousandSeparator(invoice.getTotal()));
+            parameters.put("terbilang", invoice.getSpelledOut());
+            parameters.put("namaBank", invoice.getBankName());
+            parameters.put("noRek", invoice.getAccountNumber());
+            parameters.put("atasNama", invoice.getOnBehalf());
+            parameters.put("tempat", invoice.getPlaceSigned());
+            parameters.put("tanggalDitandatangani", invoice.getDateSigned());
+            parameters.put("tandaTangan", "static/images/ttd_po.jpg");
+            parameters.put("yangMenandatangani", invoice.getSignee());
+            parameters.put("footerSpa", "static/images/footer_spa.jpg");
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+            byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
+
+            CreateInvoiceResponseDTO createInvoiceResponseDTO = new CreateInvoiceResponseDTO();
+            createInvoiceResponseDTO.setPdf(pdfBytes);
+            createInvoiceResponseDTO.setFileName(invoice.getFileName());
+
+            return createInvoiceResponseDTO;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error generating PDF report", e.getCause());
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 ```toml
 name = 'GET id'
 method = 'GET'
-url = '{{url-radiant}}/invoice/257'
+url = '{{radiant}}/invoice/257'
 sortWeight = 4000000
 id = 'd2a0857d-c5ab-469b-8c63-99d5f2e93530'
 
