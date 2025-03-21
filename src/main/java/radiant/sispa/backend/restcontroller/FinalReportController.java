@@ -140,25 +140,13 @@ public class FinalReportController {
     }
 
     @GetMapping("/{id}/download")
-    public ResponseEntity<byte[]> downloadFinalReport(@PathVariable("id") Long id,
-                                                      @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<byte[]> downloadFinalReport(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
-            byte[] pdfData = finalReportService.getPdfFile(id);
-
-            if (pdfData == null || pdfData.length == 0) {
-                return ResponseEntity.notFound().build();
-            }
-
-            // Ambil informasi laporan untuk mendapatkan nama file
-            FinalReportResponseDTO report = finalReportService.getReportsById(id);
-            String safeFileName = report.getFileName().replaceAll("[^a-zA-Z0-9.-]", "_") + ".pdf";
-
+            CreateFinalReportResponseDTO responseDTO = finalReportService.generatePdfById(id, authHeader);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_PDF)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + safeFileName)
-                    .body(pdfData);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + responseDTO.getFileName() + ".pdf")
+                    .body(responseDTO.getPdf());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
