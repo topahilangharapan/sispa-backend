@@ -104,7 +104,7 @@ public class ClientRestServiceImpl implements ClientRestService {
     }
 
     @Override
-    public ClientResponseDTO updateClient(String id, UpdateClientRequestRestDTO clientDTO) {
+    public ClientResponseDTO updateClient(String id, UpdateClientRequestRestDTO clientDTO, String username) {
         Client client = clientDb.findById(id).orElse(null);
         if (client == null || client.getDeletedAt() != null){
             return null;
@@ -116,6 +116,8 @@ public class ClientRestServiceImpl implements ClientRestService {
         client.setEmail(clientDTO.getEmail());
         client.setIndustry(clientDTO.getIndustry());
         client.setDescription(clientDTO.getDescription());
+
+        client.setUpdatedBy(username);
 
         Client updatedClient = clientDb.save(client);
         return clientToClientResponseDTO(updatedClient);

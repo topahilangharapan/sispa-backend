@@ -61,7 +61,6 @@ public class VendorRestServiceImpl implements VendorRestService {
                 throw new IllegalArgumentException("Vendor dengan nama dan kontak ini sudah terdaftar.");
             }
         }
-
         Vendor newVendor = new Vendor();
 
         newVendor.setId(generateVendorId(vendorDTO.getName()));
@@ -117,7 +116,10 @@ public class VendorRestServiceImpl implements VendorRestService {
     }
 
     @Override
-    public VendorResponseDTO updateVendor(String id, UpdateVendorRequestRestDTO vendorDTO) {
+    public VendorResponseDTO updateVendor(String id, UpdateVendorRequestRestDTO vendorDTO, String authHeader) {
+        String token = authHeader.substring(7);
+        String username = jwtUtils.getUserNameFromJwtToken(token);
+
         Vendor vendor = vendorDb.findById(id).orElse(null);
         if (vendor == null || vendor.getDeletedAt() != null){
             return null;
@@ -129,6 +131,8 @@ public class VendorRestServiceImpl implements VendorRestService {
         vendor.setEmail(vendorDTO.getEmail());
         vendor.setService(vendorDTO.getService());
         vendor.setDescription(vendorDTO.getDescription());
+        vendor.setUpdatedBy(username);
+        vendor.setUpdatedBy(username);
 
         Vendor updatedVendor = vendorDb.save(vendor);
         return vendorToVendorResponseDTO(updatedVendor);

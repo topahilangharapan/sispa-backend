@@ -15,7 +15,6 @@ import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
 import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
-import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.FileNotFoundException;
@@ -127,6 +126,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             return createInvoiceResponseDTO;
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Error generating PDF report", e.getCause());
         }
     }
@@ -252,9 +252,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceResponseDTO> getAllInvoices() {
-        List<Invoice> invoices = invoiceDb.findAll();
+        List<Invoice> invoices = invoiceDb.findAllByDeletedAtNull();
 
-        // Convert each to a response DTO
         List<InvoiceResponseDTO> result = new ArrayList<>();
         for (Invoice inv : invoices) {
             result.add(convertToResponse(inv));
@@ -264,19 +263,20 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceResponseDTO getInvoiceById(Long id) {
-        Invoice invoice = invoiceDb.findById(id);
-//                .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + id));
+        Invoice invoice = invoiceDb.findByIdAndDeletedAtNull(id);
         return convertToResponse(invoice);
     }
 
     @Override
-    public void deleteInvoice(Long id){
-        Invoice invoice = invoiceDb.findById(id);
-//                .orElseThrow(() -> new NoSuchElementException("Invoice not found with id: " + id));
+    public void deleteInvoice(Long id) throws EntityNotFoundException {
+        Invoice invoiceToDelete = invoiceDb.findByIdAndDeletedAtNull(id);
 
-        // If you want to do "soft delete," set 'deletedAt' and 'deletedBy' instead
-        // For a real physical delete:
-        invoiceDb.delete(invoice);
+        if (invoiceToDelete == null) {
+            throw new EntityNotFoundException("Invoice not found");
+        }
+
+        invoiceToDelete.setDeletedAt(new Date().toInstant());
+        invoiceDb.save(invoiceToDelete);
     }
 
     private InvoiceResponseDTO convertToResponse(Invoice entity) {
@@ -323,4 +323,31 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         return dto;
     }
+
+    @Override
+    public CreateInvoiceResponseDTO generatePdfByInvoiceId(Long invoiceId, String authHeader) {
+        Invoice invoice = invoiceDb.findByIdAndDeletedAtNull(invoiceId);
+        if (invoice == null) {
+            throw new EntityNotFoundException("Invoice tidak ditemukan.");
+        }
+
+        CreateInvoiceRequestDTO dto = new CreateInvoiceRequestDTO();
+        dto.setPurchaseOrderId(invoice.getPurchaseOrder().getId());
+        dto.setReceiver(invoice.getReceiver());
+        dto.setDateCreated(invoice.getDateCreated());
+        dto.setDatePaid(invoice.getDatePaid());
+        dto.setPpnPercentage(String.valueOf(invoice.getPpnPercentage() * 100));
+        dto.setBankName(invoice.getBankName());
+        dto.setAccountNumber(invoice.getAccountNumber());
+        dto.setOnBehalf(invoice.getOnBehalf());
+        dto.setPlaceSigned(invoice.getPlaceSigned());
+        dto.setDateSigned(invoice.getDateSigned());
+        dto.setSignee(invoice.getSignee());
+        dto.setEvent(invoice.getEvent());
+
+        System.out.println("Generating PDF for invoice ID: " + invoiceId);
+
+        return generatePdfReport(dto, authHeader);
+    }
+
 }
