@@ -12,7 +12,7 @@ public interface ClientRestService {
 
     ClientResponseDTO addClient(AddClientRequestRestDTO clientDTO, String username);
 
-    ClientResponseDTO updateClient(String id, UpdateClientRequestRestDTO clientDTO);
+    ClientResponseDTO updateClient(String id, UpdateClientRequestRestDTO clientDTO, String username);
 
     ClientResponseDTO getClientById(String id);
 

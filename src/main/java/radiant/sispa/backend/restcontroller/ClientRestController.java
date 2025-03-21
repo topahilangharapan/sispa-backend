@@ -88,8 +88,13 @@ public class ClientRestController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateClient(@Valid @RequestBody UpdateClientRequestRestDTO clientDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> updateClient(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @Valid @RequestBody UpdateClientRequestRestDTO clientDTO, BindingResult bindingResult) {
         var baseResponseDTO = new BaseResponseDTO<ClientResponseDTO>();
+
+        String token = "";
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+        }
 
         if (bindingResult.hasFieldErrors()) {
             String errorMessages = bindingResult.getFieldErrors()
@@ -103,7 +108,7 @@ public class ClientRestController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
         }
         
-        ClientResponseDTO updatedClient = clientRestService.updateClient(clientDTO.getId(), clientDTO);
+        ClientResponseDTO updatedClient = clientRestService.updateClient(clientDTO.getId(), clientDTO, jwtUtils.getUserNameFromJwtToken(token));
 
         if (updatedClient == null){
             baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
