@@ -1,6 +1,6 @@
 ```toml
 name = 'radiant'
-id = '4ff6750d-d511-4c66-8ec7-e257ed18032a'
+id = 'b3253ff0-a4b1-4291-aa1e-3e505d398d11'
 
 [[environmentGroups]]
 name = 'Default'
