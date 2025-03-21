@@ -231,27 +231,34 @@ public class FinalReportServiceImpl implements FinalReportService {
 
     @Override
     public byte[] getPdfFile(Long id) {
-        FinalReport report = finalReportDb.findById(id);
-        if (report == null) {
-            throw new NoSuchElementException("Final Report not found!");
+        try {
+            FinalReport report = finalReportDb.findById(id);
+            if (report == null) {
+                throw new NoSuchElementException("Final Report not found!");
+            }
+
+            // Convert FinalReport to CreateFinalReportRequestDTO
+            CreateFinalReportRequestDTO dto = new CreateFinalReportRequestDTO();
+            dto.setEvent(report.getEvent());
+            dto.setPerusahaan(report.getCompany());
+            dto.setTanggal(report.getEventDate());
+
+            List<Long> imageIds = new ArrayList<>();
+            for (Image img : report.getImages()) {
+                imageIds.add(img.getId());
+            }
+            dto.setImageListId(imageIds);
+
+            // Create an authorization header for internal use
+            String authHeader = "Bearer internal-system";
+
+            // Generate the PDF report
+            CreateFinalReportResponseDTO responseDTO = generatePdfReport(dto, authHeader);
+            return responseDTO.getPdf();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error generating PDF file", e);
         }
-
-        // Konversi FinalReport menjadi CreateFinalReportRequestDTO
-        CreateFinalReportRequestDTO dto = new CreateFinalReportRequestDTO();
-        dto.setEvent(report.getEvent());
-        dto.setPerusahaan(report.getCompany());
-        dto.setTanggal(report.getEventDate());
-
-        List<Long> imageIds = new ArrayList<>();
-        for (Image img : report.getImages()) {
-            imageIds.add(img.getId());
-        }
-        dto.setImageListId(imageIds);
-
-        // Panggil method generatePdfReport yang sudah ada
-        CreateFinalReportResponseDTO responseDTO = generatePdfReport(dto, null);
-
-        return responseDTO.getPdf();
     }
 
 
