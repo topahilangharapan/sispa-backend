@@ -1,5 +1,6 @@
 package radiant.sispa.backend.restservice;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +40,13 @@ public class ClientRestServiceImpl implements ClientRestService {
     }
 
     @Override
-    public ClientResponseDTO addClient(AddClientRequestRestDTO clientDTO, String username) throws IllegalArgumentException {
+    public ClientResponseDTO addClient(AddClientRequestRestDTO clientDTO, String username) throws EntityExistsException {
 
-        List<Client> existingClient = clientDb.findByNameAndContactAndDeletedAtNull(clientDTO.getName(), clientDTO.getContact());
+        List<Client> existingClient = clientDb.findByNameIgnoreCaseAndContactAndDeletedAtNull(clientDTO.getName(), clientDTO.getContact());
 
-        for (var client : existingClient) {
-            if (client.getName().equalsIgnoreCase(clientDTO.getName()) && client.getContact().equalsIgnoreCase(clientDTO.getContact())) {
-                throw new IllegalArgumentException("Klien dengan nama dan kontak ini sudah terdaftar.");
+        for (Client client : existingClient) {
+            if (client.getName().equalsIgnoreCase(clientDTO.getName()) && client.getContact().equals(clientDTO.getContact())) {
+                throw new EntityExistsException("Klien dengan nama dan kontak ini sudah terdaftar.");
             }
         }
         Client newClient = new Client();
