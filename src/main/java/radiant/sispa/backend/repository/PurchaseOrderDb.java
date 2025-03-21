@@ -20,4 +20,7 @@ public interface PurchaseOrderDb extends JpaRepository<PurchaseOrder, Long> {
 
     PurchaseOrder findPurchaseOrderById(Long id);
     PurchaseOrder findPurchaseOrderByNoPo(String id);
+    @Query("SELECT po FROM PurchaseOrder po WHERE po.deletedAt IS NULL")
+    List<PurchaseOrder> findAllActivePurchaseOrders();
+    List<PurchaseOrder> findByDeletedAtIsNull();
 }
