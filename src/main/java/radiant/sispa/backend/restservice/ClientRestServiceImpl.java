@@ -16,6 +16,8 @@ import radiant.sispa.backend.security.jwt.JwtUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
@@ -53,6 +55,11 @@ public class ClientRestServiceImpl implements ClientRestService {
 
         newClient.setId(generateClientId(clientDTO.getName()));
         newClient.setName(clientDTO.getName());
+
+        if (!isValidEmail(clientDTO.getEmail())) {
+            throw new IllegalArgumentException("Format email tidak valid.");
+        }
+
         newClient.setEmail(clientDTO.getEmail());
         newClient.setAddress(clientDTO.getAddress());
         newClient.setContact(clientDTO.getContact());
@@ -146,6 +153,13 @@ public class ClientRestServiceImpl implements ClientRestService {
         }
 
         return listClientResponseDTO;
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
 }
