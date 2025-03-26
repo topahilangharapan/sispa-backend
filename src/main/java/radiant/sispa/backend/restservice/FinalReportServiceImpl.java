@@ -230,34 +230,65 @@ public class FinalReportServiceImpl implements FinalReportService {
     }
 
     @Override
-    public byte[] getPdfFile(Long id) {
+    public CreateFinalReportResponseDTO generatePdfById(Long invoiceId, String authHeader) {
+        FinalReport finalReport = finalReportDb.findByIdAndDeletedAtNull(invoiceId);
+        if (finalReport == null) {
+            throw new EntityNotFoundException("Laporan Akhir tidak ditemukan.");
+        }
+
         try {
-            FinalReport report = finalReportDb.findById(id);
-            if (report == null) {
-                throw new NoSuchElementException("Final Report not found!");
+            List<Image> images = finalReport.getImages();
+
+            InputStream reportStream = new ClassPathResource("/static/report/final-report.jrxml").getInputStream();
+            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+
+            List<Map<String, Object>> data = new ArrayList<>();
+
+            Long count = 0L;
+            Map<String, Object> row = new HashMap<>();
+            for (Image image : finalReport.getImages()) {
+
+
+                if (count % 2 == 0) {
+                    row.put("imageLeft", new ByteArrayInputStream(image.getFileData()));
+                } else {
+                    row.put("imageRight", new ByteArrayInputStream(image.getFileData()));
+                }
+
+                if (row.size() == 2){
+                    data.add(row);
+                    row = new HashMap<>();
+                }
+
+                else if (count + 1 == finalReport.getImages().size()) {
+                    data.add(row);
+                }
+
+                count++;
             }
 
-            // Convert FinalReport to CreateFinalReportRequestDTO
-            CreateFinalReportRequestDTO dto = new CreateFinalReportRequestDTO();
-            dto.setEvent(report.getEvent());
-            dto.setPerusahaan(report.getCompany());
-            dto.setTanggal(report.getEventDate());
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(data);
 
-            List<Long> imageIds = new ArrayList<>();
-            for (Image img : report.getImages()) {
-                imageIds.add(img.getId());
-            }
-            dto.setImageListId(imageIds);
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("logoSPA", "static/images/logo_spa_with_text.png");
+            parameters.put("event", finalReport.getEvent());
+            parameters.put("tanggal", finalReport.getEventDate());
+            parameters.put("perusahaan", finalReport.getCompany());
+            parameters.put("footerSpa", "static/images/footer_spa.jpg");
 
-            // Create an authorization header for internal use
-            String authHeader = "Bearer internal-system";
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-            // Generate the PDF report
-            CreateFinalReportResponseDTO responseDTO = generatePdfReport(dto, authHeader);
-            return responseDTO.getPdf();
+            byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
+
+            CreateFinalReportResponseDTO createFinalReportResponseDTO = new CreateFinalReportResponseDTO();
+            createFinalReportResponseDTO.setPdf(pdfBytes);
+            createFinalReportResponseDTO.setFileName(finalReport.getFileName());
+
+            return createFinalReportResponseDTO;
+
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error generating PDF file", e);
+            throw new RuntimeException("Error generating PDF report", e.getCause());
         }
     }
 

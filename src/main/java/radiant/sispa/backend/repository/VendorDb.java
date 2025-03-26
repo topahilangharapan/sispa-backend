@@ -12,5 +12,5 @@ public interface VendorDb extends JpaRepository<Vendor, String> {
 
     Vendor findByIdAndDeletedAtNull(String id);
 
-    List<Vendor> findByNameAndContactAndDeletedAtNull(String name, String contact);
+    List<Vendor> findByNameIgnoreCaseAndContactAndDeletedAtNull(String name, String contact);
 }

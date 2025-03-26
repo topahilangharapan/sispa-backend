@@ -22,6 +22,7 @@ public class PurchaseOrderResponseDTO {
     private String placeSigned;
     private String dateSigned;
     private String signee;
+    private String deletedAt;
 
     private List<PurchaseOrderItemResponseDTO> items;
 }

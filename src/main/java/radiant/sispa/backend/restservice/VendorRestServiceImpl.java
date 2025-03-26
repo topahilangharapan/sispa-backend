@@ -2,7 +2,6 @@ package radiant.sispa.backend.restservice;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Vendor;
@@ -55,10 +54,10 @@ public class VendorRestServiceImpl implements VendorRestService {
         String token = authHeader.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);
 
-        List<Vendor> existingVendor = vendorDb.findByNameAndContactAndDeletedAtNull(vendorDTO.getName(), vendorDTO.getContact());
+        List<Vendor> existingVendor = vendorDb.findByNameIgnoreCaseAndContactAndDeletedAtNull(vendorDTO.getName(), vendorDTO.getContact());
 
-        for (var vendor : existingVendor) {
-            if (vendor.getName().equalsIgnoreCase(vendorDTO.getName()) && vendor.getContact().equalsIgnoreCase(vendorDTO.getContact())) {
+        for (Vendor vendor : existingVendor) {
+            if (vendor.getName().equalsIgnoreCase(vendorDTO.getName()) && vendor.getContact().equals(vendorDTO.getContact())) {
                 throw new IllegalArgumentException("Vendor dengan nama dan kontak ini sudah terdaftar.");
             }
         }
