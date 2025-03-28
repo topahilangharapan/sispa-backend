@@ -4,7 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.Vendor;
+import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.repository.VendorDb;
 import radiant.sispa.backend.restdto.request.AddVendorRequestRestDTO;
 import radiant.sispa.backend.restdto.request.UpdateVendorRequestRestDTO;
@@ -23,6 +25,9 @@ public class VendorRestServiceImpl implements VendorRestService {
 
     @Autowired
     VendorDb vendorDb;
+
+    @Autowired
+    PurchaseOrderDb purchaseOrderDb;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -163,4 +168,19 @@ public class VendorRestServiceImpl implements VendorRestService {
         return matcher.matches();
     }
 
+    @Override
+    public Vendor addPurchaseOrder(String idVendor, Long idPo) {
+        Vendor vendor = vendorDb.findByIdAndDeletedAtNull(idVendor);
+
+        if (vendor == null || vendor.getDeletedAt() != null){
+            return null;
+        }
+
+        if (vendor.getPurchaseOrders() == null) {
+            vendor.setPurchaseOrders(new ArrayList<PurchaseOrder>());
+        }
+
+        vendor.getPurchaseOrders().add(purchaseOrderDb.findPurchaseOrderById(idPo));
+        return vendorDb.save(vendor);
+    }
 }

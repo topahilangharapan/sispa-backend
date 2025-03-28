@@ -51,6 +51,12 @@ public class PurchaseOrder implements Serializable {
     @Column(name = "deleted_by")
     private String deletedBy;
 
+    @ManyToMany(mappedBy = "purchaseOrders", fetch = FetchType.LAZY)
+    private List<Vendor> vendor;
+
+    @ManyToMany(mappedBy = "purchaseOrders", fetch = FetchType.LAZY)
+    private List<Client> client;
+
     @NotNull
     @Column(name = "company_name", nullable = false)
     private String companyName;

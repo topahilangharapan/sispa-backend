@@ -53,7 +53,6 @@ public class InvoiceServiceImpl implements InvoiceService {
                 throw new FileNotFoundException("Purchase Order tidak ditemukan.");
             }
 
-
             Invoice invoice = createInvoiceRequestDTOToInvoice(createInvoiceRequestDTO, purchaseOrder, createdBy);
 
 

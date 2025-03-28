@@ -6,8 +6,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Client;
+import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.Vendor;
 import radiant.sispa.backend.repository.ClientDb;
+import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.AddClientRequestRestDTO;
 import radiant.sispa.backend.restdto.request.UpdateClientRequestRestDTO;
 import radiant.sispa.backend.restdto.response.ClientResponseDTO;
@@ -28,6 +30,9 @@ public class ClientRestServiceImpl implements ClientRestService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    PurchaseOrderDb purchaseOrderDb;
 
     @Override
     public void deleteClient(String id) throws EntityNotFoundException {
@@ -162,4 +167,19 @@ public class ClientRestServiceImpl implements ClientRestService {
         return matcher.matches();
     }
 
+    @Override
+    public Client addPurchaseOrder(String idClient, Long idPo) {
+        Client client = clientDb.findByIdAndDeletedAtNull(idClient);
+
+        if (client == null || client.getDeletedAt() != null){
+            return null;
+        }
+
+        if (client.getPurchaseOrders() == null) {
+            client.setPurchaseOrders(new ArrayList<PurchaseOrder>());
+        }
+
+        client.getPurchaseOrders().add(purchaseOrderDb.findPurchaseOrderById(idPo));
+        return clientDb.save(client);
+    }
 }
