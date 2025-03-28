@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import radiant.sispa.backend.model.Client;
 import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.PurchaseOrderItem;
+import radiant.sispa.backend.model.Vendor;
+import radiant.sispa.backend.repository.ClientDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.repository.PurchaseOrderItemDb;
+import radiant.sispa.backend.repository.VendorDb;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
-import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
-import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
-import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.InputStream;
@@ -35,6 +37,18 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Autowired
     private PurchaseOrderItemDb purchaseOrderItemDb;
 
+    @Autowired
+    private VendorRestService vendorService;
+
+    @Autowired
+    private VendorDb vendorDb;
+
+    @Autowired
+    private ClientRestService clientService;
+
+    @Autowired
+    private ClientDb clientDb;
+
     private static final String[] SATUAN = {"", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"};
     private static final String[] BELASAN = {"Sepuluh", "Sebelas", "Dua Belas", "Tiga Belas", "Empat Belas", "Lima Belas", "Enam Belas", "Tujuh Belas", "Delapan Belas", "Sembilan Belas"};
     private static final String[] PULUHAN = {"", "", "Dua Puluh", "Tiga Puluh", "Empat Puluh", "Lima Puluh", "Enam Puluh", "Tujuh Puluh", "Delapan Puluh", "Sembilan Puluh"};
@@ -47,6 +61,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
             PurchaseOrder purchaseOrder = createPurchaseOrderToPurchaseOrder(createPurchaseOrderRequestDTO, createdBy);
+
+            if (!purchaseOrder.getClient().isEmpty()) {
+                clientService.addPurchaseOrder(createPurchaseOrderRequestDTO.getClientId(), purchaseOrder.getId());
+            }
+            else if (!purchaseOrder.getVendor().isEmpty()) {
+                vendorService.addPurchaseOrder(createPurchaseOrderRequestDTO.getVendorId(), purchaseOrder.getId());
+            }
 
             InputStream reportStream = new ClassPathResource("/static/report/purchase-order.jrxml").getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
@@ -118,10 +139,30 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     private PurchaseOrder createPurchaseOrderToPurchaseOrder(CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO, String createdBy) {
+
+
+        Vendor vendor = Optional.ofNullable(createPurchaseOrderRequestDTO.getVendorId())
+                .map(vendorDb::findByIdAndDeletedAtNull)
+                .orElse(null);
+
+        Client client = Optional.ofNullable(createPurchaseOrderRequestDTO.getClientId())
+                .map(clientDb::findByIdAndDeletedAtNull)
+                .orElse(null);
+
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         List<PurchaseOrderItem> items = savePurchaseOrderItem(createPurchaseOrderRequestDTO.getItems(), createdBy);
 
         purchaseOrder.setCreatedBy(createdBy);
+
+        purchaseOrder.setVendor(new ArrayList<Vendor>());
+        purchaseOrder.setClient(new ArrayList<Client>());
+        if (vendor != null) {
+            purchaseOrder.getVendor().add(vendor);
+        }
+        else if (client != null) {
+            purchaseOrder.getClient().add(client);
+        }
+
         purchaseOrder.setCompanyName(createPurchaseOrderRequestDTO.getCompanyName());
         purchaseOrder.setCompanyAddress(createPurchaseOrderRequestDTO.getCompanyAddress());
         purchaseOrder.setReceiver(createPurchaseOrderRequestDTO.getReceiver());

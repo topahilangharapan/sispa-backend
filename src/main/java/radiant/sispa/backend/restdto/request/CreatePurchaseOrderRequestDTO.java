@@ -11,6 +11,10 @@ import java.util.Map;
 @NoArgsConstructor
 @Data
 public class CreatePurchaseOrderRequestDTO {
+    private String vendorId;
+
+    private String clientId;
+
     private String companyName;
 
     private String companyAddress;
