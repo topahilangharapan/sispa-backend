@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import radiant.sispa.backend.model.Client;
 import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.PurchaseOrderItem;
+import radiant.sispa.backend.model.Vendor;
+import radiant.sispa.backend.repository.ClientDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.repository.PurchaseOrderItemDb;
+import radiant.sispa.backend.repository.VendorDb;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
-import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
-import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
-import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.InputStream;
@@ -35,6 +37,18 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Autowired
     private PurchaseOrderItemDb purchaseOrderItemDb;
 
+    @Autowired
+    private VendorRestService vendorService;
+
+    @Autowired
+    private VendorDb vendorDb;
+
+    @Autowired
+    private ClientRestService clientService;
+
+    @Autowired
+    private ClientDb clientDb;
+
     private static final String[] SATUAN = {"", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"};
     private static final String[] BELASAN = {"Sepuluh", "Sebelas", "Dua Belas", "Tiga Belas", "Empat Belas", "Lima Belas", "Enam Belas", "Tujuh Belas", "Delapan Belas", "Sembilan Belas"};
     private static final String[] PULUHAN = {"", "", "Dua Puluh", "Tiga Puluh", "Empat Puluh", "Lima Puluh", "Enam Puluh", "Tujuh Puluh", "Delapan Puluh", "Sembilan Puluh"};
@@ -47,6 +61,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
             PurchaseOrder purchaseOrder = createPurchaseOrderToPurchaseOrder(createPurchaseOrderRequestDTO, createdBy);
+
+            if (!purchaseOrder.getClient().isEmpty()) {
+                clientService.addPurchaseOrder(createPurchaseOrderRequestDTO.getClientId(), purchaseOrder.getId());
+            }
+            else if (!purchaseOrder.getVendor().isEmpty()) {
+                vendorService.addPurchaseOrder(createPurchaseOrderRequestDTO.getVendorId(), purchaseOrder.getId());
+            }
 
             InputStream reportStream = new ClassPathResource("/static/report/purchase-order.jrxml").getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
@@ -118,10 +139,30 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     private PurchaseOrder createPurchaseOrderToPurchaseOrder(CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO, String createdBy) {
+
+
+        Vendor vendor = Optional.ofNullable(createPurchaseOrderRequestDTO.getVendorId())
+                .map(vendorDb::findByIdAndDeletedAtNull)
+                .orElse(null);
+
+        Client client = Optional.ofNullable(createPurchaseOrderRequestDTO.getClientId())
+                .map(clientDb::findByIdAndDeletedAtNull)
+                .orElse(null);
+
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         List<PurchaseOrderItem> items = savePurchaseOrderItem(createPurchaseOrderRequestDTO.getItems(), createdBy);
 
         purchaseOrder.setCreatedBy(createdBy);
+
+        purchaseOrder.setVendor(new ArrayList<Vendor>());
+        purchaseOrder.setClient(new ArrayList<Client>());
+        if (vendor != null) {
+            purchaseOrder.getVendor().add(vendor);
+        }
+        else if (client != null) {
+            purchaseOrder.getClient().add(client);
+        }
+
         purchaseOrder.setCompanyName(createPurchaseOrderRequestDTO.getCompanyName());
         purchaseOrder.setCompanyAddress(createPurchaseOrderRequestDTO.getCompanyAddress());
         purchaseOrder.setReceiver(createPurchaseOrderRequestDTO.getReceiver());
@@ -320,5 +361,78 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         return dto;
     }
+
+    @Override
+    public CreatePurchaseOrderResponseDTO generatePdfByPurchaseOrderId(Long purchaseOrderId, String authHeader) {
+        // Retrieve the existing purchase order
+        PurchaseOrder purchaseOrder = purchaseOrderDb.findById(purchaseOrderId)
+                .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + purchaseOrderId));
+        
+        try {
+            // Load and compile the Jasper report
+            InputStream reportStream = new ClassPathResource("/static/report/purchase-order.jrxml").getInputStream();
+            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+            
+            // Prepare data for the report
+            List<Map<String, Object>> data = new ArrayList<>();
+            Long count = 1L;
+            for (PurchaseOrderItem item : purchaseOrder.getItems()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("no", String.valueOf(count++));
+                row.put("uraianJudul", item.getTitle());
+                row.put("volume", formatWithThousandSeparator(item.getVolume()));
+                row.put("satuan", item.getUnit());
+                row.put("hargaSatuan", formatWithThousandSeparator(item.getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(item.getSum()));
+                row.put("blank", "");  // if needed
+                row.put("uraianDeskripsi", item.getDescription());
+                data.add(row);
+            }
+
+            if (purchaseOrder.getItems().isEmpty()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("no", "");
+                row.put("uraianJudul", "");
+                row.put("volume", "");
+                row.put("satuan", "");
+                row.put("hargaSatuan", "");
+                row.put("jumlah", "");
+                row.put("blank", "");
+                row.put("uraianDeskripsi", "");
+                data.add(row);
+            }
+            
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(data);
+            
+            // Set up report parameters using the purchaseOrder object
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("logoSPA", "static/images/logo_spa_with_text.png");
+            parameters.put("perusahaan", purchaseOrder.getCompanyName());
+            parameters.put("alamatPerusahaan", purchaseOrder.getCompanyAddress());
+            parameters.put("penerima", purchaseOrder.getReceiver());
+            parameters.put("tanggalDibuat", purchaseOrder.getDateCreated());
+            parameters.put("noPo", purchaseOrder.getNoPo());
+            parameters.put("total", formatWithThousandSeparator(purchaseOrder.getTotal()));
+            parameters.put("terbilang", purchaseOrder.getSpelledOut());
+            parameters.put("ketentuan", purchaseOrder.getTerms());
+            parameters.put("tempat", purchaseOrder.getPlaceSigned());
+            parameters.put("tanggalDitandatangani", purchaseOrder.getDateSigned());
+            parameters.put("tandaTangan", "static/images/ttd_po.jpg");
+            parameters.put("yangMenandatangani", purchaseOrder.getSignee());
+
+            // Fill the report and export to PDF
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+            byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            
+            // Prepare response DTO
+            CreatePurchaseOrderResponseDTO responseDTO = new CreatePurchaseOrderResponseDTO();
+            responseDTO.setPdf(pdfBytes);
+            responseDTO.setFileName(purchaseOrder.getFileName());
+            return responseDTO;
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating PDF report", e);
+        }
+    }
+
 
 }

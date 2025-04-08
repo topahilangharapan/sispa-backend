@@ -11,7 +11,7 @@ spring:
           lob:
             non_contextual_creation: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
   mvc:
     hiddenmethod:
       filter:

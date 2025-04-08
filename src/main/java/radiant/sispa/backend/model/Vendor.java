@@ -46,6 +46,11 @@ public class Vendor {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @ManyToMany
+    @JoinTable(name = "purchase_order_vendor", joinColumns = @JoinColumn(name = "id_vendor"),
+            inverseJoinColumns = @JoinColumn(name = "id_purchase_order"))
+    private List<PurchaseOrder> purchaseOrders;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false, nullable = false)

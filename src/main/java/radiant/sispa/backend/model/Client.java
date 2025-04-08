@@ -46,6 +46,11 @@ public class Client {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @ManyToMany
+    @JoinTable(name = "purchase_order_client", joinColumns = @JoinColumn(name = "id_client"),
+            inverseJoinColumns = @JoinColumn(name = "id_purchase_order"))
+    private List<PurchaseOrder> purchaseOrders;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false, nullable = false)

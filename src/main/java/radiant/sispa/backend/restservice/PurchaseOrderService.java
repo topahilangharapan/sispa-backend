@@ -12,4 +12,5 @@ public interface PurchaseOrderService {
     List<PurchaseOrderResponseDTO> getAllPurchaseOrders();
     PurchaseOrderResponseDTO getPurchaseOrderById(Long id);
     void deletePurchaseOrder(Long id);
+    CreatePurchaseOrderResponseDTO generatePdfByPurchaseOrderId(Long purchaseOrderId, String authHeader);
 }

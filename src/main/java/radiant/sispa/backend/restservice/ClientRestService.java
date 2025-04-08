@@ -1,6 +1,8 @@
 package radiant.sispa.backend.restservice;
 
 import jakarta.persistence.EntityNotFoundException;
+import radiant.sispa.backend.model.Client;
+import radiant.sispa.backend.model.Vendor;
 import radiant.sispa.backend.restdto.request.AddClientRequestRestDTO;
 import radiant.sispa.backend.restdto.request.UpdateClientRequestRestDTO;
 import radiant.sispa.backend.restdto.response.ClientResponseDTO;
@@ -17,4 +19,6 @@ public interface ClientRestService {
     ClientResponseDTO getClientById(String id);
 
     List<ClientResponseDTO> getAllClient();
+
+    Client addPurchaseOrder(String idClient, Long idPo);
 }

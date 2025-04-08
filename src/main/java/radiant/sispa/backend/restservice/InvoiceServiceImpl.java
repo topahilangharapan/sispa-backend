@@ -53,7 +53,6 @@ public class InvoiceServiceImpl implements InvoiceService {
                 throw new FileNotFoundException("Purchase Order tidak ditemukan.");
             }
 
-
             Invoice invoice = createInvoiceRequestDTOToInvoice(createInvoiceRequestDTO, purchaseOrder, createdBy);
 
 
@@ -252,7 +251,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceResponseDTO> getAllInvoices() {
-        List<Invoice> invoices = invoiceDb.findAllByDeletedAtNull();
+        List<Invoice> invoices = invoiceDb.findAllByDeletedAtIsNullAndPurchaseOrderDeletedAtIsNull();
 
         List<InvoiceResponseDTO> result = new ArrayList<>();
         for (Invoice inv : invoices) {
