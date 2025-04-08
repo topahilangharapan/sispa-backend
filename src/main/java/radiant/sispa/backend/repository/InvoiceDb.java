@@ -12,5 +12,5 @@ public interface InvoiceDb extends JpaRepository<Invoice, String> {
     @Query("SELECT p FROM Invoice p WHERE p.createdAt >= :startOfDay AND p.createdAt < :endOfDay")
     List<Invoice> findInvoicesToday(@Param("startOfDay") Instant startOfDay, @Param("endOfDay") Instant endOfDay);
     Invoice findByIdAndDeletedAtNull(Long id);
-    List<Invoice> findAllByDeletedAtNull();
+    List<Invoice> findAllByDeletedAtIsNullAndPurchaseOrderDeletedAtIsNull();
 }
