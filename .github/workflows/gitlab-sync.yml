@@ -17,6 +17,8 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
+          git config --global credential.helper store
+          echo "https://x-access-token:${{ secrets.GH_TOKEN }}@github.com" > ~/.git-credentials
 
       - name: Add GitLab remote
         run: |
@@ -30,6 +32,5 @@ jobs:
 
       - name: Push to GitHub
         run: |
-          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --all --force
-          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --tags --force
-
+          git push origin --all --force
+          git push origin --tags --force  
