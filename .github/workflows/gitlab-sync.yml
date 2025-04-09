@@ -20,7 +20,7 @@ jobs:
 
       - name: Add GitLab remote
         run: |
-          git remote add upstream https://gitlab.cs.ui.ac.id/propensi-2024-2025-genap/kelas-b/b01-radiant-be.git
+          git remote add upstream https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.cs.ui.ac.id/propensi-2024-2025-genap/kelas-b/b01-radiant-be.git
           git fetch upstream
 
       - name: Reset main branch to GitLab
