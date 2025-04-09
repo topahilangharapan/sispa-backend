@@ -28,6 +28,9 @@ jobs:
           git checkout main
           git reset --hard upstream/main
 
+      - name: Set remote URL with PAT
+        run: git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git
+
       - name: Push to GitHub
         run: |
           git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --all --force
