@@ -20,6 +20,9 @@ jobs:
           git config --global credential.helper store
           echo "https://x-access-token:${{ secrets.GH_TOKEN }}@github.com" > ~/.git-credentials
 
+      - name: Set GitHub token for origin
+        run: git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git
+
       - name: Add GitLab remote
         run: |
           git remote add upstream https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.cs.ui.ac.id/propensi-2024-2025-genap/kelas-b/b01-radiant-be.git
