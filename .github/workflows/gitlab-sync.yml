@@ -30,5 +30,6 @@ jobs:
 
       - name: Push to GitHub
         run: |
-          git push origin main --force
-          git push origin --tags --force
+          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --all --force
+          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --tags --force
+
