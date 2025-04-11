@@ -1,0 +1,47 @@
+name: Sync from GitLab
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Every hour
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout GitHub repo
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Add GitLab remote
+        run: |
+          git remote add upstream https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.cs.ui.ac.id/propensi-2024-2025-genap/kelas-b/b01-radiant-be.git
+          git fetch upstream
+
+      - name: Reset main branch to GitLab
+        run: |
+          git checkout main
+          git reset --hard upstream/main
+
+      - name: Set remote URL with PAT
+        run: git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git
+
+      - name: Check remotes
+        run: git remote -v
+
+      - name: Check current branch
+        run: git branch
+
+      - name: Push to GitHub
+        run: |
+          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --all --force
+          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --tags --force
+
