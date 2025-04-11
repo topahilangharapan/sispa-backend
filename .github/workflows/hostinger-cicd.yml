@@ -44,6 +44,12 @@ jobs:
         with:
           name: backend-jar
 
+      - name: Create build/libs directory
+        run: mkdir -p build/libs
+
+      - name: Move JAR to build/libs
+        run: mv *.jar build/libs/
+
       - name: List contents
         run: |
           ls -la
