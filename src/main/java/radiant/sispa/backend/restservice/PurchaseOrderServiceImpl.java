@@ -362,4 +362,77 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return dto;
     }
 
+    @Override
+    public CreatePurchaseOrderResponseDTO generatePdfByPurchaseOrderId(Long purchaseOrderId, String authHeader) {
+        // Retrieve the existing purchase order
+        PurchaseOrder purchaseOrder = purchaseOrderDb.findById(purchaseOrderId)
+                .orElseThrow(() -> new NoSuchElementException("Purchase order not found with id: " + purchaseOrderId));
+        
+        try {
+            // Load and compile the Jasper report
+            InputStream reportStream = new ClassPathResource("/static/report/purchase-order.jrxml").getInputStream();
+            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+            
+            // Prepare data for the report
+            List<Map<String, Object>> data = new ArrayList<>();
+            Long count = 1L;
+            for (PurchaseOrderItem item : purchaseOrder.getItems()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("no", String.valueOf(count++));
+                row.put("uraianJudul", item.getTitle());
+                row.put("volume", formatWithThousandSeparator(item.getVolume()));
+                row.put("satuan", item.getUnit());
+                row.put("hargaSatuan", formatWithThousandSeparator(item.getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(item.getSum()));
+                row.put("blank", "");  // if needed
+                row.put("uraianDeskripsi", item.getDescription());
+                data.add(row);
+            }
+
+            if (purchaseOrder.getItems().isEmpty()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("no", "");
+                row.put("uraianJudul", "");
+                row.put("volume", "");
+                row.put("satuan", "");
+                row.put("hargaSatuan", "");
+                row.put("jumlah", "");
+                row.put("blank", "");
+                row.put("uraianDeskripsi", "");
+                data.add(row);
+            }
+            
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(data);
+            
+            // Set up report parameters using the purchaseOrder object
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("logoSPA", "static/images/logo_spa_with_text.png");
+            parameters.put("perusahaan", purchaseOrder.getCompanyName());
+            parameters.put("alamatPerusahaan", purchaseOrder.getCompanyAddress());
+            parameters.put("penerima", purchaseOrder.getReceiver());
+            parameters.put("tanggalDibuat", purchaseOrder.getDateCreated());
+            parameters.put("noPo", purchaseOrder.getNoPo());
+            parameters.put("total", formatWithThousandSeparator(purchaseOrder.getTotal()));
+            parameters.put("terbilang", purchaseOrder.getSpelledOut());
+            parameters.put("ketentuan", purchaseOrder.getTerms());
+            parameters.put("tempat", purchaseOrder.getPlaceSigned());
+            parameters.put("tanggalDitandatangani", purchaseOrder.getDateSigned());
+            parameters.put("tandaTangan", "static/images/ttd_po.jpg");
+            parameters.put("yangMenandatangani", purchaseOrder.getSignee());
+
+            // Fill the report and export to PDF
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+            byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            
+            // Prepare response DTO
+            CreatePurchaseOrderResponseDTO responseDTO = new CreatePurchaseOrderResponseDTO();
+            responseDTO.setPdf(pdfBytes);
+            responseDTO.setFileName(purchaseOrder.getFileName());
+            return responseDTO;
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating PDF report", e);
+        }
+    }
+
+
 }

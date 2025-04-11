@@ -17,6 +17,7 @@ import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 import radiant.sispa.backend.restservice.PurchaseOrderService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -149,4 +150,31 @@ public class PurchaseOrderController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<?> downloadPurchaseOrder(@PathVariable("id") Long id, @RequestHeader("Authorization") String authHeader) {
+        var baseResponseDTO = new BaseResponseDTO<CreatePurchaseOrderResponseDTO>();
+        try {
+            // Use the new method to generate PDF from the existing purchase order
+            CreatePurchaseOrderResponseDTO pdfReport = purchaseOrderService.generatePdfByPurchaseOrderId(id, authHeader);
+            
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(pdfReport);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Purchase order PDF generated successfully!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to generate purchase order PDF: " + e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    
 }

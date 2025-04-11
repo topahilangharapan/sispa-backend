@@ -42,6 +42,10 @@ public class ClientRestServiceImpl implements ClientRestService {
             throw new EntityNotFoundException("Klien tidak ditemukan");
         }
 
+        if (clientToDelete.getPurchaseOrders() != null && !clientToDelete.getPurchaseOrders().isEmpty()) {
+            throw new IllegalStateException("Klien tidak dapat dihapus karena memiliki PO.");
+        }
+
         clientToDelete.setDeletedAt(new Date());
         clientDb.save(clientToDelete);
     }

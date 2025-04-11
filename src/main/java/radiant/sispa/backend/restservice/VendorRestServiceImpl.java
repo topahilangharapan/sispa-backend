@@ -52,6 +52,10 @@ public class VendorRestServiceImpl implements VendorRestService {
             throw new EntityNotFoundException("Vendor not found");
         }
 
+        if (vendorToDelete.getPurchaseOrders() != null && !vendorToDelete.getPurchaseOrders().isEmpty()) {
+            throw new IllegalStateException("Vendor tidak dapat dihapus karena memiliki PO.");
+        }
+
         vendorToDelete.setDeletedAt(new Date());
         vendorDb.save(vendorToDelete);
     }
