@@ -1,10 +1,5 @@
 name: Hostinger CI/CD Pipeline
 
-on:
-  push:
-    branches:
-      - deployment
-
 jobs:
   build:
     runs-on: ubuntu-latest
