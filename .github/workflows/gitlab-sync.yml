@@ -5,13 +5,11 @@ on:
     - cron: '0 * * * *' # Every hour
   workflow_dispatch: # Manual trigger
 
+permissions: write-all
+
 jobs:
   sync:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-      workflows: write
 
     steps:
       - name: Checkout GitHub repo
@@ -27,10 +25,11 @@ jobs:
           git remote add upstream https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.cs.ui.ac.id/propensi-2024-2025-genap/kelas-b/b01-radiant-be.git
           git fetch upstream
 
-      - name: Reset main branch to GitLab
+      - name: Merge GitLab main into GitHub main, keep .github
         run: |
           git checkout main
-          git reset --hard upstream/main
+          git merge --allow-unrelated-histories -X theirs upstream/main || true
+          git restore --source=origin/main .github
 
       - name: Set remote URL with PAT
         run: git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git
@@ -43,6 +42,5 @@ jobs:
 
       - name: Push to GitHub
         run: |
-          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --all --force
-          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/topahilangharapan/sispa-backend.git --tags --force
-
+          git push origin --all --force
+          git push origin --tags --force
