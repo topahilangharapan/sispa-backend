@@ -1,9 +1,7 @@
 name: Hostinger CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - deployment
+  workflow_dispatch: # Manual trigger
 
 jobs:
   build:
