@@ -1,5 +1,11 @@
 name: Hostinger CI/CD Pipeline
 
+on:
+  schedule:
+    - cron: '0 * * * *' # Every hour
+  workflow_dispatch: # Manual trigger
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
