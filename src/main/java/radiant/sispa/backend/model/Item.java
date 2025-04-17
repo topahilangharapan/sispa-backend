@@ -18,8 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "purchase_order_item")
-public class PurchaseOrderItem implements Serializable {
+@Table(name = "item")
+public class Item implements Serializable {
     @Id
     @GeneratedValue(generator = "system-uuid")
     private Long id;
