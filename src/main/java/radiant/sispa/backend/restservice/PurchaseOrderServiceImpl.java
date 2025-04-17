@@ -4,15 +4,14 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Client;
 import radiant.sispa.backend.model.PurchaseOrder;
-import radiant.sispa.backend.model.PurchaseOrderItem;
+import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.model.Vendor;
 import radiant.sispa.backend.repository.ClientDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
-import radiant.sispa.backend.repository.PurchaseOrderItemDb;
+import radiant.sispa.backend.repository.ItemDb;
 import radiant.sispa.backend.repository.VendorDb;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
@@ -35,7 +34,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private PurchaseOrderItemDb purchaseOrderItemDb;
+    private ItemDb purchaseOrderItemDb;
 
     @Autowired
     private VendorRestService vendorService;
@@ -75,7 +74,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             List<Map<String, Object>> data = new ArrayList<>();
 
             Long count = 1L;
-            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getItems()) {
+            for (Item purchaseOrderItem : purchaseOrder.getItems()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", String.valueOf(count++));
@@ -150,7 +149,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 .orElse(null);
 
         PurchaseOrder purchaseOrder = new PurchaseOrder();
-        List<PurchaseOrderItem> items = savePurchaseOrderItem(createPurchaseOrderRequestDTO.getItems(), createdBy);
+        List<Item> items = savePurchaseOrderItem(createPurchaseOrderRequestDTO.getItems(), createdBy);
 
         purchaseOrder.setCreatedBy(createdBy);
 
@@ -171,7 +170,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setItems(items);
 
         Long total = 0L;
-        for (PurchaseOrderItem item : items) {
+        for (Item item : items) {
             total += item.getSum();
         }
 
@@ -186,11 +185,11 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return purchaseOrderDb.save(purchaseOrder);
     }
 
-    private List<PurchaseOrderItem> savePurchaseOrderItem(List<Map<String, String>> items, String createdBy) {
-        List<PurchaseOrderItem> result = new ArrayList<>();
+    private List<Item> savePurchaseOrderItem(List<Map<String, String>> items, String createdBy) {
+        List<Item> result = new ArrayList<>();
 
         for (Map<String, String> item : items) {
-            PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+            Item purchaseOrderItem = new Item();
 
             purchaseOrderItem.setCreatedBy(createdBy);
             purchaseOrderItem.setTitle(item.get("title"));
@@ -345,7 +344,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         // Convert items
         List<PurchaseOrderItemResponseDTO> itemDTOs = new ArrayList<>();
         if (entity.getItems() != null) {
-            for (PurchaseOrderItem item : entity.getItems()) {
+            for (Item item : entity.getItems()) {
                 PurchaseOrderItemResponseDTO itemDTO = new PurchaseOrderItemResponseDTO();
                 itemDTO.setId(item.getId());
                 itemDTO.setTitle(item.getTitle());
@@ -376,7 +375,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             // Prepare data for the report
             List<Map<String, Object>> data = new ArrayList<>();
             Long count = 1L;
-            for (PurchaseOrderItem item : purchaseOrder.getItems()) {
+            for (Item item : purchaseOrder.getItems()) {
                 Map<String, Object> row = new HashMap<>();
                 row.put("no", String.valueOf(count++));
                 row.put("uraianJudul", item.getTitle());
