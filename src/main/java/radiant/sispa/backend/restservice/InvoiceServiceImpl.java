@@ -8,7 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Invoice;
 import radiant.sispa.backend.model.PurchaseOrder;
-import radiant.sispa.backend.model.PurchaseOrderItem;
+import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
@@ -62,7 +62,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             List<Map<String, Object>> data = new ArrayList<>();
 
             Long count = 1L;
-            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getItems()) {
+            for (Item purchaseOrderItem : purchaseOrder.getItems()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", String.valueOf(count++));
@@ -306,7 +306,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         List<PurchaseOrderItemResponseDTO> itemDTOs = new ArrayList<>();
         PurchaseOrder po = purchaseOrderDb.findPurchaseOrderByNoPo(entity.getNoPo());
         if (po.getItems() != null) {
-            for (PurchaseOrderItem item : po.getItems()) {
+            for (Item item : po.getItems()) {
                 PurchaseOrderItemResponseDTO itemDTO = new PurchaseOrderItemResponseDTO();
                 itemDTO.setId(item.getId());
                 itemDTO.setTitle(item.getTitle());
@@ -339,7 +339,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             List<Map<String, Object>> data = new ArrayList<>();
 
             Long count = 1L;
-            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getItems()) {
+            for (Item purchaseOrderItem : purchaseOrder.getItems()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", String.valueOf(count++));
