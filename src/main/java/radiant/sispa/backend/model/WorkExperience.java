@@ -22,46 +22,41 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_model")
-@Inheritance(strategy = InheritanceType.JOINED)
-public class UserModel implements Serializable {
+@Table(name = "work_experience")
+public class WorkExperience implements Serializable {
     @Id
     @GeneratedValue(generator = "system-uuid")
     private Long id;
 
-    @NotNull
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
-
-    @NotNull
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @NotNull
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
-
-    @NotNull
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_role", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_freelancer", referencedColumnName = "id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private Role role;
+    private Freelancer freelancer;
 
-    @Column(name = "address")
-    private String address;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_work_experience_category", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private WorkExperienceCategory category;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    @NotNull
+    @Column(name = "title", nullable = false)
+    private String title;
 
-    @Column(name = "place_of_birth")
-    private String placeOfBirth;
+    @NotNull
+    @Column(name = "description", nullable = false)
+    private String description;
 
-    @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
+    @NotNull
+    @Column(name = "is_still_working", nullable = false)
+    private boolean isStillWorking;
+
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -81,7 +76,7 @@ public class UserModel implements Serializable {
     private String updatedBy;
 
     @Column(name = "deleted_at")
-    private Instant deletedAt;
+    private Time deletedAt;
 
     @Column(name = "deleted_by")
     private String deletedBy;

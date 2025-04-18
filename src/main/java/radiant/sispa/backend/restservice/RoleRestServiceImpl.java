@@ -1,6 +1,7 @@
 package radiant.sispa.backend.restservice;
 
 import jakarta.persistence.EntityExistsException;
+import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class RoleRestServiceImpl implements RoleRestService {
     @Autowired
     private RoleDb roleDb;
