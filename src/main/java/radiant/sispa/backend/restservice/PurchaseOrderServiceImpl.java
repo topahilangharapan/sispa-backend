@@ -1,5 +1,6 @@
 package radiant.sispa.backend.restservice;
 
+import jakarta.transaction.Transactional;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
+@Transactional
 public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Autowired
     private PurchaseOrderDb purchaseOrderDb;

@@ -16,52 +16,27 @@ import java.io.Serializable;
 import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_model")
-@Inheritance(strategy = InheritanceType.JOINED)
-public class UserModel implements Serializable {
+@Table(name = "work_experience_category")
+public class WorkExperienceCategory implements Serializable {
     @Id
-    @GeneratedValue(generator = "system-uuid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
+    @Column(name = "category", nullable = false)
+    private String category;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @NotNull
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
-
-    @NotNull
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_role", referencedColumnName = "id", nullable = false)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private Role role;
-
-    @Column(name = "address")
-    private String address;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(name = "place_of_birth")
-    private String placeOfBirth;
-
-    @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
+    private List<WorkExperience> workExperiences;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -81,7 +56,7 @@ public class UserModel implements Serializable {
     private String updatedBy;
 
     @Column(name = "deleted_at")
-    private Instant deletedAt;
+    private Time deletedAt;
 
     @Column(name = "deleted_by")
     private String deletedBy;
