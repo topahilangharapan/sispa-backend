@@ -13,7 +13,9 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.sql.Time;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -21,11 +23,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "category")
-public class Category implements Serializable {
+@Table(name = "item_status")
+public class ItemStatus implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotNull
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @OneToMany(mappedBy = "status", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private List<Item> items;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -45,18 +56,9 @@ public class Category implements Serializable {
     private String updatedBy;
 
     @Column(name = "deleted_at")
-    private Instant deletedAt;
+    private Time deletedAt;
 
     @Column(name = "deleted_by")
     private String deletedBy;
-
-    @NotNull
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private List<Item> items;
 }
 

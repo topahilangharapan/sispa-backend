@@ -7,6 +7,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import radiant.sispa.backend.model.Category;
 import radiant.sispa.backend.model.Invoice;
 import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.model.PurchaseOrder;
@@ -15,10 +16,7 @@ import radiant.sispa.backend.repository.ItemDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
-import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateItemResponseDTO;
-import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
-import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.FileNotFoundException;
@@ -39,6 +37,12 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private ItemStatusService itemStatusService;
+
     @Override
     public CreateItemResponseDTO createItem(CreateItemRequestDTO createItemRequestDTO, String authHeader) {
         String token = authHeader.substring(7);
@@ -52,6 +56,7 @@ public class ItemServiceImpl implements ItemService {
         createItemResponseDTO.setDescription(item.getDescription());
         createItemResponseDTO.setUnit(item.getUnit());
         createItemResponseDTO.setPricePerUnit(item.getPricePerUnit());
+        createItemResponseDTO.setCategory(item.getCategory().getName());
 
         return createItemResponseDTO;
     }
@@ -64,6 +69,16 @@ public class ItemServiceImpl implements ItemService {
         item.setUnit(createItemRequestDTO.getUnit());
         item.setPricePerUnit(createItemRequestDTO.getPricePerUnit());
         item.setDescription(createItemRequestDTO.getDescription());
+
+        Category category = new Category();
+        CategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(createItemRequestDTO.getCategory());
+
+        category.setId(categoryResponseDTO.getId());
+        category.setName(categoryResponseDTO.getName());
+
+        item.setStatus(itemStatusService.getItemStatusByName("TERSEDIA"));
+
+        item.setCategory(category);
 
         return item;
     }
