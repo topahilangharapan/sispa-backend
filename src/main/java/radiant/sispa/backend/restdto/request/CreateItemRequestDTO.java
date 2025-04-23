@@ -12,8 +12,8 @@ import java.util.Map;
 @Data
 public class CreateItemRequestDTO {
     private String title;
-    private Long volume;
     private String unit;
     private Long pricePerUnit;
     private String description;
+    private String category;
 }

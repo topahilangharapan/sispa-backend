@@ -25,7 +25,7 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, CategoryDb categoryDb, ItemStatusDb itemStatusDb) {
         return args -> {
             // Create roles if they don't exist
             createRoleIfNotExists(roleDb, "ADMIN");
@@ -63,6 +63,19 @@ public class BackendApplication {
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "TRAINING");
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "WIRAUSAHA");
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "LAINNYA");
+
+            createCategoryIfNotExists(categoryDb, "MAINAN");
+            createCategoryIfNotExists(categoryDb, "FURNITUR");
+            createCategoryIfNotExists(categoryDb, "MISTIS");
+            createCategoryIfNotExists(categoryDb, "MAKANAN");
+
+            createItemStatusIfNotExists(itemStatusDb, "TERSEDIA");
+            createItemStatusIfNotExists(itemStatusDb, "DIPAKAI");
+            createItemStatusIfNotExists(itemStatusDb, "RUSAK");
+            createItemStatusIfNotExists(itemStatusDb, "MELEDAK");
+            createItemStatusIfNotExists(itemStatusDb, "ALAMAK");
+            createItemStatusIfNotExists(itemStatusDb, "DUIT");
+            createItemStatusIfNotExists(itemStatusDb, "NIIII");
         };
     }
 
@@ -142,4 +155,22 @@ public class BackendApplication {
         }
     }
 
+
+    private void createCategoryIfNotExists(CategoryDb categoryDb, String categoryName) {
+        Category newCategory = new Category();
+
+        newCategory.setName(categoryName);
+        newCategory.setCreatedBy("hilangharapan");
+
+        categoryDb.save(newCategory);
+    }
+
+    private void createItemStatusIfNotExists(ItemStatusDb itemStatusDb, String itemStatusName) {
+        ItemStatus newItemStatus = new ItemStatus();
+
+        newItemStatus.setStatus(itemStatusName);
+        newItemStatus.setCreatedBy("hilangharapan");
+
+        itemStatusDb.save(newItemStatus);
+    }
 }

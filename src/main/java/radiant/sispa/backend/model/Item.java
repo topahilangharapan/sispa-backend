@@ -1,5 +1,6 @@
 package radiant.sispa.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
@@ -52,10 +55,6 @@ public class Item implements Serializable {
     private String title;
 
     @NotNull
-    @Column(name = "volume", nullable = false)
-    private Long volume;
-
-    @NotNull
     @Column(name = "unit", nullable = false)
     private String unit;
 
@@ -63,14 +62,22 @@ public class Item implements Serializable {
     @Column(name = "price_per_unit", nullable = false)
     private Long pricePerUnit;
 
-    @NotNull
-    @Column(name = "sum", nullable = false)
-    private Long sum;
-
     @Column(name = "description")
     private String description;
 
-    @ManyToMany(mappedBy = "items", fetch = FetchType.LAZY)
-    private List<PurchaseOrder> listPurchaseOrder;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseOrderItem> purchaseOrderItems;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_category", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private Category category;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_item_status", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private ItemStatus status;
 }
 

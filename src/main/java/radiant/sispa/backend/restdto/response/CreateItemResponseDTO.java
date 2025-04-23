@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class CreateItemResponseDTO {
     private String title;
-    private Long volume;
     private String unit;
     private Long pricePerUnit;
-    private Long sum;
+    private String category;
     private String description;
 }
