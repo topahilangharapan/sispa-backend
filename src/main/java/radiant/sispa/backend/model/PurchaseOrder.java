@@ -74,18 +74,8 @@ public class PurchaseOrder implements Serializable {
     @Column(name = "date_created", nullable = false)
     private String dateCreated;
 
-    @ManyToMany
-    @JoinTable(name = "purchase_order_item", joinColumns = @JoinColumn(name = "id_purchase_order"),
-            inverseJoinColumns = @JoinColumn(name = "id_item"))
-    private List<Item> items;
-
-    @NotNull
-    @Column(name = "total", nullable = false)
-    private Long total;
-
-    @NotNull
-    @Column(name = "spelled_out", nullable = false)
-    private String spelledOut;
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseOrderItem> purchaseOrderItems;
 
     @NotNull
     @Column(name = "terms", nullable = false)

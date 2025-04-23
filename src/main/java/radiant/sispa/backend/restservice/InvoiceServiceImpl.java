@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Invoice;
 import radiant.sispa.backend.model.PurchaseOrder;
 import radiant.sispa.backend.model.Item;
+import radiant.sispa.backend.model.PurchaseOrderItem;
 import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
@@ -64,21 +65,23 @@ public class InvoiceServiceImpl implements InvoiceService {
             List<Map<String, Object>> data = new ArrayList<>();
 
             Long count = 1L;
-            for (Item purchaseOrderItem : purchaseOrder.getItems()) {
+            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getPurchaseOrderItems()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", String.valueOf(count++));
-                row.put("uraianJudul", purchaseOrderItem.getTitle());
+                row.put("uraianJudul", purchaseOrderItem.getItem().getTitle());
                 row.put("volume", formatWithThousandSeparator(purchaseOrderItem.getVolume()));
-                row.put("satuan", purchaseOrderItem.getUnit());
-                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getPricePerUnit()));
-                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getSum()));
+                row.put("satuan", purchaseOrderItem.getItem().getUnit());
+                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getItem().getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getItem().getPricePerUnit() * purchaseOrderItem.getVolume()));
+                row.put("blank", "");
+                row.put("uraianDeskripsi", purchaseOrderItem.getItem().getDescription());
 
                 data.add(row);
             }
 
 
-            if (purchaseOrder.getItems().isEmpty()) {
+            if (purchaseOrder.getPurchaseOrderItems().isEmpty()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", "");
@@ -142,7 +145,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setNoPo(purchaseOrder.getNoPo());
         invoice.setDatePaid(createInvoiceRequestDTO.getDatePaid());
         invoice.setPurchaseOrder(purchaseOrder);
-        invoice.setSubTotal(purchaseOrder.getTotal());
+
+        Long total = 0L;
+        for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getPurchaseOrderItems()) {
+            total += purchaseOrderItem.getItem().getPricePerUnit() * purchaseOrderItem.getVolume();
+        }
+        invoice.setSubTotal(total);
+
         invoice.setPpnPercentage(Double.parseDouble(createInvoiceRequestDTO.getPpnPercentage()) / 100);
         invoice.setPpn(Math.round(invoice.getSubTotal() * invoice.getPpnPercentage()));
         invoice.setTotal(invoice.getSubTotal() + invoice.getPpn());
@@ -307,16 +316,16 @@ public class InvoiceServiceImpl implements InvoiceService {
         // Convert items
         List<PurchaseOrderItemResponseDTO> itemDTOs = new ArrayList<>();
         PurchaseOrder po = purchaseOrderDb.findPurchaseOrderByNoPo(entity.getNoPo());
-        if (po.getItems() != null) {
-            for (Item item : po.getItems()) {
+        if (po.getPurchaseOrderItems() != null) {
+            for (PurchaseOrderItem purchaseOrderItem : po.getPurchaseOrderItems()) {
                 PurchaseOrderItemResponseDTO itemDTO = new PurchaseOrderItemResponseDTO();
-                itemDTO.setId(item.getId());
-                itemDTO.setTitle(item.getTitle());
-                itemDTO.setVolume(item.getVolume());
-                itemDTO.setUnit(item.getUnit());
-                itemDTO.setPricePerUnit(item.getPricePerUnit());
-                itemDTO.setSum(item.getSum());
-                itemDTO.setDescription(item.getDescription());
+                itemDTO.setId(purchaseOrderItem.getItem().getId());
+                itemDTO.setTitle(purchaseOrderItem.getItem().getTitle());
+                itemDTO.setVolume(purchaseOrderItem.getVolume());
+                itemDTO.setUnit(purchaseOrderItem.getItem().getUnit());
+                itemDTO.setPricePerUnit(purchaseOrderItem.getItem().getPricePerUnit());
+                itemDTO.setSum(purchaseOrderItem.getVolume() * purchaseOrderItem.getItem().getPricePerUnit());
+                itemDTO.setDescription(purchaseOrderItem.getItem().getDescription());
                 itemDTOs.add(itemDTO);
             }
         }
@@ -341,20 +350,23 @@ public class InvoiceServiceImpl implements InvoiceService {
             List<Map<String, Object>> data = new ArrayList<>();
 
             Long count = 1L;
-            for (Item purchaseOrderItem : purchaseOrder.getItems()) {
+            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getPurchaseOrderItems()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", String.valueOf(count++));
-                row.put("uraianJudul", purchaseOrderItem.getTitle());
+                row.put("uraianJudul", purchaseOrderItem.getItem().getTitle());
                 row.put("volume", formatWithThousandSeparator(purchaseOrderItem.getVolume()));
-                row.put("satuan", purchaseOrderItem.getUnit());
-                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getPricePerUnit()));
-                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getSum()));
+                row.put("satuan", purchaseOrderItem.getItem().getUnit());
+                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getItem().getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getItem().getPricePerUnit() * purchaseOrderItem.getVolume()));
+                row.put("blank", "");
+                row.put("uraianDeskripsi", purchaseOrderItem.getItem().getDescription());
 
                 data.add(row);
             }
 
-            if (purchaseOrder.getItems().isEmpty()) {
+
+            if (purchaseOrder.getPurchaseOrderItems().isEmpty()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", "");
