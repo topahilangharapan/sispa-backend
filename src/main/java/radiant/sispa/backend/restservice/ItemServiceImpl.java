@@ -83,4 +83,35 @@ public class ItemServiceImpl implements ItemService {
         return item;
     }
 
+    @Override
+    public List<ItemResponseDTO> getAllItems() {
+        List<Item> items = itemDb.findByDeletedAtNull();
+        List<ItemResponseDTO> result = new ArrayList<>();
+
+        for (Item item : items) {
+            result.add(itemToItemResponseDTO(item));
+        }
+
+        return result;
+    }
+
+    private ItemResponseDTO itemToItemResponseDTO(Item item) {
+        ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+
+        itemResponseDTO.setId(item.getId());
+        itemResponseDTO.setTitle(item.getTitle());
+        itemResponseDTO.setDescription(item.getDescription());
+        itemResponseDTO.setUnit(item.getUnit());
+        itemResponseDTO.setPricePerUnit(item.getPricePerUnit());
+        itemResponseDTO.setCategory(item.getCategory().getName());
+        itemResponseDTO.setStatus(item.getStatus().getStatus());
+
+        return itemResponseDTO;
+    }
+
+    @Override
+    public Item getItemById(Long id) {
+        return itemDb.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
 }

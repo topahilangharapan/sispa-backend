@@ -53,6 +53,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Autowired
     private ItemStatusService itemStatusService;
 
+    @Autowired
+    private ItemService itemService;
+
     private static final String[] SATUAN = {"", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"};
     private static final String[] BELASAN = {"Sepuluh", "Sebelas", "Dua Belas", "Tiga Belas", "Empat Belas", "Lima Belas", "Enam Belas", "Tujuh Belas", "Delapan Belas", "Sembilan Belas"};
     private static final String[] PULUHAN = {"", "", "Dua Puluh", "Tiga Puluh", "Empat Puluh", "Lima Puluh", "Enam Puluh", "Tujuh Puluh", "Delapan Puluh", "Sembilan Puluh"};
@@ -195,26 +198,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         List<Item> result = new ArrayList<>();
 
         for (Map<String, String> itemRaw : items) {
-            Item item = new Item();
-
-            item.setCreatedBy(createdBy);
-            item.setTitle(itemRaw.get("title"));
-            item.setUnit(itemRaw.get("unit"));
-            item.setPricePerUnit(Long.parseLong(itemRaw.get("pricePerUnit")));
-            item.setDescription(itemRaw.get("description"));
-            item.setPurchaseOrderItems(new ArrayList<>());
-
-            Category category = new Category();
-            CategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(itemRaw.get("category"));
-
-            category.setId(categoryResponseDTO.getId());
-            category.setName(categoryResponseDTO.getName());
-
-            item.setCategory(category);
-
-            item.setStatus(itemStatusService.getItemStatusByName(itemRaw.get("status")));
-
-            result.add(itemDb.save(item));
+            Item item = itemService.getItemById(Long.parseLong(itemRaw.get("id")));
+            result.add(item);
         }
 
         return result;
