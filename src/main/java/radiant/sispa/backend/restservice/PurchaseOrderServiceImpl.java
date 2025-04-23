@@ -6,14 +6,8 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import radiant.sispa.backend.model.Client;
-import radiant.sispa.backend.model.PurchaseOrder;
-import radiant.sispa.backend.model.Item;
-import radiant.sispa.backend.model.Vendor;
-import radiant.sispa.backend.repository.ClientDb;
-import radiant.sispa.backend.repository.PurchaseOrderDb;
-import radiant.sispa.backend.repository.ItemDb;
-import radiant.sispa.backend.repository.VendorDb;
+import radiant.sispa.backend.model.*;
+import radiant.sispa.backend.repository.*;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
@@ -36,7 +30,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private ItemDb purchaseOrderItemDb;
+    private ItemDb itemDb;
+
+    @Autowired
+    private PurchaseOrderItemDb purchaseOrderItemDb;
 
     @Autowired
     private VendorRestService vendorService;
@@ -62,6 +59,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
             PurchaseOrder purchaseOrder = createPurchaseOrderToPurchaseOrder(createPurchaseOrderRequestDTO, createdBy);
+            List<Item> items = savePurchaseOrderItem(createPurchaseOrderRequestDTO.getItems(), createdBy);
+            List<PurchaseOrderItem> purchaseOrderItems = linkPurchaseOrderItem(purchaseOrder, items, createPurchaseOrderRequestDTO.getItems());
 
             if (!purchaseOrder.getClient().isEmpty()) {
                 clientService.addPurchaseOrder(createPurchaseOrderRequestDTO.getClientId(), purchaseOrder.getId());
@@ -76,22 +75,22 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             List<Map<String, Object>> data = new ArrayList<>();
 
             Long count = 1L;
-            for (Item purchaseOrderItem : purchaseOrder.getItems()) {
+            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getPurchaseOrderItems()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", String.valueOf(count++));
-                row.put("uraianJudul", purchaseOrderItem.getTitle());
+                row.put("uraianJudul", purchaseOrderItem.getItem().getTitle());
                 row.put("volume", formatWithThousandSeparator(purchaseOrderItem.getVolume()));
-                row.put("satuan", purchaseOrderItem.getUnit());
-                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getPricePerUnit()));
-                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getSum()));
+                row.put("satuan", purchaseOrderItem.getItem().getUnit());
+                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getItem().getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getItem().getPricePerUnit() * purchaseOrderItem.getVolume()));
                 row.put("blank", "");
-                row.put("uraianDeskripsi", purchaseOrderItem.getDescription());
+                row.put("uraianDeskripsi", purchaseOrderItem.getItem().getDescription());
 
                 data.add(row);
             }
 
-            if (purchaseOrder.getItems().isEmpty()) {
+            if (purchaseOrder.getPurchaseOrderItems().isEmpty()) {
                 Map<String, Object> row = new HashMap<>();
 
                 row.put("no", "");
@@ -115,8 +114,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             parameters.put("penerima", purchaseOrder.getReceiver());
             parameters.put("tanggalDibuat", purchaseOrder.getDateCreated());
             parameters.put("noPo", purchaseOrder.getNoPo());
-            parameters.put("total", formatWithThousandSeparator(purchaseOrder.getTotal()));
-            parameters.put("terbilang", purchaseOrder.getSpelledOut());
+
+            Long total = 0L;
+            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getPurchaseOrderItems()) {
+                total += purchaseOrderItem.getItem().getPricePerUnit() * purchaseOrderItem.getVolume();
+            }
+
+            parameters.put("total", formatWithThousandSeparator(total));
+            parameters.put("terbilang", spellItOut(total));
             parameters.put("ketentuan", purchaseOrder.getTerms());
             parameters.put("tempat", purchaseOrder.getPlaceSigned());
             parameters.put("tanggalDitandatangani", purchaseOrder.getDateSigned());
@@ -141,7 +146,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     private PurchaseOrder createPurchaseOrderToPurchaseOrder(CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO, String createdBy) {
 
-
         Vendor vendor = Optional.ofNullable(createPurchaseOrderRequestDTO.getVendorId())
                 .map(vendorDb::findByIdAndDeletedAtNull)
                 .orElse(null);
@@ -151,7 +155,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 .orElse(null);
 
         PurchaseOrder purchaseOrder = new PurchaseOrder();
-        List<Item> items = savePurchaseOrderItem(createPurchaseOrderRequestDTO.getItems(), createdBy);
+        List<Map<String, String>> itemsMap = createPurchaseOrderRequestDTO.getItems();
 
         purchaseOrder.setCreatedBy(createdBy);
 
@@ -169,20 +173,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setReceiver(createPurchaseOrderRequestDTO.getReceiver());
         purchaseOrder.setDateCreated(createPurchaseOrderRequestDTO.getDateCreated());
         purchaseOrder.setNoPo(createNoPo(createPurchaseOrderRequestDTO));
-        purchaseOrder.setItems(items);
-
-        Long total = 0L;
-        for (Item item : items) {
-            total += item.getSum();
-        }
-
-        purchaseOrder.setTotal(total);
-        purchaseOrder.setSpelledOut(spellItOut(total));
         purchaseOrder.setTerms(createPurchaseOrderRequestDTO.getTerms());
         purchaseOrder.setPlaceSigned(createPurchaseOrderRequestDTO.getPlaceSigned());
         purchaseOrder.setDateSigned(createPurchaseOrderRequestDTO.getDateSigned());
         purchaseOrder.setSignee(createPurchaseOrderRequestDTO.getSignee());
         purchaseOrder.setFileName(createFileName(purchaseOrder));
+        purchaseOrder.setPurchaseOrderItems(new ArrayList<>());
 
         return purchaseOrderDb.save(purchaseOrder);
     }
@@ -190,21 +186,39 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private List<Item> savePurchaseOrderItem(List<Map<String, String>> items, String createdBy) {
         List<Item> result = new ArrayList<>();
 
-        for (Map<String, String> item : items) {
-            Item purchaseOrderItem = new Item();
+        for (Map<String, String> itemRaw : items) {
+            Item item = new Item();
 
-            purchaseOrderItem.setCreatedBy(createdBy);
-            purchaseOrderItem.setTitle(item.get("title"));
-            purchaseOrderItem.setVolume(Long.parseLong(item.get("volume")));
-            purchaseOrderItem.setUnit(item.get("unit"));
-            purchaseOrderItem.setPricePerUnit(Long.parseLong(item.get("pricePerUnit")));
-            purchaseOrderItem.setSum(purchaseOrderItem.getVolume() * purchaseOrderItem.getPricePerUnit());
-            purchaseOrderItem.setDescription(item.get("description"));
+            item.setCreatedBy(createdBy);
+            item.setTitle(itemRaw.get("title"));
+            item.setUnit(itemRaw.get("unit"));
+            item.setPricePerUnit(Long.parseLong(itemRaw.get("pricePerUnit")));
+            item.setDescription(itemRaw.get("description"));
+            item.setPurchaseOrderItems(new ArrayList<>());
 
-            result.add(purchaseOrderItemDb.save(purchaseOrderItem));
+            result.add(itemDb.save(item));
         }
 
         return result;
+    }
+
+    private List<PurchaseOrderItem> linkPurchaseOrderItem(PurchaseOrder purchaseOrder, List<Item> items, List<Map<String, String>> itemsRaw) {
+        List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
+
+        for (int i = 0; i < items.size(); i++) {
+            PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+
+            purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+            purchaseOrderItem.setItem(items.get(i));
+            purchaseOrderItem.setVolume(Long.parseLong(itemsRaw.get(i).get("volume")));
+
+            purchaseOrder.getPurchaseOrderItems().add(purchaseOrderItem);
+            items.get(i).getPurchaseOrderItems().add(purchaseOrderItem);
+
+            purchaseOrderItems.add(purchaseOrderItemDb.save(purchaseOrderItem));
+        }
+
+        return purchaseOrderItems;
     }
 
     private String createNoPo(CreatePurchaseOrderRequestDTO createPurchaseOrderRequestDTO) {
@@ -336,8 +350,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         dto.setReceiver(entity.getReceiver());
         dto.setNoPo(entity.getNoPo());
         dto.setDateCreated(entity.getDateCreated());
-        dto.setTotal(entity.getTotal());
-        dto.setSpelledOut(entity.getSpelledOut());
+
+        Long total = 0L;
+        for (PurchaseOrderItem purchaseOrderItem : entity.getPurchaseOrderItems()) {
+            total += purchaseOrderItem.getItem().getPricePerUnit() * purchaseOrderItem.getVolume();
+        }
+
+        dto.setTotal(total);
+        dto.setSpelledOut(spellItOut(total));
         dto.setTerms(entity.getTerms());
         dto.setPlaceSigned(entity.getPlaceSigned());
         dto.setDateSigned(entity.getDateSigned());
@@ -345,16 +365,16 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         // Convert items
         List<PurchaseOrderItemResponseDTO> itemDTOs = new ArrayList<>();
-        if (entity.getItems() != null) {
-            for (Item item : entity.getItems()) {
+        if (entity.getPurchaseOrderItems() != null) {
+            for (PurchaseOrderItem purchaseOrderItem : entity.getPurchaseOrderItems()) {
                 PurchaseOrderItemResponseDTO itemDTO = new PurchaseOrderItemResponseDTO();
-                itemDTO.setId(item.getId());
-                itemDTO.setTitle(item.getTitle());
-                itemDTO.setVolume(item.getVolume());
-                itemDTO.setUnit(item.getUnit());
-                itemDTO.setPricePerUnit(item.getPricePerUnit());
-                itemDTO.setSum(item.getSum());
-                itemDTO.setDescription(item.getDescription());
+                itemDTO.setId(purchaseOrderItem.getItem().getId());
+                itemDTO.setTitle(purchaseOrderItem.getItem().getTitle());
+                itemDTO.setVolume(purchaseOrderItem.getVolume());
+                itemDTO.setUnit(purchaseOrderItem.getItem().getUnit());
+                itemDTO.setPricePerUnit(purchaseOrderItem.getItem().getPricePerUnit());
+                itemDTO.setSum(purchaseOrderItem.getVolume() * purchaseOrderItem.getItem().getPricePerUnit());
+                itemDTO.setDescription(purchaseOrderItem.getItem().getDescription());
                 itemDTOs.add(itemDTO);
             }
         }
@@ -377,20 +397,23 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             // Prepare data for the report
             List<Map<String, Object>> data = new ArrayList<>();
             Long count = 1L;
-            for (Item item : purchaseOrder.getItems()) {
+
+            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getPurchaseOrderItems()) {
                 Map<String, Object> row = new HashMap<>();
+
                 row.put("no", String.valueOf(count++));
-                row.put("uraianJudul", item.getTitle());
-                row.put("volume", formatWithThousandSeparator(item.getVolume()));
-                row.put("satuan", item.getUnit());
-                row.put("hargaSatuan", formatWithThousandSeparator(item.getPricePerUnit()));
-                row.put("jumlah", formatWithThousandSeparator(item.getSum()));
-                row.put("blank", "");  // if needed
-                row.put("uraianDeskripsi", item.getDescription());
+                row.put("uraianJudul", purchaseOrderItem.getItem().getTitle());
+                row.put("volume", formatWithThousandSeparator(purchaseOrderItem.getVolume()));
+                row.put("satuan", purchaseOrderItem.getItem().getUnit());
+                row.put("hargaSatuan", formatWithThousandSeparator(purchaseOrderItem.getItem().getPricePerUnit()));
+                row.put("jumlah", formatWithThousandSeparator(purchaseOrderItem.getItem().getPricePerUnit() * purchaseOrderItem.getVolume()));
+                row.put("blank", "");
+                row.put("uraianDeskripsi", purchaseOrderItem.getItem().getDescription());
+
                 data.add(row);
             }
 
-            if (purchaseOrder.getItems().isEmpty()) {
+            if (purchaseOrder.getPurchaseOrderItems().isEmpty()) {
                 Map<String, Object> row = new HashMap<>();
                 row.put("no", "");
                 row.put("uraianJudul", "");
@@ -413,8 +436,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             parameters.put("penerima", purchaseOrder.getReceiver());
             parameters.put("tanggalDibuat", purchaseOrder.getDateCreated());
             parameters.put("noPo", purchaseOrder.getNoPo());
-            parameters.put("total", formatWithThousandSeparator(purchaseOrder.getTotal()));
-            parameters.put("terbilang", purchaseOrder.getSpelledOut());
+
+            Long total = 0L;
+            for (PurchaseOrderItem purchaseOrderItem : purchaseOrder.getPurchaseOrderItems()) {
+                total += purchaseOrderItem.getItem().getPricePerUnit() * purchaseOrderItem.getVolume();
+            }
+
+            parameters.put("total", formatWithThousandSeparator(total));
+            parameters.put("terbilang", spellItOut(total));
             parameters.put("ketentuan", purchaseOrder.getTerms());
             parameters.put("tempat", purchaseOrder.getPlaceSigned());
             parameters.put("tanggalDitandatangani", purchaseOrder.getDateSigned());

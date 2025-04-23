@@ -52,10 +52,6 @@ public class Item implements Serializable {
     private String title;
 
     @NotNull
-    @Column(name = "volume", nullable = false)
-    private Long volume;
-
-    @NotNull
     @Column(name = "unit", nullable = false)
     private String unit;
 
@@ -63,14 +59,10 @@ public class Item implements Serializable {
     @Column(name = "price_per_unit", nullable = false)
     private Long pricePerUnit;
 
-    @NotNull
-    @Column(name = "sum", nullable = false)
-    private Long sum;
-
     @Column(name = "description")
     private String description;
 
-    @ManyToMany(mappedBy = "items", fetch = FetchType.LAZY)
-    private List<PurchaseOrder> listPurchaseOrder;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseOrderItem> purchaseOrderItems;
 }
 

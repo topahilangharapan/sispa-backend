@@ -51,9 +51,7 @@ public class ItemServiceImpl implements ItemService {
         createItemResponseDTO.setTitle(item.getTitle());
         createItemResponseDTO.setDescription(item.getDescription());
         createItemResponseDTO.setUnit(item.getUnit());
-        createItemResponseDTO.setVolume(item.getVolume());
         createItemResponseDTO.setPricePerUnit(item.getPricePerUnit());
-        createItemResponseDTO.setSum(item.getSum());
 
         return createItemResponseDTO;
     }
@@ -63,10 +61,8 @@ public class ItemServiceImpl implements ItemService {
 
         item.setCreatedBy(createdBy);
         item.setTitle(createItemRequestDTO.getTitle());
-        item.setVolume(createItemRequestDTO.getVolume());
         item.setUnit(createItemRequestDTO.getUnit());
         item.setPricePerUnit(createItemRequestDTO.getPricePerUnit());
-        item.setSum(item.getVolume() * item.getPricePerUnit());
         item.setDescription(createItemRequestDTO.getDescription());
 
         return item;
