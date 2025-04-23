@@ -16,6 +16,7 @@ import radiant.sispa.backend.repository.ItemDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
+import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
@@ -110,8 +111,45 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public ItemResponseDTO updateItem(Long id, UpdateItemRequestRestDTO itemDTO, String username) {
+        Item item = itemDb.findById(id).orElse(null);
+        if (item == null || item.getDeletedAt() != null){
+            return null;
+        }
+
+        item.setTitle(itemDTO.getTitle());
+        item.setDescription(itemDTO.getDescription());
+        item.setUnit(itemDTO.getUnit());
+        item.setPricePerUnit(itemDTO.getPricePerUnit());
+        if (itemDTO.getCategory() != null && !itemDTO.getCategory().equals(item.getCategory().getName())) {
+            CategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(itemDTO.getCategory());
+            Category category = new Category();
+            category.setId(categoryResponseDTO.getId());
+            category.setName(categoryResponseDTO.getName());
+            item.setCategory(category);
+        }
+
+        Item updatedItem = itemDb.save(item);
+
+        return itemToItemResponseDTO(updatedItem);
+
+
+    }
+
+    @Override
     public Item getItemById(Long id) {
         return itemDb.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+
+    @Override
+    public ItemResponseDTO detailItem(Long id) {
+        Item item = itemDb.findById(id).orElse(null);
+        if (item == null || item.getDeletedAt() != null){
+            return null;
+        }
+
+        return itemToItemResponseDTO(item);
     }
 
 }
