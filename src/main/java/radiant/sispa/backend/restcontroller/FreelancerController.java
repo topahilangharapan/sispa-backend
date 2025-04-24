@@ -12,6 +12,7 @@ import radiant.sispa.backend.restservice.FreelancerService;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.Date;
+import java.util.List;
 
 
 @RestController
@@ -47,5 +48,17 @@ public class FreelancerController {
             baseResponseDTO.setMessage("Failed to create Freelancer!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/viewall")
+    public ResponseEntity<BaseResponseDTO<List<FreelancerResponseDTO>>> listFreelancer() {
+        List<FreelancerResponseDTO> listFreelancer = freelancerService.getAllFreelancer();
+
+        var baseResponseDTO = new BaseResponseDTO<List<FreelancerResponseDTO>>();
+        baseResponseDTO.setStatus(HttpStatus.OK.value());
+        baseResponseDTO.setData(listFreelancer);
+        baseResponseDTO.setMessage("Berhasil mengambil daftar freelancer");
+        baseResponseDTO.setTimestamp(new Date());
+        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
 }
