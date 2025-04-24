@@ -41,6 +41,9 @@ public class FreelancerServiceImpl implements FreelancerService {
     private WorkExperienceService workExperienceService;
 
     @Autowired
+    private EducationLevelService educationLevelService;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Override
@@ -59,7 +62,7 @@ public class FreelancerServiceImpl implements FreelancerService {
         return freelancerToCreateFreelancerResponseDTO(freelancer, createWorkExperienceResponseDTOS);
     }
 
-    private static CreateFreelancerResponseDTO freelancerToCreateFreelancerResponseDTO(Freelancer freelancer, List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS) {
+    private CreateFreelancerResponseDTO freelancerToCreateFreelancerResponseDTO(Freelancer freelancer, List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS) {
         CreateFreelancerResponseDTO responseDTO = new CreateFreelancerResponseDTO();
         responseDTO.setEmail(freelancer.getEmail());
         responseDTO.setId(freelancer.getId());
@@ -67,7 +70,7 @@ public class FreelancerServiceImpl implements FreelancerService {
         responseDTO.setRole(freelancer.getRole().getRole());
         responseDTO.setUsername(freelancer.getUsername());
         responseDTO.setWorkExperiences(createWorkExperienceResponseDTOS);
-        responseDTO.setEducation(freelancer.getEducation());
+        responseDTO.setEducation(freelancer.getEducation().getEducation());
         responseDTO.setReason(freelancer.getReason());
         responseDTO.setIsWorking(freelancer.getIsWorking());
         return responseDTO;
@@ -86,7 +89,7 @@ public class FreelancerServiceImpl implements FreelancerService {
         freelancer.setPhoneNumber(requestDTO.getPhoneNumber());
         freelancer.setPlaceOfBirth(requestDTO.getPlaceOfBirth());
         freelancer.setDateOfBirth(LocalDate.parse(requestDTO.getDateOfBirth()));
-        freelancer.setEducation(requestDTO.getEducation());
+        freelancer.setEducation(educationLevelService.getEducationLevelByName(requestDTO.getEducation()));
         freelancer.setReason(requestDTO.getReason());
         freelancer.setWorkExperiences(new ArrayList<>());
         freelancer.setNik(userService.hashPassword(requestDTO.getNik()));

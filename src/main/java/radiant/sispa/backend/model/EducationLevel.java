@@ -33,10 +33,10 @@ public class EducationLevel implements Serializable {
     @Column(name = "education", nullable = false)
     private String education;
 
-    @OneToMany(mappedBy = "status", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "education", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private List<Item> items;
+    private List<Freelancer> freelancers;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

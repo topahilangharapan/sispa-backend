@@ -4,9 +4,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import radiant.sispa.backend.model.ItemStatus;
 import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateItemStatusRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateItemStatusResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
 
 import java.util.List;
