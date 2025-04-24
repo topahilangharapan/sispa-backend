@@ -144,7 +144,7 @@ public class FreelancerServiceImpl implements FreelancerService {
                 .map(Timestamp::from)
                 .ifPresent(freelancerResponseDTO::setDeletedAt);
 
-        freelancerResponseDTO.setEducation(freelancer.getEducation());
+        freelancerResponseDTO.setEducation(freelancer.getEducation().getEducation());
         freelancerResponseDTO.setWorkExperiences(freelancer.getWorkExperiences());
         freelancerResponseDTO.setReason(freelancer.getReason());
         freelancerResponseDTO.setNik(freelancer.getNik());
