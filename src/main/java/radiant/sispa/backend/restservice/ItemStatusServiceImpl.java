@@ -5,15 +5,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.model.ItemStatus;
-import radiant.sispa.backend.model.WorkExperienceCategory;
 import radiant.sispa.backend.repository.ItemStatusDb;
-import radiant.sispa.backend.repository.WorkExperienceCategoryDb;
-import radiant.sispa.backend.restdto.request.CreateItemStatusRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateWorkExperienceCategoryRequestDTO;
-import radiant.sispa.backend.restdto.response.CreateItemStatusResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateWorkExperienceCategoryResponseDTO;
+import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
+import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
@@ -46,7 +41,7 @@ public class ItemStatusServiceImpl implements ItemStatusService {
     }
 
     @Override
-    public CreateItemStatusResponseDTO addItemStatus(CreateItemStatusRequestDTO requestDTO, String authHeader) throws EntityExistsException {
+    public CreateGenericDataResponseDTO addItemStatus(CreateGenericDataRequestDTO requestDTO, String authHeader) throws EntityExistsException {
         String token = authHeader.substring(7);
         String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
@@ -60,7 +55,7 @@ public class ItemStatusServiceImpl implements ItemStatusService {
         itemStatus.setCreatedBy(createdBy);
         itemStatusDb.save(itemStatus);
 
-        CreateItemStatusResponseDTO responseDTO = new CreateItemStatusResponseDTO();
+        CreateGenericDataResponseDTO responseDTO = new CreateGenericDataResponseDTO();
         responseDTO.setId(itemStatus.getId());
         responseDTO.setName(itemStatus.getStatus());
 

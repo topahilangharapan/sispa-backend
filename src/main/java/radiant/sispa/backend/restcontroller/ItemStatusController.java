@@ -5,14 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import radiant.sispa.backend.restdto.request.CreateItemStatusRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateWorkExperienceCategoryRequestDTO;
+import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateItemStatusResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateWorkExperienceCategoryResponseDTO;
+import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
 import radiant.sispa.backend.restservice.ItemStatusService;
-import radiant.sispa.backend.restservice.WorkExperienceCategoryService;
 
 import java.util.Date;
 import java.util.List;
@@ -28,10 +25,10 @@ public class ItemStatusController {
     @PostMapping("/add")
     public ResponseEntity<?> addItemStatus(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CreateItemStatusRequestDTO requestDTO) {
-        var baseResponseDTO = new BaseResponseDTO<CreateItemStatusResponseDTO>();
+            @RequestBody CreateGenericDataRequestDTO requestDTO) {
+        var baseResponseDTO = new BaseResponseDTO<CreateGenericDataResponseDTO>();
         try {
-            CreateItemStatusResponseDTO responseDTO = itemStatusService.addItemStatus(requestDTO, authHeader);
+            CreateGenericDataResponseDTO responseDTO = itemStatusService.addItemStatus(requestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());

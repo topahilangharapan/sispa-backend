@@ -6,13 +6,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.EducationLevel;
-import radiant.sispa.backend.model.WorkExperienceCategory;
 import radiant.sispa.backend.repository.EducationLevelDb;
-import radiant.sispa.backend.repository.WorkExperienceCategoryDb;
 import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateWorkExperienceCategoryRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateWorkExperienceCategoryResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 

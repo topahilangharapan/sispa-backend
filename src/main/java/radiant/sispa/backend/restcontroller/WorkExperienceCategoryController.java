@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import radiant.sispa.backend.restdto.request.CreateWorkExperienceCategoryRequestDTO;
+import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateWorkExperienceCategoryResponseDTO;
+import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
 import radiant.sispa.backend.restservice.WorkExperienceCategoryService;
 
@@ -25,10 +25,10 @@ public class WorkExperienceCategoryController {
     @PostMapping("/add")
     public ResponseEntity<?> addWorkExperienceCategory(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CreateWorkExperienceCategoryRequestDTO workExperienceCategoryRequestDTO) {
-        var baseResponseDTO = new BaseResponseDTO<CreateWorkExperienceCategoryResponseDTO>();
+            @RequestBody CreateGenericDataRequestDTO workExperienceCategoryRequestDTO) {
+        var baseResponseDTO = new BaseResponseDTO<CreateGenericDataResponseDTO>();
         try {
-            CreateWorkExperienceCategoryResponseDTO responseDTO = workExperienceCategoryService.addWorkExperienceCategory(workExperienceCategoryRequestDTO, authHeader);
+            CreateGenericDataResponseDTO responseDTO = workExperienceCategoryService.addWorkExperienceCategory(workExperienceCategoryRequestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());
