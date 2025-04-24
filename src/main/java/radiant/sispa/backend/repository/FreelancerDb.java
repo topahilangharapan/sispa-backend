@@ -10,5 +10,6 @@ import java.util.List;
 
 @Repository
 public interface FreelancerDb extends JpaRepository<Freelancer, Long> {
+    List<Freelancer> findByDeletedAtNullAndApprovedAtNull();
     List<Freelancer> findByDeletedAtNullAndApprovedAtNotNullOrderByApprovedAtDesc();
 }

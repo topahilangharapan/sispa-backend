@@ -37,7 +37,7 @@ public class Freelancer extends UserModel {
 
     @Column(name = "is_working")
     private Boolean isWorking;
-
+    
     @Column(name = "approved_at")
     private Instant approvedAt;
 }

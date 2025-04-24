@@ -47,7 +47,26 @@ public class FreelancerController {
             baseResponseDTO.setMessage("Failed to create Freelancer!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
+    @GetMapping("/viewall-applicants")
+    public ResponseEntity<?> getAllFreelancerApplicants() {
+        var baseResponseDTO = new BaseResponseDTO<List<FreelancerResponseDTO>>();
+        try {
+            List<FreelancerResponseDTO> allFreelancerApplicants = freelancerService.getAllFreelancerApplicants();
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(allFreelancerApplicants);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("List of Freelancer Applicants retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve Freelancer Applicants!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @GetMapping("/viewall")
     public ResponseEntity<BaseResponseDTO<List<FreelancerResponseDTO>>> listFreelancer() {
