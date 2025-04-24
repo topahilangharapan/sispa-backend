@@ -20,6 +20,4 @@ public class CreateFreelancerRequestDTO extends CreateUserRequestDTO {
     private List<CreateWorkExperienceRequestDTO> workExperiences;
     private String reason;
     private String nik;
-    private Boolean isWorking;
-    private Instant approvedAt;
 }
