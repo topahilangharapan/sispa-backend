@@ -13,55 +13,19 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.time.Instant;
-import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_model")
-@Inheritance(strategy = InheritanceType.JOINED)
-public class UserModel implements Serializable {
+@Table(name = "item")
+public class Item implements Serializable {
     @Id
     @GeneratedValue(generator = "system-uuid")
     private Long id;
-
-    @NotNull
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
-
-    @NotNull
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @NotNull
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
-
-    @NotNull
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_role", referencedColumnName = "id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private Role role;
-
-    @Column(name = "address")
-    private String address;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(name = "place_of_birth")
-    private String placeOfBirth;
-
-    @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -85,5 +49,35 @@ public class UserModel implements Serializable {
 
     @Column(name = "deleted_by")
     private String deletedBy;
+
+    @NotNull
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @NotNull
+    @Column(name = "unit", nullable = false)
+    private String unit;
+
+    @NotNull
+    @Column(name = "price_per_unit", nullable = false)
+    private Long pricePerUnit;
+
+    @Column(name = "description")
+    private String description;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseOrderItem> purchaseOrderItems;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_category", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private Category category;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_item_status", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private ItemStatus status;
 }
 

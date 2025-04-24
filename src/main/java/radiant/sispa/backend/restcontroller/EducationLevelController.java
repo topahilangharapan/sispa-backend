@@ -9,31 +9,33 @@ import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
-import radiant.sispa.backend.restservice.RoleRestService;
+import radiant.sispa.backend.restservice.EducationLevelService;
+import radiant.sispa.backend.restservice.ItemStatusService;
 
 import java.util.Date;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/role")
-public class RoleRestController {
-    @Autowired
-    RoleRestService roleService;
+@RequestMapping("/api/freelancer/education-level")
+public class EducationLevelController {
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addRole(
+    @Autowired
+    EducationLevelService educationLevelService;
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createEducationLevel(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CreateGenericDataRequestDTO roleRequestDTO) {
+            @RequestBody CreateGenericDataRequestDTO requestDTO) {
         var baseResponseDTO = new BaseResponseDTO<CreateGenericDataResponseDTO>();
         try {
-            CreateGenericDataResponseDTO roleResponseDTO = roleService.addRole(roleRequestDTO, authHeader);
+            CreateGenericDataResponseDTO responseDTO = educationLevelService.addEducationLevel(requestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
-            baseResponseDTO.setData(roleResponseDTO);
+            baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Role %s with id %d created!",
-                    roleResponseDTO.getName(),
-                    roleResponseDTO.getId()));
+            baseResponseDTO.setMessage(String.format("Education Level %s with id %d created!",
+                    responseDTO.getName(),
+                    responseDTO.getId()));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
             if (e instanceof EntityExistsException) {
@@ -44,25 +46,25 @@ public class RoleRestController {
             }
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to create Role!");
+            baseResponseDTO.setMessage("Failed to create Item Status!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllRoles() {
+    public ResponseEntity<?> getAllEducationLevels() {
         var baseResponseDTO = new BaseResponseDTO<List<GenericDataDTO>>();
         try {
-            List<GenericDataDTO> genericDataDTOList = roleService.roleToGenericData(roleService.getAllRoles());
+            List<GenericDataDTO> genericDataDTOList = educationLevelService.educationLevelToGenericData(educationLevelService.getAllEducationLevels());
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(genericDataDTOList);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Role retrieved!"));
+            baseResponseDTO.setMessage(String.format("Item Statuses retrieved!"));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to retrieve role!");
+            baseResponseDTO.setMessage("Failed to retrieve Item Status!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

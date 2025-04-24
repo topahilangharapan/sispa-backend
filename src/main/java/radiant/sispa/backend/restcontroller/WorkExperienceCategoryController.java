@@ -9,31 +9,32 @@ import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
-import radiant.sispa.backend.restservice.RoleRestService;
+import radiant.sispa.backend.restservice.WorkExperienceCategoryService;
 
 import java.util.Date;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/role")
-public class RoleRestController {
+@RequestMapping("/api/work-experience/category")
+public class WorkExperienceCategoryController {
+
     @Autowired
-    RoleRestService roleService;
+    WorkExperienceCategoryService workExperienceCategoryService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addRole(
+    public ResponseEntity<?> addWorkExperienceCategory(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CreateGenericDataRequestDTO roleRequestDTO) {
+            @RequestBody CreateGenericDataRequestDTO workExperienceCategoryRequestDTO) {
         var baseResponseDTO = new BaseResponseDTO<CreateGenericDataResponseDTO>();
         try {
-            CreateGenericDataResponseDTO roleResponseDTO = roleService.addRole(roleRequestDTO, authHeader);
+            CreateGenericDataResponseDTO responseDTO = workExperienceCategoryService.addWorkExperienceCategory(workExperienceCategoryRequestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
-            baseResponseDTO.setData(roleResponseDTO);
+            baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Role %s with id %d created!",
-                    roleResponseDTO.getName(),
-                    roleResponseDTO.getId()));
+            baseResponseDTO.setMessage(String.format("Work Experience Category %s with id %d created!",
+                    responseDTO.getName(),
+                    responseDTO.getId()));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
             if (e instanceof EntityExistsException) {
@@ -44,25 +45,25 @@ public class RoleRestController {
             }
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to create Role!");
+            baseResponseDTO.setMessage("Failed to create Work Experience Category!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllRoles() {
+    public ResponseEntity<?> getAllWorkExperienceCategory() {
         var baseResponseDTO = new BaseResponseDTO<List<GenericDataDTO>>();
         try {
-            List<GenericDataDTO> genericDataDTOList = roleService.roleToGenericData(roleService.getAllRoles());
+            List<GenericDataDTO> genericDataDTOList = workExperienceCategoryService.workExperienceCategoryToGenericData(workExperienceCategoryService.getAllWorkExperienceCategories());
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(genericDataDTOList);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Role retrieved!"));
+            baseResponseDTO.setMessage(String.format("Work Experience Category retrieved!"));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to retrieve role!");
+            baseResponseDTO.setMessage("Failed to retrieve Work Experience Category!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

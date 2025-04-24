@@ -1,6 +1,7 @@
 package radiant.sispa.backend.restservice;
 
 import jakarta.persistence.EntityExistsException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserRestServiceImpl implements UserRestService {
     @Autowired
     private UserDb userDb;

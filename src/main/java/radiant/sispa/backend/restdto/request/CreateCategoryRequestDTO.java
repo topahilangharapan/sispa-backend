@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreateRoleRequestDTO {
+public class CreateCategoryRequestDTO {
     private String name;
 }

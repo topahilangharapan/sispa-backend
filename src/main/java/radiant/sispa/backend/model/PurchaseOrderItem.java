@@ -6,71 +6,31 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.List;
 
+@Entity
+@Table(name = "purchase_order_item")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "purchase_order_item")
 public class PurchaseOrderItem implements Serializable {
+
     @Id
-    @GeneratedValue(generator = "system-uuid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private Instant createdAt;
+    @ManyToOne
+    @JoinColumn(name = "purchase_order_id", nullable = false)
+    private PurchaseOrder purchaseOrder;
 
-    @NotNull
-    @Column(name = "created_by", updatable = false, nullable = false)
-    private String createdBy;
-
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
-    @Column(name = "updated_by")
-    private String updatedBy;
-
-    @Column(name = "deleted_at")
-    private Instant deletedAt;
-
-    @Column(name = "deleted_by")
-    private String deletedBy;
-
-    @NotNull
-    @Column(name = "title", nullable = false)
-    private String title;
+    @ManyToOne
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
 
     @NotNull
     @Column(name = "volume", nullable = false)
     private Long volume;
-
-    @NotNull
-    @Column(name = "unit", nullable = false)
-    private String unit;
-
-    @NotNull
-    @Column(name = "price_per_unit", nullable = false)
-    private Long pricePerUnit;
-
-    @NotNull
-    @Column(name = "sum", nullable = false)
-    private Long sum;
-
-    @Column(name = "description")
-    private String description;
-
-    @ManyToMany(mappedBy = "items", fetch = FetchType.LAZY)
-    private List<PurchaseOrder> listPurchaseOrder;
 }
+
 
