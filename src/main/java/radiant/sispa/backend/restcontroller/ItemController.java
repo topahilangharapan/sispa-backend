@@ -1,5 +1,8 @@
 package radiant.sispa.backend.restcontroller;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +13,19 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
 import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
+import radiant.sispa.backend.restdto.response.*;
+import radiant.sispa.backend.restservice.ItemService;
+import radiant.sispa.backend.restservice.RoleRestService;
+import radiant.sispa.backend.security.jwt.JwtUtils;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateItemResponseDTO;
 import radiant.sispa.backend.restdto.response.ItemResponseDTO;
 import radiant.sispa.backend.restservice.ItemService;
-import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 
 
@@ -127,4 +134,31 @@ public class ItemController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/{id}/delete")
+    public ResponseEntity<?> deleteItem(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<List<ItemResponseDTO>>();
+
+        try {
+            itemService.deleteItem(id);
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setMessage(String.format("Berhasil menghapus item dengan ID %s", id));
+            baseResponseDTO.setTimestamp(new Date());
+
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+
+        } catch (ConstraintViolationException e) {
+            baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+            baseResponseDTO.setMessage(String.format(e.getMessage()));
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
+
+        } catch (EntityNotFoundException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(String.format(e.getMessage()));
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
