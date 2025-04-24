@@ -90,6 +90,11 @@ public class ItemServiceImpl implements ItemService {
         itemResponseDTO.setPricePerUnit(item.getPricePerUnit());
         itemResponseDTO.setCategory(item.getCategory().getName());
         itemResponseDTO.setStatus(item.getStatus().getStatus());
+        itemResponseDTO.setCreatedAt(item.getCreatedAt());
+        itemResponseDTO.setUpdatedAt(item.getUpdatedAt());
+        itemResponseDTO.setCreatedBy(item.getCreatedBy());
+        itemResponseDTO.setUpdatedBy(item.getUpdatedBy());
+        itemResponseDTO.setDeletedAt(item.getDeletedAt());
 
         return itemResponseDTO;
     }
@@ -112,6 +117,8 @@ public class ItemServiceImpl implements ItemService {
             category.setName(categoryResponseDTO.getName());
             item.setCategory(category);
         }
+
+        item.setUpdatedBy(username);
 
         Item updatedItem = itemDb.save(item);
 
