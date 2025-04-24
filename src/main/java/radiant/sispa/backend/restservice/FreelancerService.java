@@ -10,4 +10,7 @@ import java.util.List;
 public interface FreelancerService {
     CreateFreelancerResponseDTO addFreelancer(CreateFreelancerRequestDTO createUserRequestDTO) throws RoleNotFoundException;
     Freelancer getFreelancerById(Long id);
+    FreelancerResponseDTO freelancerToFreelancerResponseDTO(Freelancer freelancer);
+
+    List<FreelancerResponseDTO> getAllFreelancer();
 }

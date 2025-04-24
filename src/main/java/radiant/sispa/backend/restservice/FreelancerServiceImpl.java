@@ -1,27 +1,24 @@
 package radiant.sispa.backend.restservice;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import radiant.sispa.backend.model.Freelancer;
-import radiant.sispa.backend.model.Role;
-import radiant.sispa.backend.model.UserModel;
-import radiant.sispa.backend.model.WorkExperience;
 import radiant.sispa.backend.repository.FreelancerDb;
-import radiant.sispa.backend.repository.UserDb;
 import radiant.sispa.backend.restdto.request.*;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import javax.management.relation.RoleNotFoundException;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,4 +117,53 @@ public class FreelancerServiceImpl implements FreelancerService {
         }
         return freelancer;
     }
+
+    @Override
+    public FreelancerResponseDTO freelancerToFreelancerResponseDTO(Freelancer freelancer) {
+        FreelancerResponseDTO freelancerResponseDTO = new FreelancerResponseDTO();
+
+        freelancerResponseDTO.setId(freelancer.getId());
+        freelancerResponseDTO.setEmail(freelancer.getEmail());
+        freelancerResponseDTO.setUsername(freelancer.getUsername());
+        freelancerResponseDTO.setName(freelancer.getName());
+        freelancerResponseDTO.setRole(freelancer.getRole().getRole());
+        freelancerResponseDTO.setCreatedBy(freelancer.getCreatedBy());
+        freelancerResponseDTO.setAddress(freelancer.getAddress());
+        freelancerResponseDTO.setPhoneNumber(freelancer.getPhoneNumber());
+        freelancerResponseDTO.setPlaceOfBirth(freelancer.getPlaceOfBirth());
+        freelancerResponseDTO.setDateOfBirth(freelancer.getDateOfBirth() != null ? freelancer.getDateOfBirth().toString() : null);
+        Optional.ofNullable(freelancer.getCreatedAt())
+                .map(Timestamp::from)
+                .ifPresent(freelancerResponseDTO::setCreatedAt);
+        freelancerResponseDTO.setUpdatedBy(freelancer.getUpdatedBy());
+        Optional.ofNullable(freelancer.getUpdatedAt())
+                .map(Timestamp::from)
+                .ifPresent(freelancerResponseDTO::setUpdatedAt);
+        freelancerResponseDTO.setDeletedBy(freelancer.getDeletedBy());
+        Optional.ofNullable(freelancer.getDeletedAt())
+                .map(Timestamp::from)
+                .ifPresent(freelancerResponseDTO::setDeletedAt);
+
+        freelancerResponseDTO.setEducation(freelancer.getEducation());
+        freelancerResponseDTO.setWorkExperiences(freelancer.getWorkExperiences());
+        freelancerResponseDTO.setReason(freelancer.getReason());
+        freelancerResponseDTO.setNik(freelancer.getNik());
+        freelancerResponseDTO.setIsWorking(freelancer.getIsWorking());
+        freelancerResponseDTO.setApprovedAt(freelancer.getApprovedAt());
+
+        return freelancerResponseDTO;
+    }
+
+    @Override
+    public List<FreelancerResponseDTO> getAllFreelancer() {
+        List<Freelancer> listFreelancer = freelancerDb.findByDeletedAtNullAndApprovedAtNotNullOrderByApprovedAtDesc();
+
+        List<FreelancerResponseDTO> listFreelancerResponseDTO = new ArrayList<>();
+        for (Freelancer freelancer : listFreelancer) {
+            var freelancerResponseDTO = freelancerToFreelancerResponseDTO(freelancer);
+            listFreelancerResponseDTO.add(freelancerResponseDTO);
+        }
+        return listFreelancerResponseDTO;
+    }
+
 }
