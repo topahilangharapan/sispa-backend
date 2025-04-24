@@ -2,31 +2,15 @@ package radiant.sispa.backend.restservice;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import radiant.sispa.backend.model.Category;
-import radiant.sispa.backend.model.Invoice;
-import radiant.sispa.backend.model.Item;
-import radiant.sispa.backend.model.PurchaseOrder;
-import radiant.sispa.backend.repository.InvoiceDb;
+import radiant.sispa.backend.model.*;
 import radiant.sispa.backend.repository.ItemDb;
-import radiant.sispa.backend.repository.PurchaseOrderDb;
-import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
 import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.text.NumberFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -152,4 +136,18 @@ public class ItemServiceImpl implements ItemService {
         return itemToItemResponseDTO(item);
     }
 
+    @Override
+    public void deleteItem(Long id) throws EntityNotFoundException {
+        Item itemToDelete = itemDb.findByIdAndDeletedAtNull(id);
+        List<PurchaseOrderItem> listPurchaseOrderItems = itemToDelete.getPurchaseOrderItems();
+
+        for (PurchaseOrderItem purchaseOrderItem : listPurchaseOrderItems) {
+            if (purchaseOrderItem.getPurchaseOrder().getId().equals(id)) {
+                throw new IllegalStateException("Item tidak dapat dihapus karena memiliki PO.");
+            }
+        }
+
+        itemToDelete.setDeletedAt(new Date().toInstant());
+        itemDb.save(itemToDelete);
+    }
 }
