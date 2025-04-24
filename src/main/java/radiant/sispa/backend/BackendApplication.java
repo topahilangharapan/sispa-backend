@@ -25,7 +25,7 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, CategoryDb categoryDb, ItemStatusDb itemStatusDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, CategoryDb categoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb) {
         return args -> {
             // Create roles if they don't exist
             createRoleIfNotExists(roleDb, "ADMIN");
@@ -70,12 +70,22 @@ public class BackendApplication {
             createCategoryIfNotExists(categoryDb, "MAKANAN");
 
             createItemStatusIfNotExists(itemStatusDb, "TERSEDIA");
-            createItemStatusIfNotExists(itemStatusDb, "DIPAKAI");
-            createItemStatusIfNotExists(itemStatusDb, "RUSAK");
-            createItemStatusIfNotExists(itemStatusDb, "MELEDAK");
-            createItemStatusIfNotExists(itemStatusDb, "ALAMAK");
-            createItemStatusIfNotExists(itemStatusDb, "DUIT");
-            createItemStatusIfNotExists(itemStatusDb, "NIIII");
+            createItemStatusIfNotExists(itemStatusDb, "TIDAK TERSEDIA");
+            createItemStatusIfNotExists(itemStatusDb, "DIPERBAIKI");
+
+            createEducationLevelIfNotExists(educationLevelDb, "TK");
+            createEducationLevelIfNotExists(educationLevelDb, "SD");
+            createEducationLevelIfNotExists(educationLevelDb, "SMP");
+            createEducationLevelIfNotExists(educationLevelDb, "SMA");
+            createEducationLevelIfNotExists(educationLevelDb, "SMK");
+            createEducationLevelIfNotExists(educationLevelDb, "D1");
+            createEducationLevelIfNotExists(educationLevelDb, "D2");
+            createEducationLevelIfNotExists(educationLevelDb, "D3");
+            createEducationLevelIfNotExists(educationLevelDb, "D4");
+            createEducationLevelIfNotExists(educationLevelDb, "S1");
+            createEducationLevelIfNotExists(educationLevelDb, "S2");
+            createEducationLevelIfNotExists(educationLevelDb, "S3");
+            createEducationLevelIfNotExists(educationLevelDb, "Lainnya");
         };
     }
 
@@ -172,5 +182,14 @@ public class BackendApplication {
         newItemStatus.setCreatedBy("hilangharapan");
 
         itemStatusDb.save(newItemStatus);
+    }
+
+    private void createEducationLevelIfNotExists(EducationLevelDb educationLevelDb, String educationLevelName) {
+        EducationLevel newEducationLevel = new EducationLevel();
+
+        newEducationLevel.setEducation(educationLevelName);
+        newEducationLevel.setCreatedBy("hilangharapan");
+
+        educationLevelDb.save(newEducationLevel);
     }
 }

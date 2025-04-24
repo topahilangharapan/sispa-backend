@@ -9,30 +9,31 @@ import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
-import radiant.sispa.backend.restservice.WorkExperienceCategoryService;
+import radiant.sispa.backend.restservice.EducationLevelService;
+import radiant.sispa.backend.restservice.ItemStatusService;
 
 import java.util.Date;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/work-experience/category")
-public class WorkExperienceCategoryController {
+@RequestMapping("/api/freelancer/education-level")
+public class EducationLevelController {
 
     @Autowired
-    WorkExperienceCategoryService workExperienceCategoryService;
+    EducationLevelService educationLevelService;
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addWorkExperienceCategory(
+    @PostMapping("/create")
+    public ResponseEntity<?> createEducationLevel(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CreateGenericDataRequestDTO workExperienceCategoryRequestDTO) {
+            @RequestBody CreateGenericDataRequestDTO requestDTO) {
         var baseResponseDTO = new BaseResponseDTO<CreateGenericDataResponseDTO>();
         try {
-            CreateGenericDataResponseDTO responseDTO = workExperienceCategoryService.addWorkExperienceCategory(workExperienceCategoryRequestDTO, authHeader);
+            CreateGenericDataResponseDTO responseDTO = educationLevelService.addEducationLevel(requestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Work Experience Category %s with id %d created!",
+            baseResponseDTO.setMessage(String.format("Education Level %s with id %d created!",
                     responseDTO.getName(),
                     responseDTO.getId()));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
@@ -45,25 +46,25 @@ public class WorkExperienceCategoryController {
             }
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to create Work Experience Category!");
+            baseResponseDTO.setMessage("Failed to create Item Status!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllWorkExperienceCategory() {
+    public ResponseEntity<?> getAllEducationLevels() {
         var baseResponseDTO = new BaseResponseDTO<List<GenericDataDTO>>();
         try {
-            List<GenericDataDTO> genericDataDTOList = workExperienceCategoryService.workExperienceCategoryToGenericData(workExperienceCategoryService.getAllWorkExperienceCategories());
+            List<GenericDataDTO> genericDataDTOList = educationLevelService.educationLevelToGenericData(educationLevelService.getAllEducationLevels());
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(genericDataDTOList);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Work Experience Category retrieved!"));
+            baseResponseDTO.setMessage(String.format("Item Statuses retrieved!"));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to retrieve Work Experience Category!");
+            baseResponseDTO.setMessage("Failed to retrieve Item Status!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -31,7 +31,7 @@ public class WorkExperienceContoller {
         var baseResponseDTO = new BaseResponseDTO<CreateWorkExperienceResponseDTO>();
 
         try {
-            CreateWorkExperienceResponseDTO responseDTO = workExperienceService.createWorkExperience(requestDTO, authHeader);
+            CreateWorkExperienceResponseDTO responseDTO = workExperienceService.createWorkExperience(requestDTO);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());
