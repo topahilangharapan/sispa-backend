@@ -49,8 +49,12 @@ public class FreelancerServiceImpl implements FreelancerService {
     @Override
     public CreateFreelancerResponseDTO addFreelancer(CreateFreelancerRequestDTO requestDTO, String authHeader) throws RoleNotFoundException, EntityNotFoundException, EntityExistsException {
 
-        if (!userService.getUser(new UserRequestDTO(null, requestDTO.getEmail(), requestDTO.getUsername(), null, null)).isEmpty()) {
+        if (!userService.getUser(new UserRequestDTO(null, null, requestDTO.getUsername(), null, null)).isEmpty()) {
             throw new EntityExistsException("User with the same username already exists!");
+        }
+
+        if (!userService.getUser(new UserRequestDTO(null, requestDTO.getEmail(), null, null, null)).isEmpty()) {
+            throw new EntityExistsException("User with the same email already exists!");
         }
 
         String token = authHeader.substring(7);
