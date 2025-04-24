@@ -8,6 +8,6 @@ import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 
 public interface FreelancerService {
-    CreateFreelancerResponseDTO addFreelancer(CreateFreelancerRequestDTO createUserRequestDTO, String authHeader) throws RoleNotFoundException;
+    CreateFreelancerResponseDTO addFreelancer(CreateFreelancerRequestDTO createUserRequestDTO) throws RoleNotFoundException;
     Freelancer getFreelancerById(Long id);
 }

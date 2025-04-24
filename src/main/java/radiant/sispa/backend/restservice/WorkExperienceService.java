@@ -4,5 +4,5 @@ import radiant.sispa.backend.restdto.request.CreateWorkExperienceRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateWorkExperienceResponseDTO;
 
 public interface WorkExperienceService {
-    CreateWorkExperienceResponseDTO createWorkExperience(CreateWorkExperienceRequestDTO createWorkExperienceRequestDTO, String authHeader);
+    CreateWorkExperienceResponseDTO createWorkExperience(CreateWorkExperienceRequestDTO createWorkExperienceRequestDTO);
 }

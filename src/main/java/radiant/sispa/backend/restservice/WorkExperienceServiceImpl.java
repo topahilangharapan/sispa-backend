@@ -34,11 +34,8 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
     private JwtUtils jwtUtils;
 
     @Override
-    public CreateWorkExperienceResponseDTO createWorkExperience(CreateWorkExperienceRequestDTO createWorkExperienceRequestDTO, String authHeader) {
-        String token = authHeader.substring(7);
-        String createdBy = jwtUtils.getUserNameFromJwtToken(token);
-
-        WorkExperience workExperience = workExperienceDb.save(createWorkExperienceDTOToWorkExperience(createWorkExperienceRequestDTO, createdBy));
+    public CreateWorkExperienceResponseDTO createWorkExperience(CreateWorkExperienceRequestDTO createWorkExperienceRequestDTO) {
+        WorkExperience workExperience = workExperienceDb.save(createWorkExperienceDTOToWorkExperience(createWorkExperienceRequestDTO));
 
         CreateWorkExperienceResponseDTO createWorkExperienceResponseDTO = new CreateWorkExperienceResponseDTO();
 
@@ -58,7 +55,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         return createWorkExperienceResponseDTO;
     }
 
-    private WorkExperience createWorkExperienceDTOToWorkExperience(CreateWorkExperienceRequestDTO createWorkExperienceRequestDTO, String createdBy) {
+    private WorkExperience createWorkExperienceDTOToWorkExperience(CreateWorkExperienceRequestDTO createWorkExperienceRequestDTO) {
         WorkExperience workExperience = new WorkExperience();
         Freelancer freelancer = freelancerService.getFreelancerById(createWorkExperienceRequestDTO.getFreelancerId());
 
@@ -75,7 +72,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
             workExperience.setEndDate(null);
         }
 
-        workExperience.setCreatedBy(createdBy);
+        workExperience.setCreatedBy(freelancer.getUsername());
 
         return workExperience;
     }
