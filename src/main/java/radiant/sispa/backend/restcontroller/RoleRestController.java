@@ -5,14 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import radiant.sispa.backend.restdto.request.CreateRoleRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
+import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateRoleResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
+import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
 import radiant.sispa.backend.restservice.RoleRestService;
-import radiant.sispa.backend.restservice.UserRestService;
 
 import java.util.Date;
 import java.util.List;
@@ -27,12 +24,12 @@ public class RoleRestController {
     @PostMapping("/add")
     public ResponseEntity<?> addRole(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CreateRoleRequestDTO roleRequestDTO) {
-        var baseResponseDTO = new BaseResponseDTO<CreateRoleRequestDTO>();
+            @RequestBody CreateGenericDataRequestDTO roleRequestDTO) {
+        var baseResponseDTO = new BaseResponseDTO<CreateGenericDataResponseDTO>();
         try {
-            CreateRoleResponseDTO roleResponseDTO = roleService.addRole(roleRequestDTO, authHeader);
+            CreateGenericDataResponseDTO roleResponseDTO = roleService.addRole(roleRequestDTO, authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
-            baseResponseDTO.setData(roleRequestDTO);
+            baseResponseDTO.setData(roleResponseDTO);
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage(String.format("Role %s with id %d created!",
                     roleResponseDTO.getName(),

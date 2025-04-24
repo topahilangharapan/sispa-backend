@@ -23,12 +23,11 @@ public class FreelancerController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addFreelancer(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody CreateFreelancerRequestDTO freelancerRequestDTO) {
         var baseResponseDTO = new BaseResponseDTO<CreateFreelancerResponseDTO>();
 
         try {
-            CreateFreelancerResponseDTO responseDTO = freelancerService.addFreelancer(freelancerRequestDTO, authHeader);
+            CreateFreelancerResponseDTO responseDTO = freelancerService.addFreelancer(freelancerRequestDTO);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());

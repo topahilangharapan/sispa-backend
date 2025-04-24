@@ -18,8 +18,11 @@ import java.util.List;
 @PrimaryKeyJoinColumn(name = "id")
 public class Freelancer extends UserModel {
 
-    @Column(name = "education")
-    private String education;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_education_level", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private EducationLevel education;
 
     @OneToMany(mappedBy = "freelancer", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)

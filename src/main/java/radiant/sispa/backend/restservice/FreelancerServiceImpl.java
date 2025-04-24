@@ -38,25 +38,29 @@ public class FreelancerServiceImpl implements FreelancerService {
     private WorkExperienceService workExperienceService;
 
     @Autowired
+    private EducationLevelService educationLevelService;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Override
-    public CreateFreelancerResponseDTO addFreelancer(CreateFreelancerRequestDTO requestDTO, String authHeader) throws RoleNotFoundException, EntityNotFoundException, EntityExistsException {
+    public CreateFreelancerResponseDTO addFreelancer(CreateFreelancerRequestDTO requestDTO) throws RoleNotFoundException, EntityNotFoundException, EntityExistsException {
 
-        if (!userService.getUser(new UserRequestDTO(null, requestDTO.getEmail(), requestDTO.getUsername(), null, null)).isEmpty()) {
+        if (!userService.getUser(new UserRequestDTO(null, null, requestDTO.getUsername(), null, null)).isEmpty()) {
             throw new EntityExistsException("User with the same username already exists!");
         }
 
-        String token = authHeader.substring(7);
-        String createdBy = jwtUtils.getUserNameFromJwtToken(token);
+        if (!userService.getUser(new UserRequestDTO(null, requestDTO.getEmail(), null, null, null)).isEmpty()) {
+            throw new EntityExistsException("User with the same email already exists!");
+        }
 
-        Freelancer freelancer = freelancerDb.save(createFreelancerRequestDTOToFreelancer(requestDTO, createdBy));
-        List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS = addWorkExperiencesToFreelancer(freelancer, requestDTO, authHeader);
+        Freelancer freelancer = freelancerDb.save(createFreelancerRequestDTOToFreelancer(requestDTO));
+        List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS = addWorkExperiencesToFreelancer(freelancer, requestDTO);
 
         return freelancerToCreateFreelancerResponseDTO(freelancer, createWorkExperienceResponseDTOS);
     }
 
-    private static CreateFreelancerResponseDTO freelancerToCreateFreelancerResponseDTO(Freelancer freelancer, List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS) {
+    private CreateFreelancerResponseDTO freelancerToCreateFreelancerResponseDTO(Freelancer freelancer, List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS) {
         CreateFreelancerResponseDTO responseDTO = new CreateFreelancerResponseDTO();
         responseDTO.setEmail(freelancer.getEmail());
         responseDTO.setId(freelancer.getId());
@@ -64,13 +68,13 @@ public class FreelancerServiceImpl implements FreelancerService {
         responseDTO.setRole(freelancer.getRole().getRole());
         responseDTO.setUsername(freelancer.getUsername());
         responseDTO.setWorkExperiences(createWorkExperienceResponseDTOS);
-        responseDTO.setEducation(freelancer.getEducation());
+        responseDTO.setEducation(freelancer.getEducation().getEducation());
         responseDTO.setReason(freelancer.getReason());
         responseDTO.setIsWorking(freelancer.getIsWorking());
         return responseDTO;
     }
 
-    Freelancer createFreelancerRequestDTOToFreelancer(CreateFreelancerRequestDTO requestDTO, String createdBy) throws RoleNotFoundException, EntityNotFoundException {
+    Freelancer createFreelancerRequestDTOToFreelancer(CreateFreelancerRequestDTO requestDTO) throws RoleNotFoundException, EntityNotFoundException {
         Freelancer freelancer = new Freelancer();
 
         freelancer.setEmail(requestDTO.getEmail());
@@ -78,12 +82,12 @@ public class FreelancerServiceImpl implements FreelancerService {
         freelancer.setUsername(requestDTO.getUsername());
         freelancer.setRole(roleService.getRoleByRoleName(requestDTO.getRole()));
         freelancer.setPassword(userService.hashPassword(requestDTO.getPassword()));
-        freelancer.setCreatedBy(createdBy);
+        freelancer.setCreatedBy(requestDTO.getUsername());
         freelancer.setAddress(requestDTO.getAddress());
         freelancer.setPhoneNumber(requestDTO.getPhoneNumber());
         freelancer.setPlaceOfBirth(requestDTO.getPlaceOfBirth());
         freelancer.setDateOfBirth(LocalDate.parse(requestDTO.getDateOfBirth()));
-        freelancer.setEducation(requestDTO.getEducation());
+        freelancer.setEducation(educationLevelService.getEducationLevelByName(requestDTO.getEducation()));
         freelancer.setReason(requestDTO.getReason());
         freelancer.setWorkExperiences(new ArrayList<>());
         freelancer.setNik(userService.hashPassword(requestDTO.getNik()));
@@ -92,13 +96,13 @@ public class FreelancerServiceImpl implements FreelancerService {
         return freelancer;
     }
 
-    List<CreateWorkExperienceResponseDTO> addWorkExperiencesToFreelancer(Freelancer freelancer, CreateFreelancerRequestDTO requestDTO, String authHeader) throws RoleNotFoundException, EntityNotFoundException {
+    List<CreateWorkExperienceResponseDTO> addWorkExperiencesToFreelancer(Freelancer freelancer, CreateFreelancerRequestDTO requestDTO) throws RoleNotFoundException, EntityNotFoundException {
         List<CreateWorkExperienceRequestDTO> createWorkExperienceRequestDTOS = requestDTO.getWorkExperiences();
         List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS = new ArrayList<>();
 
         for (CreateWorkExperienceRequestDTO createWorkExperienceRequestDTO : createWorkExperienceRequestDTOS) {
             createWorkExperienceRequestDTO.setFreelancerId(freelancer.getId());
-            CreateWorkExperienceResponseDTO createWorkExperienceResponseDTO = workExperienceService.createWorkExperience(createWorkExperienceRequestDTO, authHeader);
+            CreateWorkExperienceResponseDTO createWorkExperienceResponseDTO = workExperienceService.createWorkExperience(createWorkExperienceRequestDTO);
             createWorkExperienceResponseDTOS.add(createWorkExperienceResponseDTO);
         }
 
