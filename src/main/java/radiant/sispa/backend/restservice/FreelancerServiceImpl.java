@@ -56,10 +56,10 @@ public class FreelancerServiceImpl implements FreelancerService {
         Freelancer freelancer = freelancerDb.save(createFreelancerRequestDTOToFreelancer(requestDTO, createdBy));
         List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS = addWorkExperiencesToFreelancer(freelancer, requestDTO, authHeader);
 
-        return freelancerToFreelancerResponseDTO(freelancer, createWorkExperienceResponseDTOS);
+        return freelancerToCreateFreelancerResponseDTO(freelancer, createWorkExperienceResponseDTOS);
     }
 
-    private static CreateFreelancerResponseDTO freelancerToFreelancerResponseDTO(Freelancer freelancer, List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS) {
+    private static CreateFreelancerResponseDTO freelancerToCreateFreelancerResponseDTO(Freelancer freelancer, List<CreateWorkExperienceResponseDTO> createWorkExperienceResponseDTOS) {
         CreateFreelancerResponseDTO responseDTO = new CreateFreelancerResponseDTO();
         responseDTO.setEmail(freelancer.getEmail());
         responseDTO.setId(freelancer.getId());
