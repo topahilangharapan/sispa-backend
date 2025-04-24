@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface ItemDb extends JpaRepository<Item, Long> {
     List<Item> findByDeletedAtNull();
+
+    Item findByIdAndDeletedAtNull(Long id);
 }

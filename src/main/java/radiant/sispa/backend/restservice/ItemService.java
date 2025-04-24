@@ -2,6 +2,7 @@ package radiant.sispa.backend.restservice;
 
 import java.util.List;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
@@ -18,4 +19,5 @@ public interface ItemService {
     Item getItemById(Long id);
     ItemResponseDTO detailItem(Long id);
     ItemResponseDTO updateItem(Long id, UpdateItemRequestRestDTO itemDTO, String username);
+    void deleteItem(Long id) throws EntityNotFoundException;
 }
