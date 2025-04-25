@@ -11,6 +11,8 @@ import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
+import java.time.Instant;
+
 import java.util.*;
 
 @Service
@@ -50,6 +52,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = new Item();
 
         item.setCreatedBy(createdBy);
+        item.setUpdatedBy(createdBy);
         item.setTitle(createItemRequestDTO.getTitle());
         item.setUnit(createItemRequestDTO.getUnit());
         item.setPricePerUnit(createItemRequestDTO.getPricePerUnit());
@@ -91,8 +94,8 @@ public class ItemServiceImpl implements ItemService {
         itemResponseDTO.setCategory(item.getCategory().getName());
         itemResponseDTO.setStatus(item.getStatus().getStatus());
         itemResponseDTO.setCreatedAt(item.getCreatedAt());
-        itemResponseDTO.setUpdatedAt(item.getUpdatedAt());
         itemResponseDTO.setCreatedBy(item.getCreatedBy());
+        itemResponseDTO.setUpdatedAt(item.getUpdatedAt());
         itemResponseDTO.setUpdatedBy(item.getUpdatedBy());
         itemResponseDTO.setDeletedAt(item.getDeletedAt());
 
@@ -118,6 +121,7 @@ public class ItemServiceImpl implements ItemService {
             item.setCategory(category);
         }
 
+        item.setUpdatedAt(Instant.now());
         item.setUpdatedBy(username);
 
         Item updatedItem = itemDb.save(item);
