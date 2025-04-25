@@ -14,4 +14,10 @@ public interface FreelancerService {
     FreelancerResponseDTO freelancerToFreelancerResponseDTO(Freelancer freelancer);
 
     List<FreelancerResponseDTO> getAllFreelancer();
+
+    FreelancerResponseDTO approveFreelancer(Long id, String updatedBy);
+    
+    FreelancerResponseDTO updateWorkingStatus(Long id, boolean isWorking, String updatedBy);
+
+    String extractUsername(String token);
 }
