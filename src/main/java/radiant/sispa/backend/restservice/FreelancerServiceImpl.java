@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import radiant.sispa.backend.model.Freelancer;
+import radiant.sispa.backend.model.WorkExperience;
 import radiant.sispa.backend.repository.FreelancerDb;
 import radiant.sispa.backend.restdto.request.*;
 import radiant.sispa.backend.restdto.response.*;
@@ -17,6 +18,7 @@ import radiant.sispa.backend.security.jwt.JwtUtils;
 import javax.management.relation.RoleNotFoundException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,6 +93,11 @@ public class FreelancerServiceImpl implements FreelancerService {
         freelancer.setReason(requestDTO.getReason());
         freelancer.setWorkExperiences(new ArrayList<>());
         freelancer.setNik(userService.hashPassword(requestDTO.getNik()));
+        
+        // Store the original NIK for display purposes
+        // Note: This stores sensitive information in plain text - only do this if required by business needs
+        freelancer.setDisplayNik(requestDTO.getNik());
+        
         freelancer.setIsWorking(false);
 
         return freelancer;
@@ -155,9 +162,35 @@ public class FreelancerServiceImpl implements FreelancerService {
                 .ifPresent(freelancerResponseDTO::setDeletedAt);
 
         freelancerResponseDTO.setEducation(freelancer.getEducation().getEducation());
-        freelancerResponseDTO.setWorkExperiences(freelancer.getWorkExperiences());
+        
+        // Convert WorkExperience entities to DTOs
+        List<CreateWorkExperienceResponseDTO> workExperienceDTOs = new ArrayList<>();
+        for (WorkExperience workExperience : freelancer.getWorkExperiences()) {
+            CreateWorkExperienceResponseDTO dto = new CreateWorkExperienceResponseDTO();
+            dto.setCategory(workExperience.getCategory().getCategory());
+            dto.setTitle(workExperience.getTitle());
+            dto.setDescription(workExperience.getDescription());
+            dto.setIsStillWorking(workExperience.isStillWorking());
+            dto.setStartDate(workExperience.getStartDate().toString());
+            
+            if (workExperience.getEndDate() != null) {
+                dto.setEndDate(workExperience.getEndDate().toString());
+            } else {
+                dto.setEndDate("-");
+            }
+            
+            // Generate a tempId for the frontend
+            dto.setTempId(workExperience.getId().toString());
+            
+            workExperienceDTOs.add(dto);
+        }
+        freelancerResponseDTO.setWorkExperiences(workExperienceDTOs);
+        
         freelancerResponseDTO.setReason(freelancer.getReason());
-        freelancerResponseDTO.setNik(freelancer.getNik());
+        
+        // Use the displayNik instead of the hashed NIK
+        freelancerResponseDTO.setNik(freelancer.getDisplayNik() != null ? freelancer.getDisplayNik() : freelancer.getNik());
+        
         freelancerResponseDTO.setIsWorking(freelancer.getIsWorking());
         freelancerResponseDTO.setApprovedAt(freelancer.getApprovedAt());
 
@@ -174,6 +207,45 @@ public class FreelancerServiceImpl implements FreelancerService {
             listFreelancerResponseDTO.add(freelancerResponseDTO);
         }
         return listFreelancerResponseDTO;
+    }
+
+    @Override
+    public FreelancerResponseDTO approveFreelancer(Long id, String updatedBy) {
+        // Get the freelancer by ID
+        Freelancer freelancer = getFreelancerById(id);
+        
+        // Set approval timestamp
+        freelancer.setApprovedAt(Instant.now());
+        freelancer.setUpdatedBy(updatedBy);
+        freelancer.setUpdatedAt(Instant.now());
+        
+        // Save to database
+        freelancerDb.save(freelancer);
+        
+        // Return the updated freelancer DTO
+        return freelancerToFreelancerResponseDTO(freelancer);
+    }
+
+    @Override
+    public FreelancerResponseDTO updateWorkingStatus(Long id, boolean isWorking, String updatedBy) {
+        // Get the freelancer by ID
+        Freelancer freelancer = getFreelancerById(id);
+        
+        // Update working status
+        freelancer.setIsWorking(isWorking);
+        freelancer.setUpdatedBy(updatedBy);
+        freelancer.setUpdatedAt(Instant.now());
+        
+        // Save to database
+        freelancerDb.save(freelancer);
+        
+        // Return the updated freelancer DTO
+        return freelancerToFreelancerResponseDTO(freelancer);
+    }
+    
+    @Override
+    public String extractUsername(String token) {
+        return jwtUtils.getUserNameFromJwtToken(token);
     }
 
 }

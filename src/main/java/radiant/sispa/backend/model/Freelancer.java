@@ -35,6 +35,9 @@ public class Freelancer extends UserModel {
     @Column(name = "nik", unique = true)
     private String nik;
 
+    @Column(name = "display_nik")
+    private String displayNik;
+
     @Column(name = "is_working")
     private Boolean isWorking;
     
