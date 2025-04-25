@@ -179,4 +179,35 @@ public class FreelancerController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<BaseResponseDTO<FreelancerResponseDTO>> rejectFreelancer(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+        var baseResponseDTO = new BaseResponseDTO<FreelancerResponseDTO>();
+        
+        try {
+            // Get username from auth header for audit
+            String username = authHeader.startsWith("Bearer ") ? 
+                    freelancerService.extractUsername(authHeader.substring(7)) : "system";
+            
+            FreelancerResponseDTO updatedFreelancer = freelancerService.rejectFreelancer(id, username);
+            
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(updatedFreelancer);
+            baseResponseDTO.setMessage("Freelancer application rejected");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setMessage("Failed to reject freelancer: " + e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
