@@ -20,4 +20,6 @@ public interface FreelancerService {
     FreelancerResponseDTO updateWorkingStatus(Long id, boolean isWorking, String updatedBy);
 
     String extractUsername(String token);
+
+    FreelancerResponseDTO rejectFreelancer(Long id, String updatedBy);
 }
