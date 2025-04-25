@@ -71,18 +71,6 @@ public class ItemServiceImpl implements ItemService {
         return item;
     }
 
-    @Override
-    public List<ItemResponseDTO> getAllItems() {
-        List<Item> items = itemDb.findByDeletedAtNull();
-        List<ItemResponseDTO> result = new ArrayList<>();
-
-        for (Item item : items) {
-            result.add(itemToItemResponseDTO(item));
-        }
-
-        return result;
-    }
-
     private ItemResponseDTO itemToItemResponseDTO(Item item) {
         ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
 
@@ -148,12 +136,26 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public List<ItemResponseDTO> getAllItems() {
+        List<Item> items = itemDb.findByDeletedAtNull();
+        List<ItemResponseDTO> result = new ArrayList<>();
+
+        for (Item item : items) {
+            result.add(itemToItemResponseDTO(item));
+        }
+
+        return result;
+    }
+
+    @Override
     public void deleteItem(Long id) throws EntityNotFoundException {
         Item itemToDelete = itemDb.findByIdAndDeletedAtNull(id);
         List<PurchaseOrderItem> listPurchaseOrderItems = itemToDelete.getPurchaseOrderItems();
 
         for (PurchaseOrderItem purchaseOrderItem : listPurchaseOrderItems) {
-            if (purchaseOrderItem.getPurchaseOrder().getId().equals(id)) {
+            System.out.println("id dari PO " + purchaseOrderItem.getItem().getId());
+            System.out.println("id " + id);
+            if (purchaseOrderItem.getItem().getId().equals(id)) {
                 throw new IllegalStateException("Item tidak dapat dihapus karena memiliki PO.");
             }
         }
