@@ -79,4 +79,104 @@ public class FreelancerController {
         baseResponseDTO.setTimestamp(new Date());
         return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
+
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponseDTO<FreelancerResponseDTO>> getFreelancerById(
+            @PathVariable Long id) {
+        var baseResponseDTO = new BaseResponseDTO<FreelancerResponseDTO>();
+        
+        try {
+            var freelancer = freelancerService.getFreelancerById(id);
+            var freelancerResponseDTO = freelancerService.freelancerToFreelancerResponseDTO(freelancer);
+            
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(freelancerResponseDTO);
+            baseResponseDTO.setMessage("Berhasil mendapatkan data freelancer");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setMessage("Gagal mendapatkan data freelancer");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<BaseResponseDTO<FreelancerResponseDTO>> approveFreelancer(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+        var baseResponseDTO = new BaseResponseDTO<FreelancerResponseDTO>();
+        
+        try {
+            // Get username from auth header for audit
+            String username = authHeader.startsWith("Bearer ") ? 
+                    freelancerService.extractUsername(authHeader.substring(7)) : "system";
+            
+            FreelancerResponseDTO updatedFreelancer = freelancerService.approveFreelancer(id, username);
+            
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(updatedFreelancer);
+            baseResponseDTO.setMessage("Freelancer berhasil disetujui");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setMessage("Gagal menyetujui freelancer: " + e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/{id}/update-working-status")
+    public ResponseEntity<BaseResponseDTO<FreelancerResponseDTO>> updateWorkingStatus(
+            @PathVariable Long id,
+            @RequestBody UpdateWorkingStatusRequestDTO requestDTO,
+            @RequestHeader("Authorization") String authHeader) {
+        var baseResponseDTO = new BaseResponseDTO<FreelancerResponseDTO>();
+        
+        try {
+            // Add logging to debug the received request
+            System.out.println("Received work status update request: " + requestDTO.isWorking());
+            
+            // Get username from auth header for audit
+            String username = authHeader.startsWith("Bearer ") ? 
+                    freelancerService.extractUsername(authHeader.substring(7)) : "system";
+            
+            FreelancerResponseDTO updatedFreelancer = freelancerService.updateWorkingStatus(
+                id, 
+                requestDTO.isWorking(),  // This should correctly call the isWorking() method
+                username
+            );
+            
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(updatedFreelancer);
+            baseResponseDTO.setMessage("Status freelancer berhasil diubah");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            // Add better error logging
+            e.printStackTrace();
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setMessage("Gagal mengubah status freelancer: " + e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

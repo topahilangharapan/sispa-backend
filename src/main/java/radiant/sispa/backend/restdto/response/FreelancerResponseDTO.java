@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class FreelancerResponseDTO extends UserResponseDTO {
     private String education;
-    private List<WorkExperience> workExperiences;
+    private List<CreateWorkExperienceResponseDTO> workExperiences;
     private String reason;
     private String nik;
     private Boolean isWorking;
