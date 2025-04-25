@@ -40,4 +40,7 @@ public class Freelancer extends UserModel {
     
     @Column(name = "approved_at")
     private Instant approvedAt;
+
+    @Column(name = "rejected_at")
+    private Instant rejectedAt;
 }
