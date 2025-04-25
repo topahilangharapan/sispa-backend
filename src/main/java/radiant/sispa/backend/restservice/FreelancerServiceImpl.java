@@ -193,6 +193,7 @@ public class FreelancerServiceImpl implements FreelancerService {
         
         freelancerResponseDTO.setIsWorking(freelancer.getIsWorking());
         freelancerResponseDTO.setApprovedAt(freelancer.getApprovedAt());
+        freelancerResponseDTO.setRejectedAt(freelancer.getRejectedAt());
 
         return freelancerResponseDTO;
     }
@@ -246,6 +247,23 @@ public class FreelancerServiceImpl implements FreelancerService {
     @Override
     public String extractUsername(String token) {
         return jwtUtils.getUserNameFromJwtToken(token);
+    }
+
+    @Override
+    public FreelancerResponseDTO rejectFreelancer(Long id, String updatedBy) {
+        // Get the freelancer by ID
+        Freelancer freelancer = getFreelancerById(id);
+        
+        // Set rejection timestamp
+        freelancer.setRejectedAt(Instant.now());
+        freelancer.setUpdatedBy(updatedBy);
+        freelancer.setUpdatedAt(Instant.now());
+        
+        // Save to database
+        freelancerDb.save(freelancer);
+        
+        // Return the updated freelancer DTO
+        return freelancerToFreelancerResponseDTO(freelancer);
     }
 
 }
