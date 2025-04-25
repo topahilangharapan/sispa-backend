@@ -15,9 +15,9 @@ import radiant.sispa.backend.restdto.response.PurchaseOrderResponseDTO;
 
 public interface ItemService {
     CreateItemResponseDTO createItem(CreateItemRequestDTO createItemRequestDTO, String authHeader);
-    List<ItemResponseDTO> getAllItems();
     Item getItemById(Long id);
     ItemResponseDTO detailItem(Long id);
     ItemResponseDTO updateItem(Long id, UpdateItemRequestRestDTO itemDTO, String username);
+    List<ItemResponseDTO> getAllItems();
     void deleteItem(Long id) throws EntityNotFoundException;
 }

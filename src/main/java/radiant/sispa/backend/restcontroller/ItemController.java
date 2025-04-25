@@ -96,25 +96,6 @@ public class ItemController {
 
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getItemById(@PathVariable("id") Long id){
-        var baseResponseDTO = new BaseResponseDTO<ItemResponseDTO>();
-        ItemResponseDTO item = itemService.detailItem(id);
-
-        if (item == null){
-            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
-            baseResponseDTO.setMessage("item not found");
-            baseResponseDTO.setTimestamp(new Date());
-            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
-        }
-
-        baseResponseDTO.setStatus(HttpStatus.OK.value());
-        baseResponseDTO.setMessage("Success");
-        baseResponseDTO.setTimestamp(new Date());
-        baseResponseDTO.setData(item);
-
-        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
-    }
     @GetMapping("/all")
     public ResponseEntity<?> getAllItems() {
         var baseResponseDTO = new BaseResponseDTO<List<ItemResponseDTO>>();
@@ -159,6 +140,26 @@ public class ItemController {
             baseResponseDTO.setTimestamp(new Date());
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getItemById(@PathVariable("id") Long id){
+        var baseResponseDTO = new BaseResponseDTO<ItemResponseDTO>();
+        ItemResponseDTO item = itemService.detailItem(id);
+
+        if (item == null){
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage("item not found");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        }
+
+        baseResponseDTO.setStatus(HttpStatus.OK.value());
+        baseResponseDTO.setMessage("Success");
+        baseResponseDTO.setTimestamp(new Date());
+        baseResponseDTO.setData(item);
+
+        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
 
 }
