@@ -127,7 +127,7 @@ public class FreelancerServiceImpl implements FreelancerService {
 
     @Override
     public List<FreelancerResponseDTO> getAllFreelancerApplicants() {
-        List<Freelancer> freelancerApplicants = freelancerDb.findByDeletedAtNullAndApprovedAtNull();
+        List<Freelancer> freelancerApplicants = freelancerDb.findByDeletedAtNullAndApprovedAtNullAndRejectedAtNull();
         List<FreelancerResponseDTO> listFreelancerResponseDTO = new ArrayList<>();
         for (Freelancer freelancer : freelancerApplicants) {
             var freelancerResponseDTO = freelancerToFreelancerResponseDTO(freelancer);
