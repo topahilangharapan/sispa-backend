@@ -18,5 +18,6 @@ public class FreelancerResponseDTO extends UserResponseDTO {
     private String nik;
     private Boolean isWorking;
     private Instant approvedAt;
+
     private Instant rejectedAt;
 }
