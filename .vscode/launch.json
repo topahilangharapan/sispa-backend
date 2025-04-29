@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "BackendApplication",
+            "request": "launch",
+            "mainClass": "radiant.sispa.backend.BackendApplication",
+            "projectName": "b01-radiant-be"
+        },
+        {
             "type": "jdk",
             "request": "launch",
             "name": "Launch Java App"
