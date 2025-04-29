@@ -5,13 +5,18 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.model.ItemStatus;
+import radiant.sispa.backend.repository.ItemDb;
 import radiant.sispa.backend.repository.ItemStatusDb;
 import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
+import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
 import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
+import radiant.sispa.backend.restdto.response.ItemResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 

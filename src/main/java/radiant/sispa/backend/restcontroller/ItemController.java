@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
 import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
+import radiant.sispa.backend.restdto.request.UpdateItemStatusRequestRestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.ItemService;
 import radiant.sispa.backend.restservice.RoleRestService;
@@ -162,4 +163,39 @@ public class ItemController {
         return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
 
+    @PutMapping("/update-status")
+    public ResponseEntity<?> updateItemStatus(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @Valid @RequestBody UpdateItemStatusRequestRestDTO itemStatusDTO, BindingResult bindingResult) {
+        var baseResponseDTO = new BaseResponseDTO<ItemResponseDTO>();
+        String token = "";
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+        }
+
+        if (bindingResult.hasFieldErrors()) {
+            String errorMessages = bindingResult.getFieldErrors()
+                    .stream()
+                    .map(FieldError::getDefaultMessage)
+                    .collect(Collectors.joining("; "));
+
+            baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+            baseResponseDTO.setMessage(errorMessages);
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
+        }
+
+        ItemResponseDTO updatedItem = itemService.updateItemStatus(itemStatusDTO.getItemId(), itemStatusDTO.getIdItemStatus(), itemStatusDTO, jwtUtils.getUserNameFromJwtToken(token));
+        if (updatedItem == null){
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage("Item not found or cannot be updated");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        }
+
+        baseResponseDTO.setStatus(HttpStatus.OK.value());
+        baseResponseDTO.setMessage(String.format("Item with ID %s has been updated", updatedItem.getId()));
+        baseResponseDTO.setTimestamp(new Date());
+        baseResponseDTO.setData(updatedItem);
+        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+
+    }
 }
