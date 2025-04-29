@@ -48,7 +48,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         if (workExperience.getEndDate() != null) {
             createWorkExperienceResponseDTO.setEndDate(workExperience.getEndDate().toString());
         } else {
-            createWorkExperienceResponseDTO.setEndDate("-");
+            createWorkExperienceResponseDTO.setEndDate(null);
         }
 
 
@@ -66,7 +66,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         workExperience.setStillWorking(false);
         workExperience.setStartDate(LocalDate.parse(createWorkExperienceRequestDTO.getStartDate()));
 
-        if (createWorkExperienceRequestDTO.getEndDate() != null) {
+        if (createWorkExperienceRequestDTO.getEndDate() != null && !createWorkExperienceRequestDTO.getEndDate().isEmpty()) {
             workExperience.setEndDate(LocalDate.parse(createWorkExperienceRequestDTO.getEndDate()));
         } else {
             workExperience.setEndDate(null);
