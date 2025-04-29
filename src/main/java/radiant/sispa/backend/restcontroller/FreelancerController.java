@@ -36,6 +36,8 @@ public class FreelancerController {
                     responseDTO.getId()));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
+
             if (e instanceof RoleNotFoundException || e instanceof EntityExistsException || e instanceof EntityNotFoundException) {
                 baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
                 baseResponseDTO.setTimestamp(new Date());
