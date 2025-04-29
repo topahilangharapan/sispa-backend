@@ -8,6 +8,7 @@ import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
 import radiant.sispa.backend.restdto.request.CreatePurchaseOrderRequestDTO;
 import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
+import radiant.sispa.backend.restdto.request.UpdateItemStatusRequestRestDTO;
 import radiant.sispa.backend.restdto.response.CreateItemResponseDTO;
 import radiant.sispa.backend.restdto.response.CreatePurchaseOrderResponseDTO;
 import radiant.sispa.backend.restdto.response.ItemResponseDTO;
@@ -20,4 +21,5 @@ public interface ItemService {
     ItemResponseDTO updateItem(Long id, UpdateItemRequestRestDTO itemDTO, String username);
     List<ItemResponseDTO> getAllItems();
     void deleteItem(Long id) throws EntityNotFoundException;
+    ItemResponseDTO updateItemStatus(Long id, Long statusId, UpdateItemStatusRequestRestDTO itemDTO, String username);
 }

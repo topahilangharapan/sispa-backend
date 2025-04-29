@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.*;
 import radiant.sispa.backend.repository.ItemDb;
+import radiant.sispa.backend.repository.ItemStatusDb;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
 import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
+import radiant.sispa.backend.restdto.request.UpdateItemStatusRequestRestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
@@ -20,6 +22,9 @@ import java.util.*;
 public class ItemServiceImpl implements ItemService {
     @Autowired
     private ItemDb itemDb;
+
+    @Autowired
+    private ItemStatusDb itemStatusDb;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -162,5 +167,23 @@ public class ItemServiceImpl implements ItemService {
 
         itemToDelete.setDeletedAt(new Date().toInstant());
         itemDb.save(itemToDelete);
+    }
+
+    @Override
+    public ItemResponseDTO updateItemStatus(Long id, Long statusId, UpdateItemStatusRequestRestDTO itemDTO, String username) {
+        Item item = itemDb.findById(id).orElse(null);
+        if (item == null || item.getDeletedAt() != null){
+            return null;
+        }
+
+        ItemStatus status = itemStatusDb.findById(statusId).orElseThrow(() -> new EntityNotFoundException("Status not found"));
+
+        item.setStatus(status);
+        item.setUpdatedAt(Instant.now());
+        item.setUpdatedBy(username);
+
+        Item updatedItem = itemDb.save(item);
+
+        return itemToItemResponseDTO(updatedItem);
     }
 }
