@@ -85,7 +85,7 @@ public class BackendApplication {
             createEducationLevelIfNotExists(educationLevelDb, "S1");
             createEducationLevelIfNotExists(educationLevelDb, "S2");
             createEducationLevelIfNotExists(educationLevelDb, "S3");
-            createEducationLevelIfNotExists(educationLevelDb, "Lainnya");
+            createEducationLevelIfNotExists(educationLevelDb, "LAINNYA");
         };
     }
 

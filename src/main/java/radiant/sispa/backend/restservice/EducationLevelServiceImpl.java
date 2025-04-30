@@ -31,6 +31,7 @@ public class EducationLevelServiceImpl implements EducationLevelService {
 
     @Override
     public EducationLevel getEducationLevelByName(String name) throws EntityNotFoundException {
+        System.out.println(name.toUpperCase());
         EducationLevel educationLevel = educationLevelDb.findByEducation(name.toUpperCase()).orElse(null);
 
         if(educationLevel == null) {
