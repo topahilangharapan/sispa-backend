@@ -12,4 +12,6 @@ public interface ItemDb extends JpaRepository<Item, Long> {
     List<Item> findByDeletedAtNull();
 
     Item findByIdAndDeletedAtNull(Long id);
+
+    Item findByTitleIgnoreCaseAndDeletedAtNull(String title);
 }
