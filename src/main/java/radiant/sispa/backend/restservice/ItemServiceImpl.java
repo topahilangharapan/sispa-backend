@@ -107,6 +107,10 @@ public class ItemServiceImpl implements ItemService {
             return null;
         }
 
+        if (itemDb.findByTitleIgnoreCaseAndDeletedAtNull(itemDTO.getTitle()) != null) {
+            throw new EntityExistsException("Item already exists");
+        }
+
         item.setTitle(itemDTO.getTitle());
         item.setDescription(itemDTO.getDescription());
         item.setUnit(itemDTO.getUnit());
