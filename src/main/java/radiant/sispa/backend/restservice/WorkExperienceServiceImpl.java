@@ -63,7 +63,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         workExperience.setCategory(workExperienceCategoryService.getWorkExperienceCategoryByName(createWorkExperienceRequestDTO.getCategory()));
         workExperience.setTitle(createWorkExperienceRequestDTO.getTitle());
         workExperience.setDescription(createWorkExperienceRequestDTO.getDescription());
-        workExperience.setStillWorking(false);
+        workExperience.setStillWorking(createWorkExperienceRequestDTO.getIsStillWorking());
         workExperience.setStartDate(LocalDate.parse(createWorkExperienceRequestDTO.getStartDate()));
 
         if (createWorkExperienceRequestDTO.getEndDate() != null && !createWorkExperienceRequestDTO.getEndDate().isEmpty()) {
