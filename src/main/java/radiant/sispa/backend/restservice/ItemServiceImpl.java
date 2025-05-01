@@ -1,5 +1,6 @@
 package radiant.sispa.backend.restservice;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,10 @@ public class ItemServiceImpl implements ItemService {
 
     private Item createItemRequestDTOToItem(CreateItemRequestDTO createItemRequestDTO, String createdBy) {
         Item item = new Item();
+
+        if (itemDb.findByTitleIgnoreCaseAndDeletedAtNull(createItemRequestDTO.getTitle()) != null) {
+            throw new EntityExistsException("Item already exists");
+        }
 
         item.setCreatedBy(createdBy);
         item.setUpdatedBy(createdBy);
