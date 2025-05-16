@@ -8,9 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import radiant.sispa.backend.model.*;
 import radiant.sispa.backend.repository.*;
-import radiant.sispa.backend.restdto.request.AddVendorRequestRestDTO;
 import radiant.sispa.backend.restservice.UserRestService;
-import radiant.sispa.backend.restservice.VendorRestService;
 
 import java.util.Date;
 import java.util.Locale;
@@ -167,7 +165,7 @@ public class BackendApplication {
 
 
     private void createCategoryIfNotExists(CategoryDb categoryDb, String categoryName) {
-        Category newCategory = new Category();
+        ItemCategory newCategory = new ItemCategory();
 
         newCategory.setName(categoryName);
         newCategory.setCreatedBy("hilangharapan");

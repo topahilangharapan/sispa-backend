@@ -3,7 +3,7 @@ package radiant.sispa.backend.restservice;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import radiant.sispa.backend.model.Category;
+import radiant.sispa.backend.model.ItemCategory;
 import radiant.sispa.backend.repository.CategoryDb;
 import radiant.sispa.backend.restdto.request.CreateCategoryRequestDTO;
 import radiant.sispa.backend.restdto.response.CategoryResponseDTO;
@@ -23,10 +23,10 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public List<CategoryResponseDTO> getAllCategory() {
-        List<Category> categories = categoryDb.findAllByDeletedAtIsNull();
+        List<ItemCategory> categories = categoryDb.findAllByDeletedAtIsNull();
 
         List<CategoryResponseDTO> listCategoryResponseDTO = new ArrayList<>();
-        for (Category category : categories) {
+        for (ItemCategory category : categories) {
             var categoryResponseDTO = categoryToCategoryResponseDTO(category);
             listCategoryResponseDTO.add(categoryResponseDTO);
         }
@@ -39,14 +39,14 @@ public class CategoryServiceImpl implements CategoryService {
         String username = jwtUtils.getUserNameFromJwtToken(token);
 
         if (categoryDb.findAllByDeletedAtIsNull() != null) {
-            Category existingCategory = categoryDb.findByNameIgnoreCaseAndDeletedAtNull(categoryDTO.getName().trim());
+            ItemCategory existingCategory = categoryDb.findByNameIgnoreCaseAndDeletedAtNull(categoryDTO.getName().trim());
 
             if (existingCategory != null) {
                 throw new IllegalArgumentException("Kategori dengan nama ini sudah terdaftar.");
             }
         }
 
-        Category newCategory = new Category();
+        ItemCategory newCategory = new ItemCategory();
         newCategory.setName(categoryDTO.getName().trim());
         newCategory.setCreatedBy(username);
 
@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryToCategoryResponseDTO(newCategory);
     }
 
-    private CategoryResponseDTO categoryToCategoryResponseDTO(Category category) {
+    private CategoryResponseDTO categoryToCategoryResponseDTO(ItemCategory category) {
         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
 
         categoryResponseDTO.setId(category.getId());
@@ -69,7 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDTO getCategoryByName(String name) {
-        Category category = categoryDb.findByNameIgnoreCaseAndDeletedAtNull(name);
+        ItemCategory category = categoryDb.findByNameIgnoreCaseAndDeletedAtNull(name);
 
         if (category == null || category.getDeletedAt() != null) {
             return null;

@@ -32,7 +32,7 @@ public class WorkExperienceCategoryController {
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Work Experience Category %s with id %d created!",
+            baseResponseDTO.setMessage(String.format("Work Experience ItemCategory %s with id %d created!",
                     responseDTO.getName(),
                     responseDTO.getId()));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
@@ -45,7 +45,7 @@ public class WorkExperienceCategoryController {
             }
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to create Work Experience Category!");
+            baseResponseDTO.setMessage("Failed to create Work Experience ItemCategory!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -58,12 +58,12 @@ public class WorkExperienceCategoryController {
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(genericDataDTOList);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Work Experience Category retrieved!"));
+            baseResponseDTO.setMessage(String.format("Work Experience ItemCategory retrieved!"));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage("Failed to retrieve Work Experience Category!");
+            baseResponseDTO.setMessage("Failed to retrieve Work Experience ItemCategory!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

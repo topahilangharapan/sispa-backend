@@ -68,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
         item.setPricePerUnit(createItemRequestDTO.getPricePerUnit());
         item.setDescription(createItemRequestDTO.getDescription());
 
-        Category category = new Category();
+        ItemCategory category = new ItemCategory();
         CategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(createItemRequestDTO.getCategory());
 
         category.setId(categoryResponseDTO.getId());
@@ -117,7 +117,7 @@ public class ItemServiceImpl implements ItemService {
         item.setPricePerUnit(itemDTO.getPricePerUnit());
         if (itemDTO.getCategory() != null && !itemDTO.getCategory().equals(item.getCategory().getName())) {
             CategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(itemDTO.getCategory());
-            Category category = new Category();
+            ItemCategory category = new ItemCategory();
             category.setId(categoryResponseDTO.getId());
             category.setName(categoryResponseDTO.getName());
             item.setCategory(category);

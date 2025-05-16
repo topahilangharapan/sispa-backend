@@ -31,7 +31,7 @@ public class CategoryRestController {
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(createCategoryResponseDTO);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Category generated!"));
+            baseResponseDTO.setMessage(String.format("ItemCategory generated!"));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

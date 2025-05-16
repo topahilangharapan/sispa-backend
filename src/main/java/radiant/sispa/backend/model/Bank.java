@@ -21,14 +21,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "category")
-public class Category implements Serializable {
+@Table(name = "bank")
+public class Bank implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false, nullable = false)
     private Instant createdAt;
 
@@ -37,7 +36,6 @@ public class Category implements Serializable {
     private String createdBy;
 
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private Instant updatedAt;
 
@@ -54,9 +52,16 @@ public class Category implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bank", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private List<Item> items;
-}
+    private List<Account> accounts;
 
+    @NotNull
+    @Column(name = "interest_rate", nullable = false)
+    private boolean interestRate;
+
+    @NotNull
+    @Column(name = "admin_fee", nullable = false)
+    private boolean adminFee;
+}

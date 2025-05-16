@@ -21,10 +21,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "item")
-public class Item implements Serializable {
+@Table(name = "item_category")
+public class ItemCategory implements Serializable {
     @Id
-    @GeneratedValue(generator = "system-uuid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @CreationTimestamp
@@ -51,33 +51,12 @@ public class Item implements Serializable {
     private String deletedBy;
 
     @NotNull
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @NotNull
-    @Column(name = "unit", nullable = false)
-    private String unit;
-
-    @NotNull
-    @Column(name = "price_per_unit", nullable = false)
-    private Long pricePerUnit;
-
-    @Column(name = "description")
-    private String description;
-
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PurchaseOrderItem> purchaseOrderItems;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_category", referencedColumnName = "id", nullable = false)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private ItemCategory category;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_item_status", referencedColumnName = "id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private ItemStatus status;
+    private List<Item> items;
 }
 
