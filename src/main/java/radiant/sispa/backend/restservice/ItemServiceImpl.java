@@ -31,7 +31,7 @@ public class ItemServiceImpl implements ItemService {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private CategoryService categoryService;
+    private ItemCategoryService categoryService;
 
     @Autowired
     private ItemStatusService itemStatusService;
@@ -68,8 +68,8 @@ public class ItemServiceImpl implements ItemService {
         item.setPricePerUnit(createItemRequestDTO.getPricePerUnit());
         item.setDescription(createItemRequestDTO.getDescription());
 
-        Category category = new Category();
-        CategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(createItemRequestDTO.getCategory());
+        ItemCategory category = new ItemCategory();
+        ItemCategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(createItemRequestDTO.getCategory());
 
         category.setId(categoryResponseDTO.getId());
         category.setName(categoryResponseDTO.getName());
@@ -116,8 +116,8 @@ public class ItemServiceImpl implements ItemService {
         item.setUnit(itemDTO.getUnit());
         item.setPricePerUnit(itemDTO.getPricePerUnit());
         if (itemDTO.getCategory() != null && !itemDTO.getCategory().equals(item.getCategory().getName())) {
-            CategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(itemDTO.getCategory());
-            Category category = new Category();
+            ItemCategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(itemDTO.getCategory());
+            ItemCategory category = new ItemCategory();
             category.setId(categoryResponseDTO.getId());
             category.setName(categoryResponseDTO.getName());
             item.setCategory(category);

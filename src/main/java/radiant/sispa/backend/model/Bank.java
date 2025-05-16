@@ -21,14 +21,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "item")
-public class Item implements Serializable {
+@Table(name = "bank")
+public class Bank implements Serializable {
     @Id
-    @GeneratedValue(generator = "system-uuid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false, nullable = false)
     private Instant createdAt;
 
@@ -37,7 +36,6 @@ public class Item implements Serializable {
     private String createdBy;
 
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private Instant updatedAt;
 
@@ -51,33 +49,19 @@ public class Item implements Serializable {
     private String deletedBy;
 
     @NotNull
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
 
-    @NotNull
-    @Column(name = "unit", nullable = false)
-    private String unit;
-
-    @NotNull
-    @Column(name = "price_per_unit", nullable = false)
-    private Long pricePerUnit;
-
-    @Column(name = "description")
-    private String description;
-
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PurchaseOrderItem> purchaseOrderItems;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_category", referencedColumnName = "id", nullable = false)
+    @OneToMany(mappedBy = "bank", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private ItemCategory category;
+    private List<Account> accounts;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_item_status", referencedColumnName = "id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private ItemStatus status;
+    @NotNull
+    @Column(name = "interest_rate", nullable = false)
+    private double interestRate;
+
+    @NotNull
+    @Column(name = "admin_fee", nullable = false)
+    private double adminFee;
 }
-

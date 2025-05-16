@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreateCategoryRequestDTO {
+public class CreateBankRequestDTO {
     private String name;
+    private double interestRate;
+    private double adminFee;
 }
