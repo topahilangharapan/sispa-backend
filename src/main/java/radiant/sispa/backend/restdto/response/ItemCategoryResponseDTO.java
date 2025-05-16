@@ -8,7 +8,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CategoryResponseDTO {
+public class ItemCategoryResponseDTO {
     private Long id;
     private String name;
     private Instant createdAt;

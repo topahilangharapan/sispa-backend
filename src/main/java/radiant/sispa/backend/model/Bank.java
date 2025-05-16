@@ -49,7 +49,7 @@ public class Bank implements Serializable {
     private String deletedBy;
 
     @NotNull
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "bank", fetch = FetchType.LAZY)
@@ -59,9 +59,9 @@ public class Bank implements Serializable {
 
     @NotNull
     @Column(name = "interest_rate", nullable = false)
-    private boolean interestRate;
+    private double interestRate;
 
     @NotNull
     @Column(name = "admin_fee", nullable = false)
-    private boolean adminFee;
+    private double adminFee;
 }

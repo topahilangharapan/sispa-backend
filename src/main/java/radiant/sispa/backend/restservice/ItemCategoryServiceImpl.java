@@ -4,9 +4,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.ItemCategory;
-import radiant.sispa.backend.repository.CategoryDb;
-import radiant.sispa.backend.restdto.request.CreateCategoryRequestDTO;
-import radiant.sispa.backend.restdto.response.CategoryResponseDTO;
+import radiant.sispa.backend.repository.ItemCategoryDb;
+import radiant.sispa.backend.restdto.request.CreateItemCategoryRequestDTO;
+import radiant.sispa.backend.restdto.response.ItemCategoryResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.util.ArrayList;
@@ -14,18 +14,18 @@ import java.util.List;
 
 @Service
 @Transactional
-public class CategoryServiceImpl implements CategoryService {
+public class ItemCategoryServiceImpl implements ItemCategoryService {
     @Autowired
-    private CategoryDb categoryDb;
+    private ItemCategoryDb categoryDb;
 
     @Autowired
     private JwtUtils jwtUtils;
     
     @Override
-    public List<CategoryResponseDTO> getAllCategory() {
+    public List<ItemCategoryResponseDTO> getAllCategory() {
         List<ItemCategory> categories = categoryDb.findAllByDeletedAtIsNull();
 
-        List<CategoryResponseDTO> listCategoryResponseDTO = new ArrayList<>();
+        List<ItemCategoryResponseDTO> listCategoryResponseDTO = new ArrayList<>();
         for (ItemCategory category : categories) {
             var categoryResponseDTO = categoryToCategoryResponseDTO(category);
             listCategoryResponseDTO.add(categoryResponseDTO);
@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponseDTO createCategory(CreateCategoryRequestDTO categoryDTO, String authHeader) throws IllegalArgumentException {
+    public ItemCategoryResponseDTO createCategory(CreateItemCategoryRequestDTO categoryDTO, String authHeader) throws IllegalArgumentException {
         String token = authHeader.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);
 
@@ -54,8 +54,8 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryToCategoryResponseDTO(newCategory);
     }
 
-    private CategoryResponseDTO categoryToCategoryResponseDTO(ItemCategory category) {
-        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
+    private ItemCategoryResponseDTO categoryToCategoryResponseDTO(ItemCategory category) {
+        ItemCategoryResponseDTO categoryResponseDTO = new ItemCategoryResponseDTO();
 
         categoryResponseDTO.setId(category.getId());
         categoryResponseDTO.setName(category.getName());
@@ -68,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponseDTO getCategoryByName(String name) {
+    public ItemCategoryResponseDTO getCategoryByName(String name) {
         ItemCategory category = categoryDb.findByNameIgnoreCaseAndDeletedAtNull(name);
 
         if (category == null || category.getDeletedAt() != null) {

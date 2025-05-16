@@ -23,9 +23,8 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, CategoryDb categoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb) {
         return args -> {
-            // Create roles if they don't exist
             createRoleIfNotExists(roleDb, "ADMIN");
             createRoleIfNotExists(roleDb, "MANAJEMEN");
             createRoleIfNotExists(roleDb, "FINANCE");
@@ -62,10 +61,10 @@ public class BackendApplication {
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "WIRAUSAHA");
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "LAINNYA");
 
-            createCategoryIfNotExists(categoryDb, "MAINAN");
-            createCategoryIfNotExists(categoryDb, "FURNITUR");
-            createCategoryIfNotExists(categoryDb, "MISTIS");
-            createCategoryIfNotExists(categoryDb, "MAKANAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "MAINAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "FURNITUR");
+            createItemCategoryIfNotExists(itemCategoryDb, "MISTIS");
+            createItemCategoryIfNotExists(itemCategoryDb, "MAKANAN");
 
             createItemStatusIfNotExists(itemStatusDb, "TERSEDIA");
             createItemStatusIfNotExists(itemStatusDb, "TIDAK TERSEDIA");
@@ -164,7 +163,7 @@ public class BackendApplication {
     }
 
 
-    private void createCategoryIfNotExists(CategoryDb categoryDb, String categoryName) {
+    private void createItemCategoryIfNotExists(ItemCategoryDb categoryDb, String categoryName) {
         ItemCategory newCategory = new ItemCategory();
 
         newCategory.setName(categoryName);

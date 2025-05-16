@@ -7,7 +7,7 @@ import radiant.sispa.backend.model.ItemCategory;
 import java.util.List;
 
 @Repository
-public interface CategoryDb extends JpaRepository<ItemCategory, Long> {
+public interface ItemCategoryDb extends JpaRepository<ItemCategory, Long> {
     List<ItemCategory> findAllByDeletedAtIsNull();
     ItemCategory findByNameIgnoreCaseAndDeletedAtNull(String name);
 }
