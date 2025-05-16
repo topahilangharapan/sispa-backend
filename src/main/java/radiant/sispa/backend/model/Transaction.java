@@ -59,5 +59,5 @@ public abstract class Transaction implements Serializable {
     @JoinColumn(name = "id_category", referencedColumnName = "id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private TransactionCategory category;
+    protected TransactionCategory category;
 }
