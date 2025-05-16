@@ -32,7 +32,7 @@ public class BankController {
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTO);
             baseResponseDTO.setTimestamp(new Date());
-            baseResponseDTO.setMessage(String.format("Bank %s with created!",
+            baseResponseDTO.setMessage(String.format("Bank %s created!",
                     responseDTO.getName()));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
         } catch (Exception e) {

@@ -23,7 +23,7 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb) {
         return args -> {
             createRoleIfNotExists(roleDb, "ADMIN");
             createRoleIfNotExists(roleDb, "MANAJEMEN");
@@ -61,10 +61,26 @@ public class BackendApplication {
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "WIRAUSAHA");
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "LAINNYA");
 
-            createItemCategoryIfNotExists(itemCategoryDb, "MAINAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "ELEKTRONIK");
             createItemCategoryIfNotExists(itemCategoryDb, "FURNITUR");
-            createItemCategoryIfNotExists(itemCategoryDb, "MISTIS");
+            createItemCategoryIfNotExists(itemCategoryDb, "PAKAIAN");
             createItemCategoryIfNotExists(itemCategoryDb, "MAKANAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "MINUMAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "ALAT TULIS");
+            createItemCategoryIfNotExists(itemCategoryDb, "MAINAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN DAPUR");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN MANDI");
+            createItemCategoryIfNotExists(itemCategoryDb, "OBAT-OBATAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERALATAN OLAHRAGA");
+            createItemCategoryIfNotExists(itemCategoryDb, "BUKU");
+            createItemCategoryIfNotExists(itemCategoryDb, "ALAT KEBERSIHAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN BAYI");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN HEWAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "ALAT MUSIK");
+            createItemCategoryIfNotExists(itemCategoryDb, "AKSESORIS");
+            createItemCategoryIfNotExists(itemCategoryDb, "KOSMETIK");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERKAKAS");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN KANTOR");
 
             createItemStatusIfNotExists(itemStatusDb, "TERSEDIA");
             createItemStatusIfNotExists(itemStatusDb, "TIDAK TERSEDIA");
@@ -83,6 +99,10 @@ public class BackendApplication {
             createEducationLevelIfNotExists(educationLevelDb, "S2");
             createEducationLevelIfNotExists(educationLevelDb, "S3");
             createEducationLevelIfNotExists(educationLevelDb, "LAINNYA");
+
+            createBankIfNotExists(bankDb, "MANDIRI", 0.2, 5000);
+            createBankIfNotExists(bankDb, "BCA", 0.2, 10000);
+            createBankIfNotExists(bankDb, "BSI", 0.125, 2500);
         };
     }
 
@@ -188,5 +208,16 @@ public class BackendApplication {
         newEducationLevel.setCreatedBy("hilangharapan");
 
         educationLevelDb.save(newEducationLevel);
+    }
+
+    private void createBankIfNotExists(BankDb bankDb, String name, double interestRate, double adminFee) {
+        Bank bank = new Bank();
+
+        bank.setName(name);
+        bank.setInterestRate(interestRate);
+        bank.setAdminFee(adminFee);
+        bank.setCreatedBy("hilangharapan");
+
+        bankDb.save(bank);
     }
 }
