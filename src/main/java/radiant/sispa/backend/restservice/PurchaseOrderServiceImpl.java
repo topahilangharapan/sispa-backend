@@ -48,7 +48,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private ClientDb clientDb;
 
     @Autowired
-    private CategoryService categoryService;
+    private ItemCategoryService categoryService;
 
     @Autowired
     private ItemStatusService itemStatusService;

@@ -34,7 +34,7 @@ public class WorkExperienceCategoryServiceImpl implements WorkExperienceCategory
         WorkExperienceCategory workExperienceCategory = workExperienceCategoryDb.findByCategory(name.toUpperCase()).orElse(null);
 
         if(workExperienceCategory == null) {
-            throw new EntityNotFoundException(String.format("Work Category %s doesnt exist!", name));
+            throw new EntityNotFoundException(String.format("Work Experience Category %s doesnt exist!", name));
         }
 
         return workExperienceCategory;
@@ -48,7 +48,7 @@ public class WorkExperienceCategoryServiceImpl implements WorkExperienceCategory
         WorkExperienceCategory workExperienceCategory = new WorkExperienceCategory();
 
         if (workExperienceCategoryDb.findByCategory(requestDTO.getName().toUpperCase()).orElse(null) != null) {
-            throw new EntityExistsException(String.format("Work Category %s already exists", requestDTO.getName()));
+            throw new EntityExistsException(String.format("Work Experience Category %s already exists", requestDTO.getName()));
         }
 
         workExperienceCategory.setCategory(requestDTO.getName().toUpperCase());

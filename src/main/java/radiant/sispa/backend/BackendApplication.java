@@ -8,9 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import radiant.sispa.backend.model.*;
 import radiant.sispa.backend.repository.*;
-import radiant.sispa.backend.restdto.request.AddVendorRequestRestDTO;
 import radiant.sispa.backend.restservice.UserRestService;
-import radiant.sispa.backend.restservice.VendorRestService;
 
 import java.util.Date;
 import java.util.Locale;
@@ -25,9 +23,8 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, CategoryDb categoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb) {
         return args -> {
-            // Create roles if they don't exist
             createRoleIfNotExists(roleDb, "ADMIN");
             createRoleIfNotExists(roleDb, "MANAJEMEN");
             createRoleIfNotExists(roleDb, "FINANCE");
@@ -64,10 +61,26 @@ public class BackendApplication {
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "WIRAUSAHA");
             createWorkExperienceCategoryIfNotExists(workExperienceCategoryDb, "LAINNYA");
 
-            createCategoryIfNotExists(categoryDb, "MAINAN");
-            createCategoryIfNotExists(categoryDb, "FURNITUR");
-            createCategoryIfNotExists(categoryDb, "MISTIS");
-            createCategoryIfNotExists(categoryDb, "MAKANAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "ELEKTRONIK");
+            createItemCategoryIfNotExists(itemCategoryDb, "FURNITUR");
+            createItemCategoryIfNotExists(itemCategoryDb, "PAKAIAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "MAKANAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "MINUMAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "ALAT TULIS");
+            createItemCategoryIfNotExists(itemCategoryDb, "MAINAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN DAPUR");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN MANDI");
+            createItemCategoryIfNotExists(itemCategoryDb, "OBAT-OBATAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERALATAN OLAHRAGA");
+            createItemCategoryIfNotExists(itemCategoryDb, "BUKU");
+            createItemCategoryIfNotExists(itemCategoryDb, "ALAT KEBERSIHAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN BAYI");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN HEWAN");
+            createItemCategoryIfNotExists(itemCategoryDb, "ALAT MUSIK");
+            createItemCategoryIfNotExists(itemCategoryDb, "AKSESORIS");
+            createItemCategoryIfNotExists(itemCategoryDb, "KOSMETIK");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERKAKAS");
+            createItemCategoryIfNotExists(itemCategoryDb, "PERLENGKAPAN KANTOR");
 
             createItemStatusIfNotExists(itemStatusDb, "TERSEDIA");
             createItemStatusIfNotExists(itemStatusDb, "TIDAK TERSEDIA");
@@ -86,6 +99,10 @@ public class BackendApplication {
             createEducationLevelIfNotExists(educationLevelDb, "S2");
             createEducationLevelIfNotExists(educationLevelDb, "S3");
             createEducationLevelIfNotExists(educationLevelDb, "LAINNYA");
+
+            createBankIfNotExists(bankDb, "MANDIRI", 0.2, 5000);
+            createBankIfNotExists(bankDb, "BCA", 0.2, 10000);
+            createBankIfNotExists(bankDb, "BSI", 0.125, 2500);
         };
     }
 
@@ -166,8 +183,8 @@ public class BackendApplication {
     }
 
 
-    private void createCategoryIfNotExists(CategoryDb categoryDb, String categoryName) {
-        Category newCategory = new Category();
+    private void createItemCategoryIfNotExists(ItemCategoryDb categoryDb, String categoryName) {
+        ItemCategory newCategory = new ItemCategory();
 
         newCategory.setName(categoryName);
         newCategory.setCreatedBy("hilangharapan");
@@ -191,5 +208,16 @@ public class BackendApplication {
         newEducationLevel.setCreatedBy("hilangharapan");
 
         educationLevelDb.save(newEducationLevel);
+    }
+
+    private void createBankIfNotExists(BankDb bankDb, String name, double interestRate, double adminFee) {
+        Bank bank = new Bank();
+
+        bank.setName(name);
+        bank.setInterestRate(interestRate);
+        bank.setAdminFee(adminFee);
+        bank.setCreatedBy("hilangharapan");
+
+        bankDb.save(bank);
     }
 }
