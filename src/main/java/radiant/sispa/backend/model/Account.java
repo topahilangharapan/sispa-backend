@@ -53,7 +53,7 @@ public class Account implements Serializable {
     private String name;
 
     @NotNull
-    @Column(name = "no", nullable = false)
+    @Column(name = "no", nullable = false, unique = true)
     private String no;
 
     @ManyToOne(fetch = FetchType.EAGER)

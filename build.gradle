@@ -58,6 +58,9 @@ dependencies {
 
 	implementation 'org.postgresql:postgresql:42.7.1'
 	implementation 'net.sf.jasperreports:jasperreports-fonts:6.19.0'
+
+	implementation 'org.hibernate.common:hibernate-commons-annotations:6.0.6.Final'
+
 }
 
 tasks.named('test') {
