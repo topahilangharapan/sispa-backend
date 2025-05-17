@@ -4,18 +4,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Freelancer;
-import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.model.WorkExperience;
-import radiant.sispa.backend.repository.FreelancerDb;
-import radiant.sispa.backend.repository.ItemDb;
 import radiant.sispa.backend.repository.WorkExperienceDb;
-import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateWorkExperienceRequestDTO;
-import radiant.sispa.backend.restdto.response.CreateItemResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateWorkExperienceResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
-import javax.management.relation.RoleNotFoundException;
 import java.time.LocalDate;
 
 @Service

@@ -23,7 +23,7 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb, TransactionCategoryDb transactionCategoryDb, AccountDb accountDb) {
         return args -> {
             createRoleIfNotExists(roleDb, "ADMIN");
             createRoleIfNotExists(roleDb, "MANAJEMEN");
@@ -103,6 +103,20 @@ public class BackendApplication {
             createBankIfNotExists(bankDb, "MANDIRI", 0.2, 5000);
             createBankIfNotExists(bankDb, "BCA", 0.2, 10000);
             createBankIfNotExists(bankDb, "BSI", 0.125, 2500);
+
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "PENDAPATAN KLIEN");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "BIAYA VENUE");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "DEKORASI DAN SETTING");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "TALENT DAN MC");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "PERIZINAN DAN LEGALITAS");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "KONSUMSI DAN KATERING");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "TRANSPORTASI DAN AKOMODASI");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "PROMOSI DAN MARKETING");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "CETAK DAN MERCHANDISE");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "GAJI DAN OPERASIONAL KARYAWAN");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "LAIN-LAIN");
+
+            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("MANDIRI").orElse(null));
         };
     }
 
@@ -219,5 +233,25 @@ public class BackendApplication {
         bank.setCreatedBy("hilangharapan");
 
         bankDb.save(bank);
+    }
+
+    private void createTransactionCategoryIfNotExists(TransactionCategoryDb transactionCategoryDb, String name) {
+        TransactionCategory transactionCategory = new TransactionCategory();
+
+        transactionCategory.setName(name);
+        transactionCategory.setCreatedBy("hilangharapan");
+
+        transactionCategoryDb.save(transactionCategory);
+    }
+
+    private void createAccountIfNotExists(AccountDb accountDb, String name, Bank bank) {
+        Account account = new Account();
+
+        account.setName(name);
+        account.setNo("04052004");
+        account.setBank(bank);
+        account.setCreatedBy("hilangharapan");
+
+        accountDb.save(account);
     }
 }

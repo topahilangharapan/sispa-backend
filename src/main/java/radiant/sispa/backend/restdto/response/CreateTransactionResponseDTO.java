@@ -1,4 +1,4 @@
-package radiant.sispa.backend.restdto.request;
+package radiant.sispa.backend.restdto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreateItemRequestDTO {
-    private String title;
-    private String unit;
-    private Long pricePerUnit;
+public class CreateTransactionResponseDTO {
+    private double amount;
     private String description;
+    private String account;
     private String category;
 }
