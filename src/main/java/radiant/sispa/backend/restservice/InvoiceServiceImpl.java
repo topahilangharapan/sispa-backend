@@ -9,7 +9,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Invoice;
 import radiant.sispa.backend.model.PurchaseOrder;
-import radiant.sispa.backend.model.Item;
 import radiant.sispa.backend.model.PurchaseOrderItem;
 import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;

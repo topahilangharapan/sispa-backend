@@ -1,7 +1,7 @@
 package radiant.sispa.backend.restservice;
 
 import radiant.sispa.backend.model.Freelancer;
-import radiant.sispa.backend.restdto.request.*;
+import radiant.sispa.backend.restdto.request.CreateFreelancerRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
 
 import javax.management.relation.RoleNotFoundException;

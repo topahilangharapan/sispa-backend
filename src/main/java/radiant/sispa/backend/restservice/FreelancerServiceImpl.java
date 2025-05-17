@@ -4,14 +4,13 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import radiant.sispa.backend.model.Freelancer;
 import radiant.sispa.backend.model.WorkExperience;
 import radiant.sispa.backend.repository.FreelancerDb;
 import radiant.sispa.backend.restdto.request.*;
+import radiant.sispa.backend.restdto.request.CreateFreelancerRequestDTO;
+import radiant.sispa.backend.restdto.request.CreateWorkExperienceRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
@@ -20,7 +19,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 

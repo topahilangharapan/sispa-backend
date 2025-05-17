@@ -1,6 +1,5 @@
 package radiant.sispa.backend.restcontroller;
 
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -14,14 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateItemRequestDTO;
 import radiant.sispa.backend.restdto.request.UpdateItemRequestRestDTO;
 import radiant.sispa.backend.restdto.request.UpdateItemStatusRequestRestDTO;
-import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.ItemService;
-import radiant.sispa.backend.restservice.RoleRestService;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateItemResponseDTO;
 import radiant.sispa.backend.restdto.response.ItemResponseDTO;
-import radiant.sispa.backend.restservice.ItemService;
 
 import java.util.Date;
 import java.util.List;
