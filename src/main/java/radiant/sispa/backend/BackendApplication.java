@@ -23,7 +23,7 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb, AccountDb accountDb) {
         return args -> {
             createRoleIfNotExists(roleDb, "ADMIN");
             createRoleIfNotExists(roleDb, "MANAJEMEN");
@@ -103,6 +103,8 @@ public class BackendApplication {
             createBankIfNotExists(bankDb, "MANDIRI", 0.2, 5000);
             createBankIfNotExists(bankDb, "BCA", 0.2, 10000);
             createBankIfNotExists(bankDb, "BSI", 0.125, 2500);
+
+            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("MANDIRI").orElse(null));
         };
     }
 
@@ -219,5 +221,16 @@ public class BackendApplication {
         bank.setCreatedBy("hilangharapan");
 
         bankDb.save(bank);
+    }
+
+    private void createAccountIfNotExists(AccountDb accountDb, String name, Bank bank) {
+        Account account = new Account();
+
+        account.setName(name);
+        account.setNo(UUID.randomUUID().toString());
+        account.setBank(bank);
+        account.setCreatedBy("hilangharapan");
+
+        accountDb.save(account);
     }
 }

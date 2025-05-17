@@ -10,11 +10,8 @@ import radiant.sispa.backend.model.Bank;
 import radiant.sispa.backend.repository.AccountDb;
 import radiant.sispa.backend.repository.BankDb;
 import radiant.sispa.backend.restdto.request.CreateAccountRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateBankRequestDTO;
 import radiant.sispa.backend.restdto.response.AccountResponseDTO;
-import radiant.sispa.backend.restdto.response.BankResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateAccountResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateBankResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.util.ArrayList;

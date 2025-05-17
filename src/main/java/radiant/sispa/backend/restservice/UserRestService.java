@@ -1,6 +1,5 @@
 package radiant.sispa.backend.restservice;
 
-import jakarta.persistence.EntityExistsException;
 import radiant.sispa.backend.restdto.request.CreateUserRequestDTO;
 import radiant.sispa.backend.restdto.request.PasswordChangeRequestDTO;
 import radiant.sispa.backend.restdto.request.UserProfileRequestDTO;

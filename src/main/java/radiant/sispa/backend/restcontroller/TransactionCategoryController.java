@@ -10,7 +10,6 @@ import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
 import radiant.sispa.backend.restservice.TransactionCategoryService;
-import radiant.sispa.backend.restservice.WorkExperienceCategoryService;
 
 import java.util.Date;
 import java.util.List;

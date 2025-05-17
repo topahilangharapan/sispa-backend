@@ -3,7 +3,6 @@ package radiant.sispa.backend.restservice;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import radiant.sispa.backend.model.TransactionCategory;
-import radiant.sispa.backend.model.WorkExperienceCategory;
 import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
 import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;

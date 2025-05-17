@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreateItemRequestDTO {
-    private String title;
-    private String unit;
-    private Long pricePerUnit;
+public class CreateTransactionRequestDTO {
+    private double amount;
     private String description;
+    private String account;
     private String category;
 }

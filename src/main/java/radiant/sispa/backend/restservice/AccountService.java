@@ -3,13 +3,9 @@ package radiant.sispa.backend.restservice;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import radiant.sispa.backend.model.Account;
-import radiant.sispa.backend.model.Bank;
 import radiant.sispa.backend.restdto.request.CreateAccountRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateBankRequestDTO;
 import radiant.sispa.backend.restdto.response.AccountResponseDTO;
-import radiant.sispa.backend.restdto.response.BankResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateAccountResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateBankResponseDTO;
 
 import java.util.List;
 

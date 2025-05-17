@@ -6,10 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateBankRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.BankService;
-import radiant.sispa.backend.restservice.WorkExperienceCategoryService;
 
 import java.util.Date;
 import java.util.List;

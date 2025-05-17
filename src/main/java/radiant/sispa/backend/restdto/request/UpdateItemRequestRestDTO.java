@@ -6,6 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UpdateItemRequestRestDTO extends CreateItemRequestDTO{
+public class UpdateItemRequestRestDTO extends CreateItemRequestDTO {
     private Long id;
 }

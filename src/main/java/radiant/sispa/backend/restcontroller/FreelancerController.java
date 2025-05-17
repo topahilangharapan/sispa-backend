@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.*;
+import radiant.sispa.backend.restdto.request.CreateFreelancerRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.FreelancerService;
 
