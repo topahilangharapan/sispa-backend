@@ -61,6 +61,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         Income newIncome = new Income();
 
+        newIncome.setId(generateIncomeId(account));
         newIncome.setAmount(requestDTO.getAmount());
         newIncome.setCreatedBy(createdBy);
         newIncome.setCategory(transactionCategory);
@@ -81,5 +82,21 @@ public class IncomeServiceImpl implements IncomeService {
         return createIncomeResponseDTO;
     }
 
+    public String generateIncomeId(Account account) {
+        String last4Account = account.getNo().length() >= 4 ?
+                account.getNo().substring(account.getNo().length() - 4) : account.getNo();
 
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        LocalDate todayDate = LocalDate.now();
+        Instant startOfDay = todayDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant endOfDay = todayDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        long countToday = incomeDb.countIncomeToday(startOfDay, endOfDay);
+
+        long newCount = countToday + 1;
+
+        String formattedCount = String.format("%04d", newCount);
+
+        return String.format("I/%s/%s/%s/%s", last4Account, account.getBank().getName(), today, formattedCount);
+    }
 }

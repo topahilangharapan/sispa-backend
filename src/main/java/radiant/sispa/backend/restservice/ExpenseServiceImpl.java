@@ -16,6 +16,11 @@ import radiant.sispa.backend.restdto.response.CreateExpenseResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateIncomeResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 @Service
 @Transactional
 public class ExpenseServiceImpl implements ExpenseService {
@@ -49,6 +54,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         Expense newExpense = new Expense();
 
+        newExpense.setId(generateExpenseId(account));
         newExpense.setAmount(requestDTO.getAmount());
         newExpense.setCreatedBy(createdBy);
         newExpense.setCategory(transactionCategory);
@@ -69,5 +75,21 @@ public class ExpenseServiceImpl implements ExpenseService {
         return createExpenseResponseDTO;
     }
 
+    public String generateExpenseId(Account account) {
+        String last4Account = account.getNo().length() >= 4 ?
+                account.getNo().substring(account.getNo().length() - 4) : account.getNo();
 
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        LocalDate todayDate = LocalDate.now();
+        Instant startOfDay = todayDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant endOfDay = todayDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        long countToday = expenseDb.countExpenseToday(startOfDay, endOfDay);
+
+        long newCount = countToday + 1;
+
+        String formattedCount = String.format("%04d", newCount);
+
+        return String.format("E/%s/%s/%s/%s", last4Account, account.getBank().getName(), today, formattedCount);
+    }
 }
