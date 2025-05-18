@@ -35,17 +35,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getAccountByNo(String no) throws EntityNotFoundException {
-        Account account = accountDb.findByNo(no.toUpperCase()).orElse(null);
-
-        if(account == null) {
-            throw new EntityNotFoundException(String.format("Account %s doesnt exist!", no));
-        }
-
-        return account;
-    }
-
-    @Override
     public CreateAccountResponseDTO addAccount(CreateAccountRequestDTO requestDTO, String authHeader) throws EntityExistsException, EntityNotFoundException {
         String token = authHeader.substring(7);
         String createdBy = jwtUtils.getUserNameFromJwtToken(token);
@@ -97,5 +86,16 @@ public class AccountServiceImpl implements AccountService {
             accountResponseDTOS.add(accountResponseDTO);
         }
         return accountResponseDTOS;
+    }
+
+    @Override
+    public Account getAccountByNo(String no) throws EntityNotFoundException {
+        Account account = accountDb.findByNo(no.toUpperCase()).orElse(null);
+
+        if(account == null) {
+            throw new EntityNotFoundException(String.format("Account %s doesnt exist!", no));
+        }
+
+        return account;
     }
 }
