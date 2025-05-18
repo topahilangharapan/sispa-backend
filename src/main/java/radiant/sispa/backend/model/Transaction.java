@@ -18,8 +18,7 @@ import java.time.Instant;
 @MappedSuperclass
 public abstract class Transaction implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    protected String id;
 
     @NotNull
     @Column(name = "amount", nullable = false)
