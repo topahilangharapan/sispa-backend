@@ -1,5 +1,8 @@
 package radiant.sispa.backend.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,5 +16,7 @@ public interface IncomeDb extends JpaRepository<Income, String> {
 
     @Query("SELECT COUNT(i) FROM Income i WHERE i.createdAt >= :startOfDay AND i.createdAt < :endOfDay")
     long countIncomeToday(@Param("startOfDay") Instant startOfDay, @Param("endOfDay") Instant endOfDay);
+
+    List<Income> findByDeletedAtIsNull();
 
 }

@@ -19,7 +19,6 @@ import radiant.sispa.backend.restservice.IncomeService;
 import java.util.Date;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api/transaction/expense")
 public class ExpenseController {
@@ -29,8 +28,7 @@ public class ExpenseController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addExpense(
-            @Valid
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @Valid @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody CreateExpenseRequestDTO requestDTO,
             BindingResult bindingResult) {
 
