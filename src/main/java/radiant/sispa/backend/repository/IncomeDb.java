@@ -9,10 +9,9 @@ import radiant.sispa.backend.model.Transaction;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.List;
 
 @Repository
-public interface IncomeDb extends JpaRepository<Income, Long> {
+public interface IncomeDb extends JpaRepository<Income, String> {
 
     @Query("SELECT COUNT(i) FROM Income i WHERE i.createdAt >= :startOfDay AND i.createdAt < :endOfDay")
     long countIncomeToday(@Param("startOfDay") Instant startOfDay, @Param("endOfDay") Instant endOfDay);

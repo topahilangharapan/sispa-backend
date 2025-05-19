@@ -9,5 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface TransactionDb extends JpaRepository<Transaction, Long> {
+    
+
 
 }

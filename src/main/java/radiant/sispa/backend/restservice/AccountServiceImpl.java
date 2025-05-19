@@ -45,17 +45,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getAccountByNo(String no) throws EntityNotFoundException {
-        Account account = accountDb.findByNo(no.toUpperCase()).orElse(null);
-
-        if(account == null) {
-            throw new EntityNotFoundException(String.format("Account %s doesnt exist!", no));
-        }
-
-        return account;
-    }
-
-    @Override
     public CreateAccountResponseDTO addAccount(CreateAccountRequestDTO requestDTO, String authHeader) throws EntityExistsException, EntityNotFoundException {
         String token = authHeader.substring(7);
         String createdBy = jwtUtils.getUserNameFromJwtToken(token);
@@ -96,9 +85,6 @@ public class AccountServiceImpl implements AccountService {
             accountResponseDTO.setName(account.getName());
             accountResponseDTO.setNo(account.getNo());
             accountResponseDTO.setBank(account.getBank().getName());
-            accountResponseDTO.setAdminFee(account.getBank().getAdminFee());
-            accountResponseDTO.setInterestRate(account.getBank().getInterestRate());
-            accountResponseDTO.setBalance(getTotalBalance(account));
 
             accountResponseDTO.setCreatedBy(account.getCreatedBy());
             accountResponseDTO.setCreatedAt(account.getCreatedAt());
@@ -112,20 +98,14 @@ public class AccountServiceImpl implements AccountService {
         return accountResponseDTOS;
     }
 
-    private double getTotalBalance(Account account) {
-        ArrayList<Income> incomes = incomeDb.findByDeletedAtIsNull();
-        ArrayList<Expense> expenses = expenseDb.findByDeletedAtIsNull();
+    @Override
+    public Account getAccountByNo(String no) throws EntityNotFoundException {
+        Account account = accountDb.findByNo(no.toUpperCase()).orElse(null);
 
-        double totalBalance = 0;
-
-        for (Income income : incomes) {
-            totalBalance += income.getAmount();
+        if(account == null) {
+            throw new EntityNotFoundException(String.format("Account %s doesnt exist!", no));
         }
 
-        for (Expense expense : expenses) {
-            totalBalance += expense.getAmount();
-        }
-
-        return totalBalance;
+        return account;
     }
 }
