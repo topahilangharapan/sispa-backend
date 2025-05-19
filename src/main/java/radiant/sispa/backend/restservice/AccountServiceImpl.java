@@ -7,8 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Account;
 import radiant.sispa.backend.model.Bank;
+import radiant.sispa.backend.model.Expense;
+import radiant.sispa.backend.model.Income;
 import radiant.sispa.backend.repository.AccountDb;
 import radiant.sispa.backend.repository.BankDb;
+import radiant.sispa.backend.repository.ExpenseDb;
+import radiant.sispa.backend.repository.IncomeDb;
 import radiant.sispa.backend.restdto.request.CreateAccountRequestDTO;
 import radiant.sispa.backend.restdto.response.AccountResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateAccountResponseDTO;
@@ -25,6 +29,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private BankDb bankDb;
+
+    @Autowired
+    private IncomeDb incomeDb;
+
+    @Autowired
+    private ExpenseDb expenseDb;
 
     @Autowired
     private JwtUtils jwtUtils;
