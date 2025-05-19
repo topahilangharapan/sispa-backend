@@ -7,8 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Account;
 import radiant.sispa.backend.model.Bank;
+import radiant.sispa.backend.model.Expense;
+import radiant.sispa.backend.model.Income;
 import radiant.sispa.backend.repository.AccountDb;
 import radiant.sispa.backend.repository.BankDb;
+import radiant.sispa.backend.repository.ExpenseDb;
+import radiant.sispa.backend.repository.IncomeDb;
 import radiant.sispa.backend.restdto.request.CreateAccountRequestDTO;
 import radiant.sispa.backend.restdto.response.AccountResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateAccountResponseDTO;
@@ -25,6 +29,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private BankDb bankDb;
+
+    @Autowired
+    private IncomeDb incomeDb;
+
+    @Autowired
+    private ExpenseDb expenseDb;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -75,6 +85,9 @@ public class AccountServiceImpl implements AccountService {
             accountResponseDTO.setName(account.getName());
             accountResponseDTO.setNo(account.getNo());
             accountResponseDTO.setBank(account.getBank().getName());
+            accountResponseDTO.setAdminFee(account.getBank().getAdminFee());
+            accountResponseDTO.setInterestRate(account.getBank().getInterestRate());
+            accountResponseDTO.setBalance(getTotalBalance(account));
 
             accountResponseDTO.setCreatedBy(account.getCreatedBy());
             accountResponseDTO.setCreatedAt(account.getCreatedAt());
@@ -97,5 +110,23 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return account;
+    }
+
+    @Override
+    public double getTotalBalance(Account account) {
+        ArrayList<Income> incomes = incomeDb.findByDeletedAtIsNull();
+        ArrayList<Expense> expenses = expenseDb.findByDeletedAtIsNull();
+
+        double totalBalance = 0;
+
+        for (Income income : incomes) {
+            totalBalance += income.getAmount();
+        }
+
+        for (Expense expense : expenses) {
+            totalBalance += expense.getAmount();
+        }
+
+        return totalBalance;
     }
 }

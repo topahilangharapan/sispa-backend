@@ -2,6 +2,7 @@ package radiant.sispa.backend.restservice;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Account;
@@ -20,12 +21,16 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 @Service
 @Transactional
 public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private ExpenseDb expenseDb;
+
+    @Autowired
+    private IncomeDb incomeDb;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -45,6 +50,10 @@ public class ExpenseServiceImpl implements ExpenseService {
         Account account = accountService.getAccountByNo(requestDTO.getAccount());
         if (account == null) {
             throw new EntityNotFoundException(String.format("Akun Bank dengan no %s tidak ditemukan.", requestDTO.getAccount()));
+        } else if (accountService.getTotalBalance(account) < requestDTO.getAmount()) {
+            throw new IllegalStateException(
+                    String.format("Saldo akun bank dengan no %s tidak mencukupi", requestDTO.getAccount())
+            );
         }
 
         TransactionCategory transactionCategory = transactionCategoryService.getTransactionCategoryByName(requestDTO.getCategory());
@@ -55,7 +64,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         Expense newExpense = new Expense();
 
         newExpense.setId(generateExpenseId(account));
-        newExpense.setAmount(requestDTO.getAmount());
+        newExpense.setAmount(requestDTO.getAmount() * -1);
         newExpense.setCreatedBy(createdBy);
         newExpense.setCategory(transactionCategory);
         newExpense.setAccount(account);
@@ -92,4 +101,6 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         return String.format("E/%s/%s/%s/%s", last4Account, account.getBank().getName(), today, formattedCount);
     }
+
+
 }

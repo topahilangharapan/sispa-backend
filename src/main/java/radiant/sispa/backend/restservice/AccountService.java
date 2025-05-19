@@ -14,4 +14,5 @@ public interface AccountService {
     Account getAccountByNo(String no) throws EntityNotFoundException;
     CreateAccountResponseDTO addAccount(CreateAccountRequestDTO accountRequestDTO, String authHeader) throws EntityExistsException, EntityNotFoundException;
     List<AccountResponseDTO> accountToAccountResponseDTO(List<Account> accounts);
+    double getTotalBalance(Account account);
 }

@@ -1,6 +1,7 @@
 package radiant.sispa.backend.restcontroller;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,11 @@ public class ExpenseController {
                 baseResponseDTO.setTimestamp(new Date());
                 baseResponseDTO.setMessage(e.getMessage());
                 return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+            } else if (e instanceof IllegalStateException) {
+                baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+                baseResponseDTO.setTimestamp(new Date());
+                baseResponseDTO.setMessage(e.getMessage());
+                return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
             }
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
