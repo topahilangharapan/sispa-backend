@@ -23,6 +23,8 @@ import radiant.sispa.backend.restdto.response.TransactionResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 import radiant.sispa.backend.restdto.response.BankBalanceDTO;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 public class TransactionServiceImpl implements TransactionService {
@@ -106,29 +108,29 @@ public class TransactionServiceImpl implements TransactionService {
         String deletedBy = jwtUtils.getUserNameFromJwtToken(token);
 
         Optional<? extends Transaction> transactionToDelete = incomeDb.findById(id);
-        
+
         if (transactionToDelete.isEmpty()) {
             transactionToDelete = expenseDb.findById(id);
         }
-        
+
         if (transactionToDelete.isEmpty()) {
             throw new EntityNotFoundException("Transaksi tidak ditemukan");
         }
-        
+
         Transaction transaction = transactionToDelete.get();
-        
+
         if (transaction.getDeletedAt() != null) {
             return;
         }
-        
+
         transaction.setDeletedAt(new Date().toInstant());
         transaction.setDeletedBy(deletedBy);
-        
+
         if (transaction instanceof Income) {
             incomeDb.save((Income) transaction);
         } else if (transaction instanceof Expense) {
             expenseDb.save((Expense) transaction);
         }
     }
-    
+
 }
