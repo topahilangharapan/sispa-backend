@@ -73,6 +73,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         CreateIncomeResponseDTO createIncomeResponseDTO = new CreateIncomeResponseDTO();
 
+        createIncomeResponseDTO.setId(income.getId());
         createIncomeResponseDTO.setAmount(income.getAmount());
         createIncomeResponseDTO.setInterest(income.isInterest());
         createIncomeResponseDTO.setDescription(income.getDescription());
