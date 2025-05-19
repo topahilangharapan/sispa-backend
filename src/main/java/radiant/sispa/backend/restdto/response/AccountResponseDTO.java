@@ -14,6 +14,9 @@ public class AccountResponseDTO {
     private String name;
     private String no;
     private String bank;
+    private double balance;
+    private double adminFee;
+    private double interestRate;
 
     private Instant createdAt;
     private String createdBy;

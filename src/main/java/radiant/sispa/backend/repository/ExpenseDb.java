@@ -8,6 +8,7 @@ import radiant.sispa.backend.model.Expense;
 import radiant.sispa.backend.model.Income;
 
 import java.time.Instant;
+import java.util.ArrayList;
 
 @Repository
 public interface ExpenseDb extends JpaRepository<Expense, Long> {
@@ -15,5 +16,6 @@ public interface ExpenseDb extends JpaRepository<Expense, Long> {
     @Query("SELECT COUNT(e) FROM Expense e WHERE e.createdAt >= :startOfDay AND e.createdAt < :endOfDay")
     long countExpenseToday(@Param("startOfDay") Instant startOfDay, @Param("endOfDay") Instant endOfDay);
 
+    ArrayList<Expense> findByDeletedAtIsNull();
 
 }

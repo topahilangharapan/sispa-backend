@@ -114,6 +114,8 @@ public class BackendApplication {
             createTransactionCategoryIfNotExists(transactionCategoryDb, "PROMOSI DAN MARKETING");
             createTransactionCategoryIfNotExists(transactionCategoryDb, "CETAK DAN MERCHANDISE");
             createTransactionCategoryIfNotExists(transactionCategoryDb, "GAJI DAN OPERASIONAL KARYAWAN");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "BUNGA BANK");
+            createTransactionCategoryIfNotExists(transactionCategoryDb, "ADMINISTRASI BANK");
             createTransactionCategoryIfNotExists(transactionCategoryDb, "LAIN-LAIN");
 
             createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("MANDIRI").orElse(null));
