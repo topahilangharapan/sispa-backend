@@ -50,7 +50,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         Account account = accountService.getAccountByNo(requestDTO.getAccount());
         if (account == null) {
             throw new EntityNotFoundException(String.format("Akun Bank dengan no %s tidak ditemukan.", requestDTO.getAccount()));
-        } else if (getTotalBalance(account) < requestDTO.getAmount()) {
+        } else if (accountService.getTotalBalance(account) < requestDTO.getAmount()) {
             throw new IllegalStateException(
                     String.format("Saldo akun bank dengan no %s tidak mencukupi", requestDTO.getAccount())
             );
@@ -102,20 +102,5 @@ public class ExpenseServiceImpl implements ExpenseService {
         return String.format("E/%s/%s/%s/%s", last4Account, account.getBank().getName(), today, formattedCount);
     }
 
-    private double getTotalBalance(Account account) {
-        ArrayList<Income> incomes = incomeDb.findByDeletedAtIsNull();
-        ArrayList<Expense> expenses = expenseDb.findByDeletedAtIsNull();
 
-        double totalBalance = 0;
-
-        for (Income income : incomes) {
-            totalBalance += income.getAmount();
-        }
-
-        for (Expense expense : expenses) {
-            totalBalance += expense.getAmount();
-        }
-
-        return totalBalance;
-    }
 }
