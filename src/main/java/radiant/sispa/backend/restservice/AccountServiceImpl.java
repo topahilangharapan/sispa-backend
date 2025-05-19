@@ -102,6 +102,32 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public AccountResponseDTO accountToAccountResponseDTO(Account account) {
+        List<AccountResponseDTO> accountResponseDTOS = new ArrayList<>();
+
+        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
+
+        accountResponseDTO.setId(account.getId());
+        accountResponseDTO.setName(account.getName());
+        accountResponseDTO.setNo(account.getNo());
+        accountResponseDTO.setBank(account.getBank().getName());
+        accountResponseDTO.setAdminFee(account.getBank().getAdminFee());
+        accountResponseDTO.setInterestRate(account.getBank().getInterestRate());
+        accountResponseDTO.setBalance(getTotalBalance(account));
+
+        accountResponseDTO.setCreatedBy(account.getCreatedBy());
+        accountResponseDTO.setCreatedAt(account.getCreatedAt());
+        accountResponseDTO.setUpdatedBy(account.getUpdatedBy());
+        accountResponseDTO.setUpdatedAt(account.getUpdatedAt());
+        accountResponseDTO.setDeletedBy(account.getDeletedBy());
+        accountResponseDTO.setDeletedAt(account.getDeletedAt());
+
+        accountResponseDTOS.add(accountResponseDTO);
+
+        return accountResponseDTO;
+    }
+
+    @Override
     public Account getAccountByNo(String no) throws EntityNotFoundException {
         Account account = accountDb.findByNo(no.toUpperCase()).orElse(null);
 
@@ -110,6 +136,17 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return account;
+    }
+
+    @Override
+    public AccountResponseDTO getAccountById(Long id) throws EntityNotFoundException {
+        Account account = accountDb.findById(id).orElse(null);
+
+        if(account == null) {
+            throw new EntityNotFoundException(String.format("Account %s doesnt exist!", id));
+        }
+
+        return accountToAccountResponseDTO(account);
     }
 
     @Override

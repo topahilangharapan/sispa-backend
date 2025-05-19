@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import radiant.sispa.backend.model.Account;
 import radiant.sispa.backend.restdto.request.CreateAccountRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.AccountService;
@@ -63,5 +64,25 @@ public class AccountController {
             baseResponseDTO.setMessage("Failed to retrieve Accounts!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getAccountById(@PathVariable("id") Long id) {
+        var baseResponseDTO = new BaseResponseDTO<AccountResponseDTO>();
+        AccountResponseDTO account = accountService.getAccountById(id);
+
+        if (account == null){
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage("Account not found");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        }
+
+        baseResponseDTO.setStatus(HttpStatus.OK.value());
+        baseResponseDTO.setMessage("Success");
+        baseResponseDTO.setTimestamp(new Date());
+        baseResponseDTO.setData(account);
+
+        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
 }

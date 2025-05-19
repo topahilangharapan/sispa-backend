@@ -11,8 +11,10 @@ import java.util.List;
 
 public interface AccountService {
     List<Account> getAllAccounts();
+    AccountResponseDTO accountToAccountResponseDTO(Account account);
     Account getAccountByNo(String no) throws EntityNotFoundException;
     CreateAccountResponseDTO addAccount(CreateAccountRequestDTO accountRequestDTO, String authHeader) throws EntityExistsException, EntityNotFoundException;
     List<AccountResponseDTO> accountToAccountResponseDTO(List<Account> accounts);
+    AccountResponseDTO getAccountById(Long id) throws EntityNotFoundException;
     double getTotalBalance(Account account);
 }
