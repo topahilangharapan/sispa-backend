@@ -18,6 +18,7 @@ import radiant.sispa.backend.restdto.response.AccountResponseDTO;
 import radiant.sispa.backend.restdto.response.CreateAccountResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,8 +104,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountResponseDTO accountToAccountResponseDTO(Account account) {
-        List<AccountResponseDTO> accountResponseDTOS = new ArrayList<>();
-
         AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
 
         accountResponseDTO.setId(account.getId());
@@ -121,8 +120,7 @@ public class AccountServiceImpl implements AccountService {
         accountResponseDTO.setUpdatedAt(account.getUpdatedAt());
         accountResponseDTO.setDeletedBy(account.getDeletedBy());
         accountResponseDTO.setDeletedAt(account.getDeletedAt());
-
-        accountResponseDTOS.add(accountResponseDTO);
+        accountResponseDTO.setLastUpdated(getLastUpdated(account));
 
         return accountResponseDTO;
     }
@@ -165,5 +163,22 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return totalBalance;
+    }
+
+    private Instant getLastUpdated(Account account){
+        Instant latestIncome = incomeDb
+                .findTopByAccountAndDeletedAtIsNullOrderByCreatedAtDesc(account)
+                .map(Income::getCreatedAt)
+                .orElse(null);
+
+        Instant latestExpense = expenseDb
+                .findTopByAccountAndDeletedAtIsNullOrderByCreatedAtDesc(account)
+                .map(Expense::getCreatedAt)
+                .orElse(null);
+
+        if (latestIncome == null) return latestExpense;
+        if (latestExpense == null) return latestIncome;
+
+        return latestIncome.isAfter(latestExpense) ? latestIncome : latestExpense;
     }
 }
