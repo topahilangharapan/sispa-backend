@@ -1,12 +1,5 @@
 package radiant.sispa.backend.restservice;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.text.NumberFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -36,6 +29,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    AccountService accountService;
 
     @Override
     public TransactionResponseDTO getTransactionById(String id) {
@@ -68,7 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
         transactionResponseDTO.setCreatedAt(transaction.getCreatedAt());
         transactionResponseDTO.setUpdatedBy(transaction.getUpdatedBy());
         transactionResponseDTO.setUpdatedAt(transaction.getUpdatedAt());
-        transactionResponseDTO.setAccount(transaction.getAccount());
+        transactionResponseDTO.setAccount(accountService.accountToAccountResponseDTO(transaction.getAccount()));
         transactionResponseDTO.setCategory(transaction.getCategory());
         return transactionResponseDTO;
     }
