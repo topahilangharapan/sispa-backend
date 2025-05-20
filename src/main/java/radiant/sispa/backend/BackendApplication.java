@@ -10,6 +10,8 @@ import radiant.sispa.backend.model.*;
 import radiant.sispa.backend.repository.*;
 import radiant.sispa.backend.restservice.UserRestService;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
@@ -281,7 +283,12 @@ public class BackendApplication {
         income.setInterest(false);
         incomeDb.save(income);
 
-        income.setCreatedAt(faker.date().birthday().toInstant());
+        Date randomDate = faker.date().between(
+                Date.from(LocalDate.of(2004, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                Date.from(LocalDate.of(2024, 12, 31).atStartOfDay(ZoneId.systemDefault()).toInstant())
+        );
+
+        income.setCreatedAt(randomDate.toInstant());
         incomeDb.save(income);
     }
 }
