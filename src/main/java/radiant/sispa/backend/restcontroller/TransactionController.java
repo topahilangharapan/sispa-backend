@@ -6,8 +6,11 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import radiant.sispa.backend.restdto.request.CashFlowChartRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
+import radiant.sispa.backend.restdto.request.CreateIncomeRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.TransactionCategoryService;
 import radiant.sispa.backend.restservice.TransactionService;
@@ -88,17 +91,25 @@ public class TransactionController {
         }
     }
 
-    @GetMapping("/cash-flow/chart-data")
-    public ResponseEntity<?> getCashFlowChartData() {
+    @PostMapping("/cash-flow/chart-data")
+    public ResponseEntity<?> getCashFlowChartData(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                                  @RequestBody CashFlowChartRequestDTO requestDTO,
+                                                  BindingResult bindingResult) {
         var baseResponseDTO = new BaseResponseDTO<List<CashFlowChartResponseDTO>>();
         try {
-            List<CashFlowChartResponseDTO> responseDTOS = transactionService.getCashFlowChartData();
+            List<CashFlowChartResponseDTO> responseDTOS = transactionService.getCashFlowChartData(requestDTO);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTOS);
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage("Cash Flow Data retrieved!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (EntityNotFoundException e) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage("Failed to retrieve Cash Flow Data!");

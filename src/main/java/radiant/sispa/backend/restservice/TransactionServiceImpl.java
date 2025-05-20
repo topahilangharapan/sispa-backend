@@ -19,8 +19,10 @@ import radiant.sispa.backend.model.Account;
 import radiant.sispa.backend.model.Expense;
 import radiant.sispa.backend.model.Income;
 import radiant.sispa.backend.model.Transaction;
+import radiant.sispa.backend.repository.AccountDb;
 import radiant.sispa.backend.repository.ExpenseDb;
 import radiant.sispa.backend.repository.IncomeDb;
+import radiant.sispa.backend.restdto.request.CashFlowChartRequestDTO;
 import radiant.sispa.backend.restdto.response.CashFlowChartResponseDTO;
 import radiant.sispa.backend.restdto.response.TransactionResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
@@ -34,6 +36,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     ExpenseDb expenseDb;
+
+    @Autowired
+    AccountDb accountDb;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -135,9 +140,15 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public  ArrayList<CashFlowChartResponseDTO> getCashFlowChartData() {
-        ArrayList<Income> incomes = incomeDb.findByDeletedAtIsNull();
-        ArrayList<Expense> expenses = expenseDb.findByDeletedAtIsNull();
+    public  ArrayList<CashFlowChartResponseDTO> getCashFlowChartData(CashFlowChartRequestDTO requestDTO) {
+        Account account = accountDb.findByNo(requestDTO.getAccountNo()).orElse(null);
+
+        if (account == null) {
+            throw new EntityNotFoundException(String.format("Account dengan no %s tidak ditemukan", requestDTO.getAccountNo()));
+        }
+
+        List<Income> incomes = account.getIncomes();
+        List<Expense> expenses = account.getExpenses();
 
         ArrayList<CashFlowChartResponseDTO> responseDTOS = new ArrayList<>();
 
