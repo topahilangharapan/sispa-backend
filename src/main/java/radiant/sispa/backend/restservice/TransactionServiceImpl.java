@@ -159,7 +159,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public  ArrayList<CashFlowChartResponseDTO> getCashFlowChartData(CashFlowChartRequestDTO requestDTO) {
+    public ArrayList<CashFlowChartResponseDTO> getCashFlowChartData(CashFlowChartRequestDTO requestDTO) {
         Account account = accountDb.findByNo(requestDTO.getAccountNo()).orElse(null);
 
         if (account == null) {
