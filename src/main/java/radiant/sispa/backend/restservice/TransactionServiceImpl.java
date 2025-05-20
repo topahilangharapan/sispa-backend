@@ -91,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
         for (Expense expense : expenses) {
             String bankName = expense.getAccount().getBank().getName();
             balanceMap.put(bankName,
-                    balanceMap.getOrDefault(bankName, 0.0) - expense.getAmount());
+                    balanceMap.getOrDefault(bankName, 0.0) + expense.getAmount());
         }
 
         List<BankBalanceDTO> result = new ArrayList<>();
@@ -132,5 +132,4 @@ public class TransactionServiceImpl implements TransactionService {
             expenseDb.save((Expense) transaction);
         }
     }
-
 }
