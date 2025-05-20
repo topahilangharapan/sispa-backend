@@ -74,4 +74,26 @@ public class ExpenseController {
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/by-account/{accountId}")
+    public ResponseEntity<?> getExpensesByAccount(
+            @PathVariable Long accountId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        var baseResponseDTO = new BaseResponseDTO<List<CreateExpenseResponseDTO>>();
+
+        try {
+            List<CreateExpenseResponseDTO> expenses = expenseService.getExpensesByAccount(accountId);
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(expenses);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Expenses retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve expenses!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

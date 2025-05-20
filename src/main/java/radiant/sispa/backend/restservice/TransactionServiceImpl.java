@@ -27,6 +27,9 @@ import radiant.sispa.backend.restdto.response.CashFlowChartResponseDTO;
 import radiant.sispa.backend.restdto.response.TransactionResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 import radiant.sispa.backend.restdto.response.BankBalanceDTO;
+import radiant.sispa.backend.restdto.response.CreateExpenseResponseDTO;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -42,6 +45,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    AccountService accountService;
 
     @Override
     public TransactionResponseDTO getTransactionById(String id) {
@@ -74,7 +80,7 @@ public class TransactionServiceImpl implements TransactionService {
         transactionResponseDTO.setCreatedAt(transaction.getCreatedAt());
         transactionResponseDTO.setUpdatedBy(transaction.getUpdatedBy());
         transactionResponseDTO.setUpdatedAt(transaction.getUpdatedAt());
-        transactionResponseDTO.setAccount(transaction.getAccount());
+        transactionResponseDTO.setAccount(accountService.accountToAccountResponseDTO(transaction.getAccount()));
         transactionResponseDTO.setCategory(transaction.getCategory());
         return transactionResponseDTO;
     }
@@ -85,26 +91,39 @@ public class TransactionServiceImpl implements TransactionService {
         List<Expense> expenses = expenseDb.findByDeletedAtIsNull();
 
         Map<String, Double> balanceMap = new HashMap<>();
+        Map<String, String> accountNumberMap = new HashMap<>();
+        Map<String, Long> accountIdMap = new HashMap<>();
 
         // Hitung income per bank
         for (Income income : incomes) {
             String bankName = income.getAccount().getBank().getName();
+            String accountNumber = income.getAccount().getNo();
+            Long accountId = income.getAccount().getId();
             balanceMap.put(bankName,
                     balanceMap.getOrDefault(bankName, 0.0) + income.getAmount());
+            accountNumberMap.putIfAbsent(bankName, accountNumber);
+            accountIdMap.putIfAbsent(bankName, accountId);
         }
 
         // Kurangi expense per bank
         for (Expense expense : expenses) {
             String bankName = expense.getAccount().getBank().getName();
+            String accountNumber = expense.getAccount().getNo();
+            Long accountId = expense.getAccount().getId();
             balanceMap.put(bankName,
-                    balanceMap.getOrDefault(bankName, 0.0) - expense.getAmount());
+                    balanceMap.getOrDefault(bankName, 0.0) + expense.getAmount());
+            accountNumberMap.putIfAbsent(bankName, accountNumber);
+            accountIdMap.putIfAbsent(bankName, accountId);
         }
 
         List<BankBalanceDTO> result = new ArrayList<>();
         for (var entry : balanceMap.entrySet()) {
-            result.add(new BankBalanceDTO(entry.getKey(), entry.getValue()));
+            String bankName = entry.getKey();
+            double totalBalance = entry.getValue();
+            String accountNumber = accountNumberMap.getOrDefault(bankName, "-");
+            Long accountId = accountIdMap.getOrDefault(bankName, null);
+            result.add(new BankBalanceDTO(bankName, totalBalance, accountNumber, accountId));
         }
-
         return result;
     }
 
@@ -114,24 +133,24 @@ public class TransactionServiceImpl implements TransactionService {
         String deletedBy = jwtUtils.getUserNameFromJwtToken(token);
 
         Optional<? extends Transaction> transactionToDelete = incomeDb.findById(id);
-        
+
         if (transactionToDelete.isEmpty()) {
             transactionToDelete = expenseDb.findById(id);
         }
-        
+
         if (transactionToDelete.isEmpty()) {
             throw new EntityNotFoundException("Transaksi tidak ditemukan");
         }
-        
+
         Transaction transaction = transactionToDelete.get();
-        
+
         if (transaction.getDeletedAt() != null) {
             return;
         }
-        
+
         transaction.setDeletedAt(new Date().toInstant());
         transaction.setDeletedBy(deletedBy);
-        
+
         if (transaction instanceof Income) {
             incomeDb.save((Income) transaction);
         } else if (transaction instanceof Expense) {

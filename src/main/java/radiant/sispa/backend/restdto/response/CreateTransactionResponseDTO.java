@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class CreateTransactionResponseDTO {
+    private String id;
     private double amount;
     private String description;
     private String account;

@@ -24,4 +24,5 @@ public class AccountResponseDTO {
     private String updatedBy;
     private Instant deletedAt;
     private String deletedBy;
+    private Instant lastUpdated;
 }
