@@ -3,18 +3,13 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
+import radiant.sispa.backend.restdto.request.IdTransactionRequestDTO;
 import radiant.sispa.backend.restdto.response.BankBalanceDTO;
-import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
-import radiant.sispa.backend.restdto.response.GenericDataDTO;
-import radiant.sispa.backend.restdto.response.TransactionResponseDTO;
-import radiant.sispa.backend.restservice.TransactionCategoryService;
-import radiant.sispa.backend.restservice.TransactionService;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.TransactionResponseDTO;
 import radiant.sispa.backend.restservice.TransactionService;
@@ -28,11 +23,10 @@ public class TransactionController {
     @Autowired
     TransactionService transactionService;
 
-    @GetMapping("/detail")
-    public ResponseEntity<?> getTransactionById(@RequestParam("id") String id) {
+    @PostMapping("/detail")
+    public ResponseEntity<?> getTransactionById(@Valid @RequestBody IdTransactionRequestDTO idTransactionDTO) {
         var baseResponseDTO = new BaseResponseDTO<TransactionResponseDTO>();
-        TransactionResponseDTO transaction = transactionService.getTransactionById(id);
-
+        TransactionResponseDTO transaction = transactionService.getTransactionById(idTransactionDTO.getId());
         if (transaction == null) {
             baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
             baseResponseDTO.setMessage("Transaction not found.");
