@@ -105,7 +105,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<CreateExpenseResponseDTO> getExpensesByAccount(Long accountId) {
-//        List<Expense> expenses = expenseDb.findByAccountId(accountId);
+        List<Expense> expenses = expenseDb.findByAccountId(accountId);
         List<CreateExpenseResponseDTO> responseList = new ArrayList<>();
         for (Expense expense : expenses) {
             CreateExpenseResponseDTO dto = new CreateExpenseResponseDTO();
