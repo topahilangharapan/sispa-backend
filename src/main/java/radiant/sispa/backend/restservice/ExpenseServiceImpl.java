@@ -105,18 +105,20 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<CreateExpenseResponseDTO> getExpensesByAccount(Long accountId) {
-//        List<Expense> expenses = expenseDb.findByAccountId(accountId);
+        List<Expense> expenses = expenseDb.findByAccountId(accountId);
         List<CreateExpenseResponseDTO> responseList = new ArrayList<>();
-//        for (Expense expense : expenses) {
-//            CreateExpenseResponseDTO dto = new CreateExpenseResponseDTO();
-//            dto.setAmount(expense.getAmount());
-//            dto.setAdmin(expense.isAdmin());
-//            dto.setDescription(expense.getDescription());
-//            dto.setAccount(expense.getAccount().getNo());
-//            dto.setCategory(expense.getCategory().getName());
-//            // Add other fields as needed
-//            responseList.add(dto);
-//        }
+        for (Expense expense : expenses) {
+            CreateExpenseResponseDTO dto = new CreateExpenseResponseDTO();
+            dto.setAmount(expense.getAmount());
+            dto.setAdmin(expense.isAdmin());
+            dto.setDescription(expense.getDescription());
+            dto.setAccount(expense.getAccount().getNo());
+            dto.setCategory(expense.getCategory().getName());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneId.of("Asia/Jakarta"));
+            dto.setCreatedAt(formatter.format(expense.getCreatedAt()));
+            // Add other fields as needed
+            responseList.add(dto);
+        }
         return responseList;
     }
 }
