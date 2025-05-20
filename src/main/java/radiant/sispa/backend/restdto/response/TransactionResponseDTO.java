@@ -3,7 +3,6 @@ package radiant.sispa.backend.restdto.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import radiant.sispa.backend.model.Account;
 import radiant.sispa.backend.model.TransactionCategory;
 
 import java.time.Instant;
@@ -19,6 +18,6 @@ public class TransactionResponseDTO {
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
-    private Account account;
+    private AccountResponseDTO account;
     private TransactionCategory category;
 }
