@@ -8,11 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
-import radiant.sispa.backend.restdto.response.BankBalanceDTO;
-import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
-import radiant.sispa.backend.restdto.response.GenericDataDTO;
-import radiant.sispa.backend.restdto.response.TransactionResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.TransactionCategoryService;
 import radiant.sispa.backend.restservice.TransactionService;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
@@ -89,6 +85,24 @@ public class TransactionController {
             baseResponseDTO.setMessage(String.format(e.getMessage()));
             baseResponseDTO.setTimestamp(new Date());
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/cash-flow/chart-data")
+    public ResponseEntity<?> getCashFlowChartData() {
+        var baseResponseDTO = new BaseResponseDTO<List<CashFlowChartResponseDTO>>();
+        try {
+            List<CashFlowChartResponseDTO> responseDTOS = transactionService.getCashFlowChartData();
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(responseDTOS);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Cash Flow Data retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve Cash Flow Data!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

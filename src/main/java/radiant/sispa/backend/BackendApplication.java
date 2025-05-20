@@ -12,6 +12,7 @@ import radiant.sispa.backend.restservice.UserRestService;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -23,7 +24,7 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb, TransactionCategoryDb transactionCategoryDb, AccountDb accountDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb, TransactionCategoryDb transactionCategoryDb, AccountDb accountDb, IncomeDb incomeDb) {
         return args -> {
             createRoleIfNotExists(roleDb, "ADMIN");
             createRoleIfNotExists(roleDb, "MANAJEMEN");
@@ -118,7 +119,19 @@ public class BackendApplication {
             createTransactionCategoryIfNotExists(transactionCategoryDb, "ADMINISTRASI BANK");
             createTransactionCategoryIfNotExists(transactionCategoryDb, "LAIN-LAIN");
 
-            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("MANDIRI").orElse(null));
+            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("MANDIRI").orElse(null), "040504-MANDIRI");
+            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("BCA").orElse(null), "040504-BCA");
+
+            Faker faker = new Faker();
+            Random random = new Random();
+
+            for (int i = 0; i < random.nextInt(100, 1000); i++) {
+                if (i % 2 == 0) {
+                    createIncomeAtRandom(incomeDb, accountDb.findByNo("040504-MANDIRI").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
+                } else {
+                    createIncomeAtRandom(incomeDb, accountDb.findByNo("040504-BCA").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
+                }
+            }
         };
     }
 
@@ -246,14 +259,29 @@ public class BackendApplication {
         transactionCategoryDb.save(transactionCategory);
     }
 
-    private void createAccountIfNotExists(AccountDb accountDb, String name, Bank bank) {
+    private void createAccountIfNotExists(AccountDb accountDb, String name, Bank bank, String no) {
         Account account = new Account();
 
         account.setName(name);
-        account.setNo("04052004");
+        account.setNo(no);
         account.setBank(bank);
         account.setCreatedBy("hilangharapan");
 
         accountDb.save(account);
+    }
+
+    private void createIncomeAtRandom(IncomeDb incomeDb, Account account, TransactionCategory transactionCategory, Faker faker, Random random) {
+        Income income = new Income();
+
+        income.setId(UUID.randomUUID().toString() + "-FAKER");
+        income.setCategory(transactionCategory);
+        income.setAccount(account);
+        income.setCreatedBy("hilangharapan");
+        income.setAmount(random.nextDouble(1000, 1000000000));
+        income.setInterest(false);
+        incomeDb.save(income);
+
+        income.setCreatedAt(faker.date().birthday().toInstant());
+        incomeDb.save(income);
     }
 }
