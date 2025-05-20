@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -102,5 +103,20 @@ public class ExpenseServiceImpl implements ExpenseService {
         return String.format("E/%s/%s/%s/%s", last4Account, account.getBank().getName(), today, formattedCount);
     }
 
-
+    @Override
+    public List<CreateExpenseResponseDTO> getExpensesByAccount(Long accountId) {
+        List<Expense> expenses = expenseDb.findByAccountId(accountId);
+        List<CreateExpenseResponseDTO> responseList = new ArrayList<>();
+        for (Expense expense : expenses) {
+            CreateExpenseResponseDTO dto = new CreateExpenseResponseDTO();
+            dto.setAmount(expense.getAmount());
+            dto.setAdmin(expense.isAdmin());
+            dto.setDescription(expense.getDescription());
+            dto.setAccount(expense.getAccount().getNo());
+            dto.setCategory(expense.getCategory().getName());
+            // Add other fields as needed
+            responseList.add(dto);
+        }
+        return responseList;
+    }
 }
