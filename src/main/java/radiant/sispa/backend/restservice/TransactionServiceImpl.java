@@ -1,5 +1,13 @@
 package radiant.sispa.backend.restservice;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.text.NumberFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -7,11 +15,15 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import radiant.sispa.backend.model.Account;
 import radiant.sispa.backend.model.Expense;
 import radiant.sispa.backend.model.Income;
 import radiant.sispa.backend.model.Transaction;
+import radiant.sispa.backend.repository.AccountDb;
 import radiant.sispa.backend.repository.ExpenseDb;
 import radiant.sispa.backend.repository.IncomeDb;
+import radiant.sispa.backend.restdto.request.CashFlowChartRequestDTO;
+import radiant.sispa.backend.restdto.response.CashFlowChartResponseDTO;
 import radiant.sispa.backend.restdto.response.TransactionResponseDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 import radiant.sispa.backend.restdto.response.BankBalanceDTO;
@@ -27,6 +39,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     ExpenseDb expenseDb;
+
+    @Autowired
+    AccountDb accountDb;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -104,7 +119,7 @@ public class TransactionServiceImpl implements TransactionService {
         List<BankBalanceDTO> result = new ArrayList<>();
         for (var entry : balanceMap.entrySet()) {
             String bankName = entry.getKey();
-            double totalBalance = entry.getValue(); 
+            double totalBalance = entry.getValue();
             String accountNumber = accountNumberMap.getOrDefault(bankName, "-");
             Long accountId = accountIdMap.getOrDefault(bankName, null);
             result.add(new BankBalanceDTO(bankName, totalBalance, accountNumber, accountId));
@@ -141,5 +156,57 @@ public class TransactionServiceImpl implements TransactionService {
         } else if (transaction instanceof Expense) {
             expenseDb.save((Expense) transaction);
         }
+    }
+
+    @Override
+    public ArrayList<CashFlowChartResponseDTO> getCashFlowChartData(CashFlowChartRequestDTO requestDTO) {
+        Account account = accountDb.findByNo(requestDTO.getAccountNo()).orElse(null);
+
+        if (account == null) {
+            throw new EntityNotFoundException(String.format("Account dengan no %s tidak ditemukan", requestDTO.getAccountNo()));
+        }
+
+        List<Income> incomes = account.getIncomes();
+        List<Expense> expenses = account.getExpenses();
+
+        ArrayList<CashFlowChartResponseDTO> responseDTOS = new ArrayList<>();
+
+        for (Income income : incomes) {
+            CashFlowChartResponseDTO responseDTO = new CashFlowChartResponseDTO();
+
+            LocalDateTime dateTime = LocalDateTime.ofInstant(income.getCreatedAt(), ZoneId.systemDefault());
+
+            int year = dateTime.getYear();
+            int month = dateTime.getMonthValue();
+            int quarter = (dateTime.getMonthValue() - 1) / 3 + 1;
+
+            responseDTO.setAmount(income.getAmount());
+            responseDTO.setBank(income.getAccount().getBank().getName());
+            responseDTO.setYear(year);
+            responseDTO.setMonth(month);
+            responseDTO.setQuartal(quarter);
+
+            responseDTOS.add(responseDTO);
+        }
+
+        for (Expense expense : expenses) {
+            CashFlowChartResponseDTO responseDTO = new CashFlowChartResponseDTO();
+
+            LocalDateTime dateTime = LocalDateTime.ofInstant(expense.getCreatedAt(), ZoneId.systemDefault());
+
+            int year = dateTime.getYear();
+            int month = dateTime.getMonthValue();
+            int quarter = (dateTime.getMonthValue() - 1) / 3 + 1;
+
+            responseDTO.setAmount(expense.getAmount());
+            responseDTO.setBank(expense.getAccount().getBank().getName());
+            responseDTO.setYear(year);
+            responseDTO.setMonth(month);
+            responseDTO.setQuartal(quarter);
+
+            responseDTOS.add(responseDTO);
+        }
+
+        return responseDTOS;
     }
 }

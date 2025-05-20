@@ -28,7 +28,7 @@ public abstract class Transaction implements Serializable {
     protected String description;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
+    @Column(name = "created_at", nullable = false)
     protected Instant createdAt;
 
     @NotNull

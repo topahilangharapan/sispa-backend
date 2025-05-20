@@ -41,7 +41,7 @@ public class UserRestServiceImpl implements UserRestService {
     public CreateUserResponseDTO addUser(CreateUserRequestDTO requestDTO, String authHeader) throws RoleNotFoundException, EntityExistsException {
 
         if (!getUser(new UserRequestDTO(null, requestDTO.getEmail(), requestDTO.getUsername(), null, null)).isEmpty()) {
-            throw new EntityExistsException("User with the same username already exists!");
+            throw new EntityExistsException("User with the same username or email already exists!");
         }
 
         String token = authHeader.substring(7);
