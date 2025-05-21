@@ -17,4 +17,6 @@ public interface AccountService {
     List<AccountResponseDTO> accountToAccountResponseDTO(List<Account> accounts);
     AccountResponseDTO getAccountById(Long id) throws EntityNotFoundException;
     double getTotalBalance(Account account);
+
+    double getAccountBalance(Account account);
 }

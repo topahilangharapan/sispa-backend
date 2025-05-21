@@ -10,17 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.restdto.request.CashFlowChartRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
-import radiant.sispa.backend.restdto.request.CreateIncomeRequestDTO;
 import radiant.sispa.backend.restdto.response.*;
-import radiant.sispa.backend.restservice.TransactionCategoryService;
 import radiant.sispa.backend.restservice.TransactionService;
 import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.request.IdTransactionRequestDTO;
 import radiant.sispa.backend.restdto.response.BankBalanceDTO;
-import radiant.sispa.backend.restdto.response.BaseResponseDTO;
 import radiant.sispa.backend.restdto.response.TransactionResponseDTO;
-import radiant.sispa.backend.restservice.TransactionService;
 
 import java.util.Date;
 import java.util.List;
