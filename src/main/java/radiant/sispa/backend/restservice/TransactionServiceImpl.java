@@ -171,40 +171,42 @@ public class TransactionServiceImpl implements TransactionService {
 
         ArrayList<CashFlowChartResponseDTO> responseDTOS = new ArrayList<>();
 
-        for (Income income : incomes) {
-            CashFlowChartResponseDTO responseDTO = new CashFlowChartResponseDTO();
+        if (requestDTO.getType().equals("income")) {
+            for (Income income : incomes) {
+                CashFlowChartResponseDTO responseDTO = new CashFlowChartResponseDTO();
 
-            LocalDateTime dateTime = LocalDateTime.ofInstant(income.getCreatedAt(), ZoneId.systemDefault());
+                LocalDateTime dateTime = LocalDateTime.ofInstant(income.getCreatedAt(), ZoneId.systemDefault());
 
-            int year = dateTime.getYear();
-            int month = dateTime.getMonthValue();
-            int quarter = (dateTime.getMonthValue() - 1) / 3 + 1;
+                int year = dateTime.getYear();
+                int month = dateTime.getMonthValue();
+                int quarter = (dateTime.getMonthValue() - 1) / 3 + 1;
 
-            responseDTO.setAmount(income.getAmount());
-            responseDTO.setBank(income.getAccount().getBank().getName());
-            responseDTO.setYear(year);
-            responseDTO.setMonth(month);
-            responseDTO.setQuartal(quarter);
+                responseDTO.setAmount(income.getAmount());
+                responseDTO.setBank(income.getAccount().getBank().getName());
+                responseDTO.setYear(year);
+                responseDTO.setMonth(month);
+                responseDTO.setQuartal(quarter);
 
-            responseDTOS.add(responseDTO);
-        }
+                responseDTOS.add(responseDTO);
+            }
+        } else {
+            for (Expense expense : expenses) {
+                CashFlowChartResponseDTO responseDTO = new CashFlowChartResponseDTO();
 
-        for (Expense expense : expenses) {
-            CashFlowChartResponseDTO responseDTO = new CashFlowChartResponseDTO();
+                LocalDateTime dateTime = LocalDateTime.ofInstant(expense.getCreatedAt(), ZoneId.systemDefault());
 
-            LocalDateTime dateTime = LocalDateTime.ofInstant(expense.getCreatedAt(), ZoneId.systemDefault());
+                int year = dateTime.getYear();
+                int month = dateTime.getMonthValue();
+                int quarter = (dateTime.getMonthValue() - 1) / 3 + 1;
 
-            int year = dateTime.getYear();
-            int month = dateTime.getMonthValue();
-            int quarter = (dateTime.getMonthValue() - 1) / 3 + 1;
+                responseDTO.setAmount(expense.getAmount());
+                responseDTO.setBank(expense.getAccount().getBank().getName());
+                responseDTO.setYear(year);
+                responseDTO.setMonth(month);
+                responseDTO.setQuartal(quarter);
 
-            responseDTO.setAmount(expense.getAmount());
-            responseDTO.setBank(expense.getAccount().getBank().getName());
-            responseDTO.setYear(year);
-            responseDTO.setMonth(month);
-            responseDTO.setQuartal(quarter);
-
-            responseDTOS.add(responseDTO);
+                responseDTOS.add(responseDTO);
+            }
         }
 
         return responseDTOS;

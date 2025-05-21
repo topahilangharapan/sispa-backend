@@ -100,6 +100,7 @@ public class TransactionController {
                                                   BindingResult bindingResult) {
         var baseResponseDTO = new BaseResponseDTO<List<CashFlowChartResponseDTO>>();
         try {
+            System.out.println(requestDTO);
             List<CashFlowChartResponseDTO> responseDTOS = transactionService.getCashFlowChartData(requestDTO);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTOS);
