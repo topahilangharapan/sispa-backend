@@ -1,5 +1,4 @@
 package radiant.sispa.backend.restcontroller;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 
@@ -95,7 +94,7 @@ public class TransactionController {
                                                   BindingResult bindingResult) {
         var baseResponseDTO = new BaseResponseDTO<List<CashFlowChartResponseDTO>>();
         try {
-            System.out.println(requestDTO);
+//            System.out.println(requestDTO);
             List<CashFlowChartResponseDTO> responseDTOS = transactionService.getCashFlowChartData(requestDTO);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setData(responseDTOS);
