@@ -192,7 +192,7 @@ public class TransactionServiceImpl implements TransactionService {
                 int month = dateTime.getMonthValue();
                 int quarter = (dateTime.getMonthValue() - 1) / 3 + 1;
 
-                responseDTO.setAmount(expense.getAmount());
+                responseDTO.setAmount(expense.getAmount() * -1);
                 responseDTO.setBank(expense.getAccount().getBank().getName());
                 responseDTO.setYear(year);
                 responseDTO.setMonth(month);
