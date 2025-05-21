@@ -113,6 +113,7 @@ public class AccountServiceImpl implements AccountService {
         accountResponseDTO.setAdminFee(account.getBank().getAdminFee());
         accountResponseDTO.setInterestRate(account.getBank().getInterestRate());
         accountResponseDTO.setBalance(getTotalBalance(account));
+        accountResponseDTO.setAccountBalance(getAccountBalance(account));
 
         accountResponseDTO.setCreatedBy(account.getCreatedBy());
         accountResponseDTO.setCreatedAt(account.getCreatedAt());
@@ -149,8 +150,26 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public double getTotalBalance(Account account) {
-        ArrayList<Income> incomes = incomeDb.findByDeletedAtIsNull();
-        ArrayList<Expense> expenses = expenseDb.findByDeletedAtIsNull();
+        List<Income> incomes = account.getIncomes();
+        List<Expense> expenses = account.getExpenses();
+
+        double totalBalance = 0;
+
+        for (Income income : incomes) {
+            totalBalance += income.getAmount();
+        }
+
+        for (Expense expense : expenses) {
+            totalBalance += expense.getAmount();
+        }
+
+        return totalBalance;
+    }
+
+    @Override
+    public double getAccountBalance(Account account) {
+        ArrayList<Income> incomes = incomeDb.findByAccountAndDeletedAtIsNull(account);
+        ArrayList<Expense> expenses = expenseDb.findByAccountAndDeletedAtIsNull(account);
 
         double totalBalance = 0;
 

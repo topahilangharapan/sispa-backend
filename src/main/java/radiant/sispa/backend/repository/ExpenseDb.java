@@ -20,8 +20,8 @@ public interface ExpenseDb extends JpaRepository<Expense, String> {
     long countExpenseToday(@Param("startOfDay") Instant startOfDay, @Param("endOfDay") Instant endOfDay);
 
     ArrayList<Expense> findByDeletedAtIsNull();
-
     Optional<Expense> findTopByAccountAndDeletedAtIsNullOrderByCreatedAtDesc(Account account);
-
     List<Expense> findByAccountId(Long accountId);
+
+    ArrayList<Expense> findByAccountAndDeletedAtIsNull(Account account);
 }
