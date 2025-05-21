@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface IncomeService {
     CreateIncomeResponseDTO addIncome(CreateIncomeRequestDTO requestDTO, String authHeader);
+    List<CreateIncomeResponseDTO> getIncomeByAccount(Long accountId);
+    List<CreateIncomeResponseDTO> getAllIncome();
 }
