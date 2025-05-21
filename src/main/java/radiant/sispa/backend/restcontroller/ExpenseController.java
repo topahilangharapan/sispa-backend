@@ -27,6 +27,26 @@ public class ExpenseController {
     @Autowired
     private ExpenseService expenseService;
 
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllExpense() {
+        var baseResponseDTO = new BaseResponseDTO<List<CreateExpenseResponseDTO>>();
+        try {
+            List<CreateExpenseResponseDTO> allExpenses = expenseService.getAllExpense();
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(allExpenses);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("List of expenses retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve expense list!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addExpense(
             @Valid @RequestHeader(value = "Authorization", required = false) String authHeader,
