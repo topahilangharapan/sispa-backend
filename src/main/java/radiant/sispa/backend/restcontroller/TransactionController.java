@@ -63,13 +63,13 @@ public class TransactionController {
     }
 
     @PutMapping("/delete")
-    public ResponseEntity<?> deleteTransaction(@RequestHeader(value = "Authorization", required = false) String authHeader, @RequestParam String id) {
+    public ResponseEntity<?> deleteTransaction(@RequestHeader(value = "Authorization", required = false) String authHeader, @RequestBody IdTransactionRequestDTO idTransactionDTO) {
         var baseResponseDTO = new BaseResponseDTO<List<TransactionResponseDTO>>();
 
         try {
-            transactionService.deleteTransaction(id, authHeader);
+            transactionService.deleteTransaction(idTransactionDTO.getId(), authHeader);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
-            baseResponseDTO.setMessage(String.format("Berhasil menghapus transaksi dengan ID %s", id));
+            baseResponseDTO.setMessage(String.format("Berhasil menghapus transaksi dengan ID %s", idTransactionDTO.getId()));
             baseResponseDTO.setTimestamp(new Date());
 
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
