@@ -107,14 +107,17 @@ public class ItemServiceImpl implements ItemService {
             return null;
         }
 
-        if (itemDb.findByTitleIgnoreCaseAndDeletedAtNull(itemDTO.getTitle()) != null) {
-            throw new EntityExistsException("Item already exists");
+        Item existingItem = itemDb.findByTitleIgnoreCaseAndDeletedAtNull(itemDTO.getTitle());
+
+        if (existingItem != null && !existingItem.getId().equals(id)) {
+            throw new EntityExistsException("Item with this title already exists");
         }
 
         item.setTitle(itemDTO.getTitle());
         item.setDescription(itemDTO.getDescription());
         item.setUnit(itemDTO.getUnit());
         item.setPricePerUnit(itemDTO.getPricePerUnit());
+
         if (itemDTO.getCategory() != null && !itemDTO.getCategory().equals(item.getCategory().getName())) {
             ItemCategoryResponseDTO categoryResponseDTO = categoryService.getCategoryByName(itemDTO.getCategory());
             ItemCategory category = new ItemCategory();
@@ -129,9 +132,8 @@ public class ItemServiceImpl implements ItemService {
         Item updatedItem = itemDb.save(item);
 
         return itemToItemResponseDTO(updatedItem);
-
-
     }
+
 
     @Override
     public Item getItemById(Long id) {
