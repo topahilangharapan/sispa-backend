@@ -15,6 +15,7 @@ public class AccountResponseDTO {
     private String no;
     private String bank;
     private double balance;
+    private double accountBalance;
     private double adminFee;
     private double interestRate;
 
