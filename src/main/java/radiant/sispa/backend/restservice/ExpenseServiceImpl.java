@@ -109,6 +109,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         List<CreateExpenseResponseDTO> responseList = new ArrayList<>();
         for (Expense expense : expenses) {
             CreateExpenseResponseDTO dto = new CreateExpenseResponseDTO();
+            dto.setId(expense.getId());
             dto.setAmount(expense.getAmount());
             dto.setAdmin(expense.isAdmin());
             dto.setDescription(expense.getDescription());
