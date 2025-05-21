@@ -149,8 +149,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public double getTotalBalance(Account account) {
-        ArrayList<Income> incomes = incomeDb.findByDeletedAtIsNull();
-        ArrayList<Expense> expenses = expenseDb.findByDeletedAtIsNull();
+        List<Income> incomes = account.getIncomes();
+        List<Expense> expenses = account.getExpenses();
 
         double totalBalance = 0;
 
