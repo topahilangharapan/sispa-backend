@@ -26,7 +26,7 @@ public class BackendApplication {
 
     @Bean
     @Transactional
-    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb, TransactionCategoryDb transactionCategoryDb, AccountDb accountDb, IncomeDb incomeDb) {
+    CommandLineRunner run(RoleDb roleDb, UserDb userDb, UserRestService userService, VendorDb vendorDb, ClientDb clientDb, WorkExperienceCategoryDb workExperienceCategoryDb, ItemCategoryDb itemCategoryDb, ItemStatusDb itemStatusDb, EducationLevelDb educationLevelDb, BankDb bankDb, TransactionCategoryDb transactionCategoryDb, AccountDb accountDb, IncomeDb incomeDb, ExpenseDb expenseDb) {
         return args -> {
             createRoleIfNotExists(roleDb, "ADMIN");
             createRoleIfNotExists(roleDb, "MANAJEMEN");
@@ -129,9 +129,9 @@ public class BackendApplication {
 
             for (int i = 0; i < random.nextInt(100, 1000); i++) {
                 if (i % 2 == 0) {
-                    createIncomeAtRandom(incomeDb, accountDb.findByNo("040504-MANDIRI").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
+                    createIncomeAndExpenseAtRandom(incomeDb, expenseDb,accountDb.findByNo("040504-MANDIRI").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
                 } else {
-                    createIncomeAtRandom(incomeDb, accountDb.findByNo("040504-BCA").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
+                    createIncomeAndExpenseAtRandom(incomeDb, expenseDb, accountDb.findByNo("040504-BCA").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
                 }
             }
         };
@@ -272,8 +272,9 @@ public class BackendApplication {
         accountDb.save(account);
     }
 
-    private void createIncomeAtRandom(IncomeDb incomeDb, Account account, TransactionCategory transactionCategory, Faker faker, Random random) {
+    private void createIncomeAndExpenseAtRandom(IncomeDb incomeDb, ExpenseDb expenseDb, Account account, TransactionCategory transactionCategory, Faker faker, Random random) {
         Income income = new Income();
+        Expense expense = new Expense();
 
         income.setId(UUID.randomUUID().toString() + "-FAKER");
         income.setCategory(transactionCategory);
@@ -290,5 +291,17 @@ public class BackendApplication {
 
         income.setCreatedAt(randomDate.toInstant());
         incomeDb.save(income);
+
+        expense.setId(UUID.randomUUID().toString() + "-FAKER");
+        expense.setCategory(transactionCategory);
+        expense.setAccount(account);
+        expense.setCreatedBy("hilangharapan");
+        expense.setAmount(random.nextDouble(1000, income.getAmount()));
+        expense.setAdmin(false);
+        expenseDb.save(expense);
+
+        expense.setCreatedAt(randomDate.toInstant());
+        expenseDb.save(expense);
     }
+
 }
