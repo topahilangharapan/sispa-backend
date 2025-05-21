@@ -13,10 +13,7 @@ import radiant.sispa.backend.repository.InvoiceDb;
 import radiant.sispa.backend.repository.PurchaseOrderDb;
 import radiant.sispa.backend.restdto.request.CreateIncomeRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.response.CreateIncomeResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
-import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
-import radiant.sispa.backend.restdto.response.PurchaseOrderItemResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
 import java.io.FileNotFoundException;
@@ -100,4 +97,44 @@ public class IncomeServiceImpl implements IncomeService {
 
         return String.format("I/%s/%s/%s/%s", last4Account, account.getBank().getName(), today, formattedCount);
     }
+
+    @Override
+    public List<CreateIncomeResponseDTO> getIncomeByAccount(Long accountId) {
+        List<Income> incomes = incomeDb.findByAccountId(accountId);
+        List<CreateIncomeResponseDTO> responseList = new ArrayList<>();
+        for (Income income : incomes) {
+            CreateIncomeResponseDTO dto = new CreateIncomeResponseDTO();
+            dto.setId(income.getId());
+            dto.setAmount(income.getAmount());
+            dto.setInterest(income.isInterest());
+            dto.setDescription(income.getDescription());
+            dto.setAccount(income.getAccount().getNo());
+            dto.setCategory(income.getCategory().getName());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneId.of("Asia/Jakarta"));
+            dto.setCreatedAt(formatter.format(income.getCreatedAt()));
+            responseList.add(dto);
+        }
+        return responseList;
+    }
+
+    @Override
+    public List<CreateIncomeResponseDTO> getAllIncome() {
+        List<Income> incomes = incomeDb.findAllByDeletedAtIsNull();
+
+        List<CreateIncomeResponseDTO> result = new ArrayList<>();
+        for (Income income : incomes) {
+            CreateIncomeResponseDTO dto = new CreateIncomeResponseDTO();
+            dto.setId(income.getId());
+            dto.setAmount(income.getAmount());
+            dto.setInterest(income.isInterest());
+            dto.setDescription(income.getDescription());
+            dto.setAccount(income.getAccount().getNo());
+            dto.setCategory(income.getCategory().getName());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneId.of("Asia/Jakarta"));
+            dto.setCreatedAt(formatter.format(income.getCreatedAt()));
+            result.add(dto);
+        }
+        return result;
+    }
+
 }

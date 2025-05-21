@@ -11,4 +11,5 @@ import radiant.sispa.backend.restdto.response.CreateIncomeResponseDTO;
 public interface ExpenseService {
     CreateExpenseResponseDTO addExpense(CreateExpenseRequestDTO requestDTO, String authHeader);
     List<CreateExpenseResponseDTO> getExpensesByAccount(Long accountId);
+    List<CreateExpenseResponseDTO> getAllExpense();
 }
