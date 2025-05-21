@@ -296,7 +296,7 @@ public class BackendApplication {
         expense.setCategory(transactionCategory);
         expense.setAccount(account);
         expense.setCreatedBy("hilangharapan");
-        expense.setAmount(random.nextDouble(1000, income.getAmount()));
+        expense.setAmount(random.nextDouble(1000, income.getAmount()) * -1);
         expense.setAdmin(false);
         expenseDb.save(expense);
 
