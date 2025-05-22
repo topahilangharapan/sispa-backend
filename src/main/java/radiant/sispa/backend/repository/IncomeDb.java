@@ -25,7 +25,7 @@ public interface IncomeDb extends JpaRepository<Income, String> {
 
     ArrayList<Income> findByAccountAndDeletedAtIsNull(Account account);
 
-    ArrayList<Income> findByAccountId(Long accountId);
+    ArrayList<Income> findByAccountIdAndDeletedAtIsNull(Long accountId);
 
     ArrayList<Income> findAllByDeletedAtIsNull();
 }

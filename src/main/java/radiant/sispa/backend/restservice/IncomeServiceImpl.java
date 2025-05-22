@@ -100,7 +100,7 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     public List<CreateIncomeResponseDTO> getIncomeByAccount(Long accountId) {
-        List<Income> incomes = incomeDb.findByAccountId(accountId);
+        List<Income> incomes = incomeDb.findByAccountIdAndDeletedAtIsNull(accountId);
         List<CreateIncomeResponseDTO> responseList = new ArrayList<>();
         for (Income income : incomes) {
             CreateIncomeResponseDTO dto = new CreateIncomeResponseDTO();
