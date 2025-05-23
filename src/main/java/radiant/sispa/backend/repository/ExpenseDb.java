@@ -21,8 +21,8 @@ public interface ExpenseDb extends JpaRepository<Expense, String> {
 
     ArrayList<Expense> findByDeletedAtIsNull();
     Optional<Expense> findTopByAccountAndDeletedAtIsNullOrderByCreatedAtDesc(Account account);
-    List<Expense> findByAccountIdAndDeletedAtIsNull(Long accountId);
+    List<Expense> findByAccountIdAndDeletedAtIsNullOrderByTransactionDateDesc(Long accountId);
 
     ArrayList<Expense> findByAccountAndDeletedAtIsNull(Account account);
-    ArrayList<Expense> findAllByDeletedAtIsNull();
+    ArrayList<Expense> findAllByDeletedAtIsNullOrderByTransactionDateDesc();
 }
