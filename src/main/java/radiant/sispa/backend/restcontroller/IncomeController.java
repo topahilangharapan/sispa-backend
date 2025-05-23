@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import radiant.sispa.backend.model.Income;
 import radiant.sispa.backend.restdto.request.CreateIncomeRequestDTO;
 import radiant.sispa.backend.restdto.request.CreateInvoiceRequestDTO;
-import radiant.sispa.backend.restdto.response.BaseResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateIncomeResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateInvoiceResponseDTO;
-import radiant.sispa.backend.restdto.response.InvoiceResponseDTO;
+import radiant.sispa.backend.restdto.response.*;
 import radiant.sispa.backend.restservice.IncomeService;
 import radiant.sispa.backend.restservice.InvoiceService;
 
@@ -32,6 +29,25 @@ public class IncomeController {
 
     @Autowired
     private IncomeService incomeService;
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllIncome() {
+        var baseResponseDTO = new BaseResponseDTO<List<CreateIncomeResponseDTO>>();
+        try {
+            List<CreateIncomeResponseDTO> allIncomes = incomeService.getAllIncome();
+
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(allIncomes);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("List of incomes retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve income list!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PostMapping("/add")
     public ResponseEntity<?> addIncome(
@@ -73,6 +89,29 @@ public class IncomeController {
             baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage("Gagal mencatat Income!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/by-account/{accountId}")
+    public ResponseEntity<?> getIncomesByAccount(
+            @PathVariable Long accountId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        var baseResponseDTO = new BaseResponseDTO<List<CreateIncomeResponseDTO>>();
+
+        try {
+            List<CreateIncomeResponseDTO> incomes = incomeService.getIncomeByAccount(accountId);
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(incomes);
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Incomes retrieved!");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage("Failed to retrieve incomes!");
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

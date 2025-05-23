@@ -1,5 +1,6 @@
 package radiant.sispa.backend.repository;
 
+import java.lang.reflect.Array;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +24,8 @@ public interface IncomeDb extends JpaRepository<Income, String> {
     Optional<Income> findTopByAccountAndDeletedAtIsNullOrderByCreatedAtDesc(Account account);
 
     ArrayList<Income> findByAccountAndDeletedAtIsNull(Account account);
+
+    ArrayList<Income> findByAccountIdAndDeletedAtIsNull(Long accountId);
+
+    ArrayList<Income> findAllByDeletedAtIsNull();
 }

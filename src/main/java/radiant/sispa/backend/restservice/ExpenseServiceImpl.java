@@ -125,4 +125,24 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
         return responseList;
     }
+
+    @Override
+    public List<CreateExpenseResponseDTO> getAllExpense() {
+        List<Expense> expenses = expenseDb.findAllByDeletedAtIsNull();
+
+        List<CreateExpenseResponseDTO> result = new ArrayList<>();
+        for (Expense expense : expenses) {
+            CreateExpenseResponseDTO dto = new CreateExpenseResponseDTO();
+            dto.setId(expense.getId());
+            dto.setAmount(expense.getAmount());
+            dto.setAdmin(expense.isAdmin());
+            dto.setDescription(expense.getDescription());
+            dto.setAccount(expense.getAccount().getNo());
+            dto.setCategory(expense.getCategory().getName());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneId.of("Asia/Jakarta"));
+            dto.setCreatedAt(formatter.format(expense.getCreatedAt()));
+            result.add(dto);
+        }
+        return result;
+    }
 }
