@@ -12,4 +12,5 @@ public class CreateTransactionRequestDTO {
     private String description;
     private String account;
     private String category;
+    private String transactionDate;
 }

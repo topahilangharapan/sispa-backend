@@ -66,6 +66,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         newExpense.setId(generateExpenseId(account));
         newExpense.setAmount(requestDTO.getAmount() * -1);
+        newExpense.setTransactionDate(LocalDate.parse(requestDTO.getTransactionDate()));
         newExpense.setCreatedBy(createdBy);
         newExpense.setCategory(transactionCategory);
         newExpense.setAccount(account);
@@ -78,12 +79,11 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         createExpenseResponseDTO.setId(expense.getId());
         createExpenseResponseDTO.setAmount(expense.getAmount() * -1);
+        createExpenseResponseDTO.setTransactionDate(expense.getTransactionDate().toString());
         createExpenseResponseDTO.setAdmin(expense.isAdmin());
         createExpenseResponseDTO.setDescription(expense.getDescription());
         createExpenseResponseDTO.setAccount(expense.getAccount().getNo());
         createExpenseResponseDTO.setCategory(expense.getCategory().getName());
-
-        System.out.println(expense.getAmount());
 
         return createExpenseResponseDTO;
     }

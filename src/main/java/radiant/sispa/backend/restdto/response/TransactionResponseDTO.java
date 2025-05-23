@@ -14,6 +14,7 @@ public class TransactionResponseDTO {
     private String id;
     private Double amount;
     private String description;
+    private String transactionDate;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
