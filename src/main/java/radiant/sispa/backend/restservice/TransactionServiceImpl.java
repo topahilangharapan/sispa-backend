@@ -69,6 +69,7 @@ public class TransactionServiceImpl implements TransactionService {
         transactionResponseDTO.setId(transaction.getId());
         transactionResponseDTO.setAmount(transaction.getAmount());
         transactionResponseDTO.setDescription(transaction.getDescription());
+        transactionResponseDTO.setTransactionDate(transaction.getTransactionDate().toString());
         transactionResponseDTO.setCreatedBy(transaction.getCreatedBy());
         transactionResponseDTO.setCreatedAt(transaction.getCreatedAt());
         transactionResponseDTO.setUpdatedBy(transaction.getUpdatedBy());
