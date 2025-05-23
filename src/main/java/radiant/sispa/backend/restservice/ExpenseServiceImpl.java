@@ -108,7 +108,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<CreateExpenseResponseDTO> getExpensesByAccount(Long accountId) {
-        List<Expense> expenses = expenseDb.findByAccountIdAndDeletedAtIsNull(accountId);
+        List<Expense> expenses = expenseDb.findByAccountIdAndDeletedAtIsNullOrderByTransactionDateDesc(accountId);
         List<CreateExpenseResponseDTO> responseList = new ArrayList<>();
         for (Expense expense : expenses) {
             CreateExpenseResponseDTO dto = new CreateExpenseResponseDTO();
@@ -120,6 +120,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             dto.setCategory(expense.getCategory().getName());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneId.of("Asia/Jakarta"));
             dto.setCreatedAt(formatter.format(expense.getCreatedAt()));
+            dto.setTransactionDate(expense.getTransactionDate().toString());
             // Add other fields as needed
             responseList.add(dto);
         }
@@ -128,7 +129,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<CreateExpenseResponseDTO> getAllExpense() {
-        List<Expense> expenses = expenseDb.findAllByDeletedAtIsNull();
+        List<Expense> expenses = expenseDb.findAllByDeletedAtIsNullOrderByTransactionDateDesc();
 
         List<CreateExpenseResponseDTO> result = new ArrayList<>();
         for (Expense expense : expenses) {
@@ -141,6 +142,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             dto.setCategory(expense.getCategory().getName());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneId.of("Asia/Jakarta"));
             dto.setCreatedAt(formatter.format(expense.getCreatedAt()));
+            dto.setTransactionDate(expense.getTransactionDate().toString());
             result.add(dto);
         }
         return result;

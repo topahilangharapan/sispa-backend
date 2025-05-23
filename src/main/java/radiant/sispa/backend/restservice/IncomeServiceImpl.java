@@ -102,7 +102,7 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     public List<CreateIncomeResponseDTO> getIncomeByAccount(Long accountId) {
-        List<Income> incomes = incomeDb.findByAccountIdAndDeletedAtIsNull(accountId);
+        List<Income> incomes = incomeDb.findByAccountIdAndDeletedAtIsNullOrderByTransactionDateDesc(accountId);
         List<CreateIncomeResponseDTO> responseList = new ArrayList<>();
         for (Income income : incomes) {
             CreateIncomeResponseDTO dto = new CreateIncomeResponseDTO();
@@ -113,6 +113,7 @@ public class IncomeServiceImpl implements IncomeService {
             dto.setAccount(income.getAccount().getNo());
             dto.setCategory(income.getCategory().getName());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneId.of("Asia/Jakarta"));
+            dto.setTransactionDate(income.getTransactionDate().toString());
             dto.setCreatedAt(formatter.format(income.getCreatedAt()));
             responseList.add(dto);
         }
@@ -121,7 +122,7 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     public List<CreateIncomeResponseDTO> getAllIncome() {
-        List<Income> incomes = incomeDb.findAllByDeletedAtIsNull();
+        List<Income> incomes = incomeDb.findAllByDeletedAtIsNullOrderByTransactionDateDesc();
 
         List<CreateIncomeResponseDTO> result = new ArrayList<>();
         for (Income income : incomes) {
@@ -133,6 +134,7 @@ public class IncomeServiceImpl implements IncomeService {
             dto.setAccount(income.getAccount().getNo());
             dto.setCategory(income.getCategory().getName());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneId.of("Asia/Jakarta"));
+            dto.setTransactionDate(income.getTransactionDate().toString());
             dto.setCreatedAt(formatter.format(income.getCreatedAt()));
             result.add(dto);
         }
