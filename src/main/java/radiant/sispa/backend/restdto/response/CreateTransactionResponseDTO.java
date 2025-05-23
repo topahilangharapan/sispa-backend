@@ -13,6 +13,7 @@ public class CreateTransactionResponseDTO {
     private String id;
     private double amount;
     private String description;
+    private String transactionDate;
     private String account;
     private String category;
     private String createdAt;
