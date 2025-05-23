@@ -168,7 +168,7 @@ public class TransactionServiceImpl implements TransactionService {
             for (Income income : incomes) {
                 CashFlowChartResponseDTO responseDTO = new CashFlowChartResponseDTO();
 
-                LocalDateTime dateTime = LocalDateTime.ofInstant(income.getCreatedAt(), ZoneId.systemDefault());
+                LocalDateTime dateTime = income.getTransactionDate().atStartOfDay();
 
                 int year = dateTime.getYear();
                 int month = dateTime.getMonthValue();
@@ -186,7 +186,7 @@ public class TransactionServiceImpl implements TransactionService {
             for (Expense expense : expenses) {
                 CashFlowChartResponseDTO responseDTO = new CashFlowChartResponseDTO();
 
-                LocalDateTime dateTime = LocalDateTime.ofInstant(expense.getCreatedAt(), ZoneId.systemDefault());
+                LocalDateTime dateTime = expense.getTransactionDate().atStartOfDay();
 
                 int year = dateTime.getYear();
                 int month = dateTime.getMonthValue();

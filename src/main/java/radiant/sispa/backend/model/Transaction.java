@@ -12,6 +12,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -27,8 +29,11 @@ public abstract class Transaction implements Serializable {
     @Column(name = "description")
     protected String description;
 
+    @Column(name = "transaction_date", nullable = false)
+    protected LocalDate transactionDate;
+
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     protected Instant createdAt;
 
     @NotNull

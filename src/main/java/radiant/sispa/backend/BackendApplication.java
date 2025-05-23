@@ -12,10 +12,12 @@ import radiant.sispa.backend.restservice.UserRestService;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootApplication
 public class BackendApplication {
@@ -121,17 +123,17 @@ public class BackendApplication {
             createTransactionCategoryIfNotExists(transactionCategoryDb, "ADMINISTRASI BANK");
             createTransactionCategoryIfNotExists(transactionCategoryDb, "LAIN-LAIN");
 
-            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("MANDIRI").orElse(null), "040504-MANDIRI");
-            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("BCA").orElse(null), "040504-BCA");
+            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("MANDIRI").orElse(null), "04050401");
+            createAccountIfNotExists(accountDb, "hilangharapan", bankDb.findByName("BCA").orElse(null), "04050402");
 
             Faker faker = new Faker();
             Random random = new Random();
 
             for (int i = 0; i < random.nextInt(100, 1000); i++) {
                 if (i % 2 == 0) {
-                    createIncomeAndExpenseAtRandom(incomeDb, expenseDb,accountDb.findByNo("040504-MANDIRI").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
+                    createIncomeAndExpenseAtRandom(incomeDb, expenseDb,accountDb.findByNo("04050401").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
                 } else {
-                    createIncomeAndExpenseAtRandom(incomeDb, expenseDb, accountDb.findByNo("040504-BCA").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
+                    createIncomeAndExpenseAtRandom(incomeDb, expenseDb, accountDb.findByNo("04050402").orElse(null), transactionCategoryDb.findByName("LAIN-LAIN").orElse(null),faker, random);
                 }
             }
         };
@@ -273,6 +275,12 @@ public class BackendApplication {
     }
 
     private void createIncomeAndExpenseAtRandom(IncomeDb incomeDb, ExpenseDb expenseDb, Account account, TransactionCategory transactionCategory, Faker faker, Random random) {
+        LocalDate start = LocalDate.of(2004, 1, 1);
+        LocalDate end = LocalDate.of(2024, 12, 31);
+        long days = ChronoUnit.DAYS.between(start, end);
+        long randomDays = ThreadLocalRandom.current().nextLong(days + 1);
+        LocalDate randomDate = start.plusDays(randomDays);
+
         Income income = new Income();
         Expense expense = new Expense();
 
@@ -282,15 +290,9 @@ public class BackendApplication {
         income.setCreatedBy("hilangharapan");
         income.setAmount(random.nextDouble(1000, 1000000000));
         income.setInterest(false);
+        income.setTransactionDate(randomDate);
         incomeDb.save(income);
 
-        Date randomDate = faker.date().between(
-                Date.from(LocalDate.of(2004, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                Date.from(LocalDate.of(2024, 12, 31).atStartOfDay(ZoneId.systemDefault()).toInstant())
-        );
-
-        income.setCreatedAt(randomDate.toInstant());
-        incomeDb.save(income);
 
         expense.setId(UUID.randomUUID().toString() + "-FAKER");
         expense.setCategory(transactionCategory);
@@ -298,9 +300,7 @@ public class BackendApplication {
         expense.setCreatedBy("hilangharapan");
         expense.setAmount(random.nextDouble(1000, income.getAmount()) * -1);
         expense.setAdmin(false);
-        expenseDb.save(expense);
-
-        expense.setCreatedAt(randomDate.toInstant());
+        expense.setTransactionDate(randomDate);
         expenseDb.save(expense);
     }
 

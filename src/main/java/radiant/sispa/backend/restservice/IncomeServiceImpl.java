@@ -63,6 +63,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         newIncome.setId(generateIncomeId(account));
         newIncome.setAmount(requestDTO.getAmount());
+        newIncome.setTransactionDate(LocalDate.parse(requestDTO.getTransactionDate()));
         newIncome.setCreatedBy(createdBy);
         newIncome.setCategory(transactionCategory);
         newIncome.setAccount(account);
@@ -75,6 +76,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         createIncomeResponseDTO.setId(income.getId());
         createIncomeResponseDTO.setAmount(income.getAmount());
+        createIncomeResponseDTO.setTransactionDate(income.getTransactionDate().toString());
         createIncomeResponseDTO.setInterest(income.isInterest());
         createIncomeResponseDTO.setDescription(income.getDescription());
         createIncomeResponseDTO.setAccount(income.getAccount().getNo());
