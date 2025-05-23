@@ -85,8 +85,6 @@ public class ExpenseServiceImpl implements ExpenseService {
         createExpenseResponseDTO.setAccount(expense.getAccount().getNo());
         createExpenseResponseDTO.setCategory(expense.getCategory().getName());
 
-        System.out.println(expense.getAmount());
-
         return createExpenseResponseDTO;
     }
 
