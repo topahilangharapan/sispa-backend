@@ -107,7 +107,6 @@ public class BackendApplication {
 
             createBankIfNotExists(bankDb, "MANDIRI", 0.2, 5000);
             createBankIfNotExists(bankDb, "BCA", 0.2, 10000);
-            createBankIfNotExists(bankDb, "BSI", 0.125, 2500);
 
             createTransactionCategoryIfNotExists(transactionCategoryDb, "PENDAPATAN KLIEN");
             createTransactionCategoryIfNotExists(transactionCategoryDb, "BIAYA VENUE");
