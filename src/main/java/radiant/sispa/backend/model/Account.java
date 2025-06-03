@@ -2,15 +2,13 @@ package radiant.sispa.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -64,11 +62,13 @@ public class Account implements Serializable {
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Where(clause = "deleted_at IS NULL")
     @JsonIgnore
     private List<Expense> expenses;
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Where(clause = "deleted_at IS NULL")
     @JsonIgnore
     private List<Income> incomes;
 }
