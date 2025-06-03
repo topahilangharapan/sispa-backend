@@ -20,7 +20,31 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 100MB
-manpromanpro:
+sispa:
   app:
     jwtSecret: "${JWT_SECRET_KEY}"
     jwtExpirationMs: 86400000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
