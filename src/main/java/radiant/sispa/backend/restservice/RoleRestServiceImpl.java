@@ -1,14 +1,13 @@
 package radiant.sispa.backend.restservice;
 
 import jakarta.persistence.EntityExistsException;
-import org.apache.coyote.BadRequestException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import radiant.sispa.backend.model.Role;
 import radiant.sispa.backend.repository.RoleDb;
-import radiant.sispa.backend.restdto.request.CreateRoleRequestDTO;
-import radiant.sispa.backend.restdto.response.CreateRoleResponseDTO;
-import radiant.sispa.backend.restdto.response.CreateUserResponseDTO;
+import radiant.sispa.backend.restdto.request.CreateGenericDataRequestDTO;
+import radiant.sispa.backend.restdto.response.CreateGenericDataResponseDTO;
 import radiant.sispa.backend.restdto.response.GenericDataDTO;
 import radiant.sispa.backend.security.jwt.JwtUtils;
 
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class RoleRestServiceImpl implements RoleRestService {
     @Autowired
     private RoleDb roleDb;
@@ -41,7 +41,7 @@ public class RoleRestServiceImpl implements RoleRestService {
     }
 
     @Override
-    public CreateRoleResponseDTO addRole(CreateRoleRequestDTO requestDTO, String authHeader) throws EntityExistsException {
+    public CreateGenericDataResponseDTO addRole(CreateGenericDataRequestDTO requestDTO, String authHeader) throws EntityExistsException {
         String token = authHeader.substring(7);
         String createdBy = jwtUtils.getUserNameFromJwtToken(token);
 
@@ -55,7 +55,7 @@ public class RoleRestServiceImpl implements RoleRestService {
         role.setCreatedBy(createdBy);
         roleDb.save(role);
 
-        CreateRoleResponseDTO responseDTO = new CreateRoleResponseDTO();
+        CreateGenericDataResponseDTO responseDTO = new CreateGenericDataResponseDTO();
         responseDTO.setId(role.getId());
         responseDTO.setName(role.getRole());
 

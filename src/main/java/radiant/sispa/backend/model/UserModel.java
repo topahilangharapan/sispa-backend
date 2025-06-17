@@ -23,6 +23,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_model")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class UserModel implements Serializable {
     @Id
     @GeneratedValue(generator = "system-uuid")

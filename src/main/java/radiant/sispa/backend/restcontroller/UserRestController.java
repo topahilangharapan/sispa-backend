@@ -16,7 +16,6 @@ import radiant.sispa.backend.restservice.UserRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.Date;

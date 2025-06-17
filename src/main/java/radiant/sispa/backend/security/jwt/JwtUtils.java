@@ -23,10 +23,10 @@ import java.util.Map;
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${manpromanpro.app.jwtSecret}")
+    @Value("${sispa.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${manpromanpro.app.jwtExpirationMs}")
+    @Value("${sispa.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
     @Autowired

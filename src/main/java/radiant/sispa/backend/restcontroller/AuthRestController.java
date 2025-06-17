@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,6 +58,11 @@ public class AuthRestController {
             baseResponseDTO.setTimestamp(new Date());
             baseResponseDTO.setMessage(String.format("Login Successful!"));
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (BadCredentialsException e) {
+            baseResponseDTO.setStatus(HttpStatus.UNAUTHORIZED.value());
+            baseResponseDTO.setTimestamp(new Date());
+            baseResponseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             baseResponseDTO.setStatus(HttpStatus.UNAUTHORIZED.value());
             baseResponseDTO.setTimestamp(new Date());
